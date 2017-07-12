@@ -138,5 +138,34 @@ The momentum vairables at the end of this $L$-step trajectory are then negated, 
 \min[1, \exp(-H(q^{*}, p^{*}) + H(p,q)] = \min[1, \exp(-U(q^{*}) + U(q) - K(p^{*}) + K(p))]
 \end{equation} 
 If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
-The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.
+The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.\label{key}
+
+\begin{algorithm}
+	\caption{Hamiltonian Monte Carlo MCMC}
+	\begin{algorithmic}[1]
+	\Procedure{HMC}{$U$, $\nabla U$, $\epsilon$, $L$, $q_{current}$}
+		\State $ q \gets q_{current}$
+		\State $ p \sim \mathcal{N}(len(q),0,1)$
+		\State $ p_{current} \gets p$
+		\State $ p \gets p - \frac{\epsilon}{2}\nabla U(q)$ \Comment{make half step for momentum} 
+		\For{$i \text{ in } 1:L$}
+		\State $q \gets q + epsilon * p$ \Comment{make full step for the position} 
+		\If{$i != L$}
+		\State $p \gets p- \epsilon \nabla U(q)$
+		\EndIf
+		\EndFor
+		\State $p - \frac{\epsilon}{2}\nabla U(q)$ \Comment{Half step for momentum}
+		\State $p \gets - p$ \Comment{Ensuring symmetry of Metropolis proposal}
+		\State $U_{current} \gets U(q_{current})$
+		\State $U_{proposed} \gets U(q)$
+		\State $K_{current} \gets \frac{1}{2} p_{current} \cdot p_{current} $
+		\State $K_{proposed} \gets \frac{1}{2} p \cdot p$
+		\State $ u \sim Uniform(0,1)$
+		\If{$u < exp(U_{current} - U_{proposed} + K_{current} - K_{proposed})$}
+		\State $q \gets q$ \Comment{Accept}
+		\Else
+		\State $q_{current} \gets q_{current}$ \Comment{Reject}
+		\EndIf
+	\end{algorithmic} 
+\end{algorithm}
 \end{document} 
