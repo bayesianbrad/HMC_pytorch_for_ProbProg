@@ -138,5 +138,5 @@ The momentum vairables at the end of this $L$-step trajectory are then negated, 
 \min[1, \exp(-H(q^{*}, p^{*}) + H(p,q)] = \min[1, \exp(-U(q^{*}) + U(q) - K(p^{*}) + K(p))]
 \end{equation} 
 If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
-
+The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.
 \end{document} 
