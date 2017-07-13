@@ -3,22 +3,22 @@ rand('seed',12345);
 randn('seed',12345);
  
 % STEP SIZE
-epsilon = 0.3;
+epsilon = 0.18;
 nSamples = 1000;
 L = 20;
  
 % DEFINE POTENTIAL ENERGY FUNCTION
-U = inline('transp(q)*inv([1,.95;.95,1])*q','q');
+U = inline('transp(q)*inv([1,.98;.98,1])*q','q');
  
 % DEFINE GRADIENT OF POTENTIAL ENERGY
-dU = inline('transp(q)*inv([1,.95;.95,1])','q');
+dU = inline('transp(q)*inv([1,.98;.98,1])','q');
  
 % DEFINE KINETIC ENERGY FUNCTION
 K = inline('sum((transp(p)*p))/2','p');
  
 % INITIAL STATE
 q = zeros(2,nSamples);
-q0 = [0;6];
+q0 = [-1.5;-1.55];
 q(:,1) = q0;
  
 t = 1;
