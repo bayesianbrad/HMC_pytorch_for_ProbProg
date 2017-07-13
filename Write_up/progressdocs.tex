@@ -11,13 +11,15 @@
 \usepackage{microtype}      % microtypography
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
 %\usepackage{subfigure}
 %%\usepackage{tikz}
 %\usepackage{algorithm}
 \usepackage{algpseudocode}
 %\usepackage{graphicx}
 %\usepackage{subfig}
-\usepackage{pythonhighlight}
+\usepackage{minted}
 
 % Title Page
 \title{Hamiltonian Monte Carlo}
@@ -178,6 +180,7 @@ A function that implements a single iteration of the HMC algorithm is given in a
 We need to select suitable parameters $\epsilon$ and $L$, which together determine the length of the trajectory in fictitious time $\epsilon L$  
 
 \section{Automatic Differentiation in Pytorch}
-To use autodiff in pytorch we make use of the 
+To use autodiff in pytorch we make use of the \begin{minted}{python}import autograd
+\close{minted}
 
 \end{document} 
