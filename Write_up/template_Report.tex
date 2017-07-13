@@ -106,7 +106,7 @@ We start with a state at $t = 0$ and then evaluate at a subsequent time $t + \ep
 
 \begin{align}
 p_{i}(t + \frac{\epsilon}{2}) &= p_{i}(t) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(q(t))}{\partial q_{i}} \\
-q_{i}(t + \epsilon) &= q_{i}(t) + \epsilon\frac{\partial K(p + \frac{\epsilon}{2})}{dp_{i}}\\
+q_{i}(t + \epsilon) &= q_{i}(t) + \epsilon\frac{\partial K(p(t + \frac{\epsilon}{2}))}{dp_{i}}\\
 p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U}{\partial q_{i}}\\
 \end{align}
 \footnote{For the usual choice of kinetic energy, we have $\frac{\partial K(p + \frac{\epsilon}{2})}{dp_{i}} = \frac{p_{i}(t + \frac{\epsilon}{2})}{m_{i}}$}
@@ -141,20 +141,21 @@ If the proposed state is rejected, then the next state is the same as the curren
 The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.\label{key}
 
 \begin{algorithm}
-	\caption{Hamiltonian Monte Carlo MCMC}
+	\label{alg:simpHMC}
+	\caption{Simple Hamiltonian Monte Carlo MCMC}
 	\begin{algorithmic}[1]
-	\Procedure{HMC}{$U$, $\nabla U$, $\epsilon$, $L$, $q_{current}$}
+	\Procedure{HMC single iteration}{$\epsilon$, $L$, $q_{current}$}
 		\State $ q \gets q_{current}$
 		\State $ p \sim \mathcal{N}(len(q),0,1)$
 		\State $ p_{current} \gets p$
-		\State $ p \gets p - \frac{\epsilon}{2}\nabla U(q)$ \Comment{make half step for momentum} 
+		\State $ p \gets p - \frac{\epsilon}{2}\nabla_{q} U(q)$ \Comment{make half step for momentum} 
 		\For{$i \text{ in } 1:L$}
-		\State $q \gets q + epsilon * p$ \Comment{make full step for the position} 
+		\State $q \gets q + epsilon * \nabla_{p} K (p(t + \frac{\epsilon}{2}))$ \Comment{make full step for the position} 
 		\If{$i != L$}
-		\State $p \gets p- \epsilon \nabla U(q)$
+		\State $p \gets p- \epsilon \nabla_{q} U(q)$
 		\EndIf
 		\EndFor
-		\State $p - \frac{\epsilon}{2}\nabla U(q)$ \Comment{Half step for momentum}
+		\State $p - \frac{\epsilon}{2}\nabla_{q} U(q)$ \Comment{Half step for momentum}
 		\State $p \gets - p$ \Comment{Ensuring symmetry of Metropolis proposal}
 		\State $U_{current} \gets U(q_{current})$
 		\State $U_{proposed} \gets U(q)$
@@ -162,10 +163,11 @@ The negation of the momentum variables at the end of the trajectory makes the Me
 		\State $K_{proposed} \gets \frac{1}{2} p \cdot p$
 		\State $ u \sim Uniform(0,1)$
 		\If{$u < exp(U_{current} - U_{proposed} + K_{current} - K_{proposed})$}
-		\State $q \gets q$ \Comment{Accept}
+		\State $\text{return } q \gets q$ \Comment{Accept}
 		\Else
-		\State $q_{current} \gets q_{current}$ \Comment{Reject}
+		\State $\text{return } q_{current} \gets q_{current}$ \Comment{Reject}
 		\EndIf
 	\end{algorithmic} 
 \end{algorithm}
+A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $q$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $q$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $q_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
 \end{document} 
