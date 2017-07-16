@@ -19,8 +19,8 @@
 \usepackage{algpseudocode}
 %\usepackage{graphicx}
 %\usepackage{subfig}
-\usepackage{minted}
-
+\newcommand{\tif}{\textit}
+\newcommand{\tbf}{\textbf}
 % Title Page
 \title{Hamiltonian Monte Carlo}
 \author{Bradley Gram-Hansen}
@@ -29,13 +29,10 @@
 \begin{document}
 \maketitle
 
-\begin{abstract}
-	These are note on aspects of Hamiltonian monte carlo methods.]
-\end{abstract}
 
+\section{Intro to HMC MCMC}
 
-\section{Radford Neals intro to HMC MCMC}
-
+Following Neal 2011 Chapter 5 Handbook of MCMCM
 \subsection{Metropolis-hastings algorithm}
 The Metropolis hastings algorithm is the work horse of Monte Carlo Markov Chain (MCMC) methods, It relies on a simple reject and accept criteria for determining whether or not we should proceed to some next state. If our state is accepted, but does not satisfy the full criteria then a probability is associated with that state, and if that probability exceeds the one sampled from a given cut off, usually determined by sampling from a uniform distribution then it is accepted, else rejected. 
 
@@ -135,9 +132,7 @@ $
 Both steps leave the canonical distribution of (q,p) invariant, hence the distribution remains invariant.
 
 In \textbf{Step 1} we first draw the $p_{i}$ randomly from their Gaussian distribution independently of the current values of the position values. 
-
-next, in \textbf{Step 2} a Metropolis update is performed, using the Hamiltonian dynamics to propose a new state. Starting with the current state $(q,p)$, Hamiltonian dynamics is simulated for $L$ steps using the leapfrog method, with a stepsize of $\epsilon$. $L$ and $\epsilon$ are parameters of the mnodel that need to be tuned. 
-
+In \textbf{Step 2} a Metropolis update is performed, using the Hamiltonian dynamics to propose a new state. Starting with the current state $(q,p)$, Hamiltonian dynamics is simulated for $L$ steps using the leapfrog method, with a stepsize of $\epsilon$. $L$ and $\epsilon$ are parameters of the mnodel that need to be tuned.\\
 The momentum vairables at the end of this $L$-step trajectory are then negated, giving s proposed state $(q^{*}. p^{*})$. This proposed state is accepted as the next state in the Markov Chain with probability: \begin{equation}
 \min[1, \exp(-H(q^{*}, p^{*}) + H(p,q)] = \min[1, \exp(-U(q^{*}) + U(q) - K(p^{*}) + K(p))]
 \end{equation} 
@@ -179,8 +174,64 @@ A function that implements a single iteration of the HMC algorithm is given in a
 
 We need to select suitable parameters $\epsilon$ and $L$, which together determine the length of the trajectory in fictitious time $\epsilon L$  
 
-\section{Automatic Differentiation in Pytorch}
-To use autodiff in pytorch we make use of the \begin{minted}{python}import autograd
-\close{minted}
+\section{Automatic differentiation AD}
+Automatic differentiation is quite different from both Numerical and Analytical differentiation. It is, in a very loose sense a hybrid of the two, that is optimal for computational performance. It works by systematically applying the chain rule of differential calculus at the elementary operator level, enabling us to generate numerical derivative evaluations through the accumulation of values.   
+This “interleaving” idea forms the basis of AD and provides an account of
+its simplest form: apply symbolic differentiation at the elementary operation
+level and keep intermediate numerical results, in lockstep with the evaluation
+of the main function. This is AD in the forward accumulation mode
+
+\subsection{Automatic Differentiation in Pytorch}
+To use autodiff in pytorch we make use of the \textit{autograd} package. it provides automatic differentiation for all operations on tensors. It is a \textbf{define-by-run framework}, which means brackprop is defined by how your code is run and that every single iteration \textbf{can be} different. 
+
+\subsubsection{Variable}
+
+\textit{autograd.Variable} is the central class of the package. Once you finish your call \textit{.backward()} and have all the gradients computed automatically. You can access the raw tensor through the \textit{.data} attribute, while the gradient w.r.t to that variable is accumulated in \textit{.grad}. 
+Another important class is \textit{autograd.Function}, which is interconnected with \textit{Variable}. Together they build an \textbf{acyclic} that encodes the complete history of the computation. Each variable has a \textit{.creator} attribute that references a \textit{Function} that has created the \textit{Variable}.  
+\begin{figure}[!]
+\centering
+\includegraphics{../Pytorch_learning/autograd}\caption{Variable}
+\end{figure}
+
+\subsubsection{Gradients}
+
+To calculate \textbf{gradients} from our \textit{Variable} object we apply the method \textit{<newVariable>.backward()} (where \textit{newVariable} is created from the original variable) and then extract the attribute \textit{<Variable>.grad} from the original variable. We are interested in the relation between the \textit{newVariable} and the \textit{Variable} as composition of functions, and the gradients of those functions evaluated at the a particular point. 
+
+
+\subsection{Neural Networks in Torch}
+
+Using the \textit{torch.nn} package, we can develop a NN. The \textit{torch.nn} package is dependent upon the \textit{autograd} package, to define models and differentiate them.  The \tif{nn.Module} contains layers and a method \tif{.forward(input)} returns the \tif{.output}. 
+
+\subsubsection{Training Procedure}
+\begin{enumerate}
+	\item Define the NN that has some learnable parameters (or weights) 
+	\item Iterate over a dataset of inputs
+	\item Process input through the network
+	\item Compute the loss ( how far is the output from being corrected)
+	\item Propagate gradients back into the network's parameters
+	\item Update the weights of the network, using a update rule
+\end{enumerate} 
+
+A simple update rule might be of the form: $weight = weight - learningRate \times gradient$. When using PyTorch, you always have to define the \tif{forward} function, but once that is done, PyTorch, using \tif{autograd}, will automatically define the \tif{backward} function.  The learnable parameters of the model can be recalled by using \textit{<class\_name\_for\_nn>.parameters()}. See \tbf{blitztor.py} for more details.\\
+
+\tbf{Important note: } \tif{torch.nn} only supports mini-batches, the entire \tif{torch.nn} package only supports inputs that are a mini-batch of samples and not a single sample.\\
+
+To load data in to pytorch, we load data in via an nparray and convert this array into a \textit{torch.*Tensor}.
+For loading audio, use scipy and librosa. For loading text either raw Python an Cython based loading, ir NLTK and SpaCy. For vision Pytorch has the \tif{torchvision} package.  
+  
+ 
+\subsubsection{Loss function}
+
+The loss function takes the (output, target) pairs of inputs, and computers a value that estimates how far away the output is from the target, under some measure. The Pytorch library contains many different loss functions, see documentation. See \tbf{blitzor.py} for more details.
+To give all \tif{Variables} there specified gradients, up to their node in the tree, 
+we simply call \tif{loss.backward()} and that accumulates all \tif{.grad}'s to calculate the gradient for the different variables, w.r.t the loss.
+This also enables us to backprop the error through the network, although the existing gradients will need to be cleared. Else, you will be double adding. To zero we use the command \textit{<neural\_net\_object>.zero\_grad()}.
+
+\subsubsection{Backprop}
+To get any Variables derivative w.r.t the loss, we call, after doing \tif{loss.backward()}, \tif{<network\_name>.<Variable\_name>.\{other\_properties\}.grad}
+
+\subsubsection{Updating the Weights}
+Using the \textit{torch.optim} package we can use an array of optimizers, including SGD. See documentation. 
+
 
 \end{document} 

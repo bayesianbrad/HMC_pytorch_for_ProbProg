@@ -1,6 +1,8 @@
-\BOOKMARK [1][-]{section.0.1}{Radford Neals intro to HMC MCMC}{}% 1
+\BOOKMARK [1][-]{section.0.1}{Intro to HMC MCMC}{}% 1
 \BOOKMARK [2][-]{subsection.0.1.1}{Metropolis-hastings algorithm}{section.0.1}% 2
 \BOOKMARK [2][-]{subsection.0.1.2}{HMC for MCMC}{section.0.1}% 3
 \BOOKMARK [2][-]{subsection.0.1.3}{The Algorithm}{section.0.1}% 4
 \BOOKMARK [2][-]{subsection.0.1.4}{Tuning the HMC}{section.0.1}% 5
-\BOOKMARK [1][-]{section.0.2}{Automatic Differentiation in Pytorch}{}% 6
+\BOOKMARK [1][-]{section.0.2}{Automatic differentiation AD}{}% 6
+\BOOKMARK [2][-]{subsection.0.2.1}{Automatic Differentiation in Pytorch}{section.0.2}% 7
+\BOOKMARK [2][-]{subsection.0.2.2}{Neural Networks in Torch}{section.0.2}% 8
