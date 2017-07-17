@@ -4,8 +4,8 @@ randn('seed',12345);
  
 % STEP SIZE
 epsilon = 0.18;
-nSamples = 1000;
-L = 20;
+nSamples = 100;
+L = 5;
  
 % DEFINE POTENTIAL ENERGY FUNCTION
 U = inline('transp(q)*inv([1,.98;.98,1])*q','q');

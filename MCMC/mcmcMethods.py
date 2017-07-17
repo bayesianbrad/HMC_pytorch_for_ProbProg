@@ -10,7 +10,8 @@ A simple implementation of Metropolis-Hasting algorithm
 """
 import numpy as np
 import matplotlib.pyplot as plt
-
+import math
+import random
 # Just metropolis, i.e. q(x|y) = q(y|x) 
 # target dist is choosen to be exp(-x^(2) / 2)
 # proposal dist is cossen to be N(y| x,0.25)
@@ -32,30 +33,27 @@ def independence_sampler():
     where L(y|x) = exp(-(X - \bar{y})**2 / 2)
     Let the proposal q(y|x) = q(y)  = 1/π(1+y**2)
     '''
-    n        = 20 # number of samples
-    ybar     = 0.0675
     x_chain  = []
-    x_current = np.random.randn(1)
+    # Prior on the intial state x_0 is π^{0} ~ N(0,1)
+    x_current = random.gauss(0,1)
     x_chain.append(x_current)
     for i in range(100):
-        y_sample          = IS_likelihood(x_current,ybar,n)
-        x_proposal       = IS_proposal(y_sample)
-        x_new             = alpha(x_current,x_proposal,n,ybar)
+        x_proposal        = IS_proposal(x_current)
+        x_new             = alpha(x_current,x_proposal)
         # This step is to highlight that the new x_new value, becomes our
         # new current x.  We could have just labeled x_new as x_current
         x_current         = x_new
         x_chain.append(x_new)
     return x_chain
 
-def alpha(x_current,x_proposal,y_sample,n,ybar):
+def alpha(x_current,x_proposal):
     '''Decides whether to accept or reject the proposal. As the proposal
     distribution is not dependent on x, we have a simple acceptance ration
     of just the priors. '''
-    acceptance = IS_proposal(x_proposal)/IS_target(x_current,n,ybar)
+    acceptance = IS_target(x_proposal)/IS_target(x_current)
     u = np.random.uniform(0,1)
     r = acceptance
-    if r >= 1:
-        return x_proposal
+
     # return x proposal if the sampled uniform value u, is less than the 
     # acceptance ratio of r. We accept x_proposal, with prob u. 
     if u < r:
@@ -63,28 +61,24 @@ def alpha(x_current,x_proposal,y_sample,n,ybar):
     elif u >= r:
         return x_current
         
-def IS_target(x, ybar,n):
-    '''This is the posterior '''
-    return IS_likelihood(x, ybar,n) * IS_prior(x)
-           
-def IS_proposal(y):
-    return 1/(1 + y**2)
-
-def IS_prior(x):
+def IS_target(x):
+    '''This is the posterior "target distribution - in this instance" '''
     return 1/ (1 + x**2)
+           
+def IS_proposal(x_current):
+    '''q(x^{t+1} | x^{t}) ~ N(x^{t},1)'''
+    return np.random.normal(x_current,1)
 
-def IS_likelihood(x,ybar,n):
-    inside = 0.5*n*((x - ybar)**2)
-    return np.exp(-inside)
 
-def plot_histogram(chain):
-     bins = np.linspace(math.ceil(min(chain)),math.floor(max(chain)),5)
+
+def plot_histogram(samples):
+     bins = np.linspace(math.ceil(min(samples)),math.floor(max(samples)),10)
      plt.figure(2)
-     plt.xlim([min(chain)-1, max(chain)+1])
+     plt.xlim([min(samples)-1, max(samples)+1])
      
-     plt.hist(chain,bins=bins, alpha = 0.7)
+     plt.hist(samples,bins=bins,alpha = 0.5)
      plt.title('Histogram of markov chain')
-     plt.xlabel('markov chain values')
+     plt.xlabel('bins of xvalues')
      plt.ylabel('count')
      
 def main():
@@ -93,8 +87,8 @@ def main():
     no_samples = np.arange(0,len(sampled_x),1)
     plt.plot(no_samples,sampled_x)
     print(np.mean(sampled_x))
-    #plot_histogram(sampled_x)
-    
+    plt.figure(2)
+    plot_histogram(sampled_x)
 #    np.random.seed(1)
 #    x = np.linspace(-3,3,1000)
 #    y = np.random.randn(1000)
