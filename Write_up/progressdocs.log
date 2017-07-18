@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.11.20)  14 JUL 2017 15:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.11.20)  18 JUL 2017 08:14
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -844,7 +844,7 @@ xmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2016/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/texmf-
 dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2016/texmf-d
 ist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on progressdocs.pdf (9 pages, 255002 bytes).
+Output written on progressdocs.pdf (9 pages, 255019 bytes).
 PDF statistics:
  214 PDF objects out of 1000 (max. 8388607)
  179 compressed objects within 2 object streams

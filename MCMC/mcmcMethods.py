@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import random
+import scipy.stats
 # Just metropolis, i.e. q(x|y) = q(y|x) 
 # target dist is choosen to be exp(-x^(2) / 2)
 # proposal dist is cossen to be N(y| x,0.25)
@@ -37,7 +38,7 @@ def independence_sampler():
     # Prior on the intial state x_0 is π^{0} ~ N(0,1)
     x_current = random.gauss(0,1)
     x_chain.append(x_current)
-    for i in range(100):
+    for i in range(5000):
         x_proposal        = IS_proposal(x_current)
         x_new             = alpha(x_current,x_proposal)
         # This step is to highlight that the new x_new value, becomes our
@@ -72,21 +73,33 @@ def IS_proposal(x_current):
 
 
 def plot_histogram(samples):
-     bins = np.linspace(math.ceil(min(samples)),math.floor(max(samples)),10)
+     bins = np.linspace(math.ceil(min(samples)),math.floor(max(samples)),1000)
      plt.figure(2)
-     plt.xlim([min(samples)-1, max(samples)+1])
-     
-     plt.hist(samples,bins=bins,alpha = 0.5)
-     plt.title('Histogram of markov chain')
-     plt.xlabel('bins of xvalues')
-     plt.ylabel('count')
-     
-def main():
+     plt.xlim([min(samples)-5, max(samples)+5])
+     histogram_data = np.histogram(samples, bins = 'auto', density= False)
+     # 'auto' automatically finds optimum number of bins
+     plt.hist(samples,bins= 'auto',normed = True, alpha =0.5, label = 'Histogram of samples')
+     plt.title('Histogram of proposed x-values')
+     plt.xlabel(r'samples,$ x $')
+     plt.ylabel(r"$p(x)$, target distribtution")
+     plot_t_dist()
+
+def plot_t_dist():
+    x          = np.linspace(-6,6,10000)
+    df         = 1
+    t_dist_pdf = scipy.stats.t.pdf(x,df)
+    plt.plot(x, t_dist_pdf,label = r't-dist $\nu = 0$ ')
+    plt.legend()
+    mean, var = t_dist_pdf.stats(df, moments = 'mv')
+
+def main():   
+    random.seed(1)
     sampled_x = independence_sampler()
     plt.figure(1)
     no_samples = np.arange(0,len(sampled_x),1)
     plt.plot(no_samples,sampled_x)
-    print(np.mean(sampled_x))
+    unit_sample = sampled_x / np.linalg.norm(sampled_x)
+    print(np.mean(unit_sample))
     plt.figure(2)
     plot_histogram(sampled_x)
 #    np.random.seed(1)
