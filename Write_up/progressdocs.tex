@@ -119,7 +119,7 @@ p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\
 For the leapfrog method the local error, error after one step, is of $\mathcal{O}(\epsilon^{2})$ and a global error, error after simulating for some fixed time interval s, which requires $\frac{s}{\epsilon}$ is $\mathcal{O}(\epsilon^{3})$
 \subsubsection{Some initial points of notice}
 Neals implementation of the HMC can only be used to sample from continuous distributions on $\mathbb{R}^{d}$ for which a density function can be evaluated.\\
-We must be able to compute the partial derivative of the log of the density function. The derivaties must exists at the points at which they are evaluated [\textbf{Automatic differention}]
+We must be able to compute the partial derivative of the log of the density function. The derivaties must exists at the points at which they are evaluated [\textbf{Automatic differentiation}]
 
 HMC samples from the canonical distribution for $q$ and $p$. $q$ has the distribution of interest as specified by the potential $U(q)$. 
 The distribution of the $p$'s can be chosen by us and are independent of the $q$'s. 
@@ -213,7 +213,7 @@ a latent parameter $\tilde{N}$, whose relationship with $N$ is defined as follow
 \caption{A view of our continuous embedding of a discrete parameter. The shaded region represents the piecewise constant prior density $\pi_{\tilde{N}}(\tilde{n})$ over $\tilde{N}$}\label{fig:contembedding}
 \end{figure}
 To match the priordistribution $\pi(N)$, the corresponding, piecewise constant, prior over the latent parameter $\tilde{N}$ is given by: \begin{equation}
-\pi_{\tilde{N}}(\tilde{n}) = \sum_{n \geq 1} \frac{\pi_{\tilde{N}}(n)}{a_{n+1} - a_{n}} \mathbb{I}(a_{n} < \tilde{n} \leq a_{n+1}) 
+\pi_{\tilde{N}}(\tilde{n}) = \sum_{n \geq 1} \frac{\pi_{N}(n)}{a_{n+1} - a_{n}} \mathbb{I}(a_{n} < \tilde{n} \leq a_{n+1}) 
 \end{equation}
 where the Jacobian-like factor $(a_{n+1} - a_{n})^{-1}$ adjusts for embedding into non-uniform intervals. Rather than pick uniform embedding such as $a_{n} = n$ for all $n$, it is better to use a non-uniform one. For example $a_{n} = log(a_{n})$.
 
@@ -270,12 +270,31 @@ and so we only depend on the sign of $p$ and not the magnitudes. If we know that
 To derive a scheme for the integrator under a independent Laplace momentum, we consider the equation for each coordinate $(\theta_{i}, p_{i})$, while the other parameters $(\theta_{-i},p_{-i})$ are fixed, which would mean that the only non-zero derivatives are given by:\begin{equation}
 	\dot{\theta_{i}} = m^{-1}_{i} sign(p_{i}), \hspace{2mm} \dot{p_{i}} = -\nabla_{\theta_{i}} U(\theta) 
 \end{equation}
-In the case that the initial momentum is large enough that $m^{-1}_{i}|p_{i}(\tau)| > U(\theta^{*}(t)) - U(\theta(\tau))$ for all $t \epsilon [\tau, \tau + \epsilon]$, we have: \begin{equation}
+In the case that the initial momentum is large enough that $m^{-1}_{i}|p_{i}(\tau)| > U(\theta^{*}(t)) - U(\theta(\tau))$ for all $t \in [\tau, \tau + \epsilon]$, we have: \begin{equation}
 	\theta(t + \epsilon) = \theta^{*}(\tau + \epsilon) + \epsilon m^{-1} \odot sign(p(\tau))
 \end{equation}
-\subsection{Tuning the HMC}
 
-We need to select suitable parameters $\epsilon$ and $L$, which together determine the length of the trajectory in fictitious time $\epsilon L$  
+Otherwise, the momentum is $p_{i}$ flips, and the trajectory $\theta(t)$ reverses its course at the event time $t_{e}$, figure \ref{fig:bounceback}\,  given by:\begin{equation}
+	t_{e} = \inf\{t \in [\tau. \tau + \epsilon] : U(\theta^{*}(t)) - U(\theta(\tau)) > K(p(\tau))\}
+\end{equation}
+The reversibility of the described integrator is guaranteed by randomly permuting the order of the coordinate updates. 
+\begin{algorithm}
+	\label{alg:intcord}
+	\caption{Integrator step for purely discrete parameters, with Laplace momentum}
+		\begin{algorithmic}[1]
+			\Procedure{Cordinate-wise integrator}{$\theta, p, i, \epsilon$}
+			\State $ \theta_{i}^{*} \gets \theta$
+			\State $ \theta_{i}^{*} \gets \theta^{*}_{i} + \epsilon m^{-1}_{i} sign(p_{i})$
+			\State $ \nabla U \gets U(\theta^{*}) - U(\theta)$
+			\If{$m^{-1}_{i}|p_{i}| > \nabla U$}
+			\State $ \theta \gets \theta^{*} $
+			\State $ p_{i} \gets p_{i} - m_{i} \nabla U$
+			\Else
+			\State $p_{i} \gets - p_{i}$
+			\Endif 
+			\State $\text{ reuturn } \theta, p$
+		\end{algorithmic} 
+\end{algorithm}
 
 
 \section{Automatic differentiation AD}

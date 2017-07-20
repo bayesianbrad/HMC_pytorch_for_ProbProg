@@ -85,7 +85,7 @@ def plot_histogram(samples):
      plot_t_dist()
 
 def plot_t_dist():
-    x          = np.linspace(-6,6,10000)
+    x          = np.linspace(-10,10,10000)
     df         = 1
     t_dist_pdf = scipy.stats.t.pdf(x,df)
     plt.plot(x, t_dist_pdf,label = r't-dist $\nu = 0$ ')

@@ -8,7 +8,6 @@
 \BOOKMARK [2][-]{subsection.0.2.3}{Defining the trajectory}{section.0.2}% 8
 \BOOKMARK [2][-]{subsection.0.2.4}{The Need For A New Momentum}{section.0.2}% 9
 \BOOKMARK [2][-]{subsection.0.2.5}{Creating an Integrator for Laplace Momentum via Operator Splitting}{section.0.2}% 10
-\BOOKMARK [2][-]{subsection.0.2.6}{Tuning the HMC}{section.0.2}% 11
-\BOOKMARK [1][-]{section.0.3}{Automatic differentiation AD}{}% 12
-\BOOKMARK [2][-]{subsection.0.3.1}{Automatic Differentiation in Pytorch}{section.0.3}% 13
-\BOOKMARK [2][-]{subsection.0.3.2}{Neural Networks in Torch}{section.0.3}% 14
+\BOOKMARK [1][-]{section.0.3}{Automatic differentiation AD}{}% 11
+\BOOKMARK [2][-]{subsection.0.3.1}{Automatic Differentiation in Pytorch}{section.0.3}% 12
+\BOOKMARK [2][-]{subsection.0.3.2}{Neural Networks in Torch}{section.0.3}% 13
