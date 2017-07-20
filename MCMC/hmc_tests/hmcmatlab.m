@@ -4,14 +4,14 @@ randn('seed',12345);
  
 % STEP SIZE
 epsilon = 0.18;
-nSamples = 100;
+nSamples = 10000;
 L = 5;
  
 % DEFINE POTENTIAL ENERGY FUNCTION
-U = inline('transp(q)*inv([1,.98;.98,1])*q','q');
+U = inline('transp(q)*inv([1,0.8;0.8,1])*q','q');
  
 % DEFINE GRADIENT OF POTENTIAL ENERGY
-dU = inline('transp(q)*inv([1,.98;.98,1])','q');
+dU = inline('transp(q)*inv([1,0.8;0.8,1])','q');
  
 % DEFINE KINETIC ENERGY FUNCTION
 K = inline('sum((transp(p)*p))/2','p');
@@ -73,7 +73,16 @@ end
 % DISPLAY
 figure
 scatter(q(1,:),q(2,:),'k.'); hold on;
-plot(q(1,1:50),q(2,1:50),'ro-','Linewidth',2);
+plot(q(1,:),q(2,:),'ro-','Linewidth',2);
+hold on
+SIGMA = [1,0.8;0.8,1];
+MU = [0;0]';
+x = linspace(-2,2,1000);
+y = linspace(-2,2,1000);
+[X,Y] = meshgrid(x,y);
+z = mvnpdf([X(:) Y(:)],MU,SIGMA);
+z = reshape(z,size(X));
+contour(X,Y,z)
 xlim([-6 6]); ylim([-6 6]);
 legend({'Samples','1st 50 States'},'Location','Northwest')
 title('Hamiltonian Monte Carlo')

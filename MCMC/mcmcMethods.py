@@ -90,7 +90,6 @@ def plot_t_dist():
     t_dist_pdf = scipy.stats.t.pdf(x,df)
     plt.plot(x, t_dist_pdf,label = r't-dist $\nu = 0$ ')
     plt.legend()
-    mean, var = t_dist_pdf.stats(df, moments = 'mv')
 
 def main():   
     random.seed(1)
