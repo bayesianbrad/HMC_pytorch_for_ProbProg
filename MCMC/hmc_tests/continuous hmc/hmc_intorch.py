@@ -4,35 +4,74 @@
 Created on Thu Jul 20 15:24:46 2017
 
 @author: bradley
+
+simulate_dynamics: a symbolic Python function which, given an initial position 
+and velocity, will perform n_steps leapfrog updates and return the symbolic
+ variables for the proposed state \chi'.
+hmc_move: a symbolic Python function which given a starting position, 
+generates \chi by randomly sampling a velocity vector. 
+It then calls simulate_dynamics and determines whether the transition \chi
+\rightarrow \chi' is to be accepted.
+hmc_updates: a Python function which, given the symbolic outputs of 
+hmc_move, generates the list of updates for a single iteration of HMC.
+HMC_sampler: a Python helper class which wraps everything together.
+
 """
+from __future__ import print_function
+import torch
+import numpy
+from torch import autograd
+import torch.optim as optim
+import theano
+from theano import function, shared
+from theano import tensor as TT
+import theano.sandbox
 
+def kinetic_energy(vel):
+    """Returns the kinetic energy associated with the given velocity
+    and mass of 1.
 
-def simulate_dynamics(initial_pos, initial_vel, stepsize, n_steps, energy_fn):
+    Parameters
+    ----------
+    vel: theano matrix
+        Symbolic matrix whose rows are velocity vectors.
+
+    Returns
+    -------
+    return: theano vector
+        Vector whose i-th entry is the kinetic entry associated with vel[i].
+
     """
-    Return final (position, velocity) obtained after an `n_steps` leapfrog
+    return 0.5 * (vel ** 2).sum(axis=1)
+
+def simulate_dynamics(initial_pos, initial_mom, stepsize, n_steps, potential_fn):
+    """
+    Return final (position, momentum) obtained after an `n_steps` leapfrog
     updates, using Hamiltonian dynamics.
 
     Parameters
     ----------
     initial_pos: shared theano matrix
         Initial position at which to start the simulation
-    initial_vel: shared theano matrix
-        Initial velocity of particles
+    initial_mom: shared theano matrix
+        Initial momentum of particles
     stepsize: shared theano scalar
         Scalar value controlling amount by which to move
-    energy_fn: python function
+    potential_fn: python function
         Python function, operating on symbolic theano variables, used to
-        compute the potential energy at a given position.
+        compute the potential potential at a given position.
 
     Returns
     -------
     rval1: theano matrix
         Final positions obtained after simulation
     rval2: theano matrix
-        Final velocity obtained after simulation
+        Final momentum obtained after simulation
     """
-
-    def leapfrog(pos, vel, step):
+#==============================================================================
+# WITH PYTORCH WE CAN SIMPLY CONVERT THIS TO A FOR LOOP AND WHILE LOOP! 
+#==============================================================================
+    def leapfrog(pos, mom, step):
         """
         Inside loop of Scan. Performs one step of leapfrog update, using
         Hamiltonian dynamics.
@@ -41,9 +80,9 @@ def simulate_dynamics(initial_pos, initial_vel, stepsize, n_steps, energy_fn):
         ----------
         pos: theano matrix
             in leapfrog update equations, represents pos(t), position at time t
-        vel: theano matrix
-            in leapfrog update equations, represents vel(t - stepsize/2),
-            velocity at time (t - stepsize/2)
+        mom: theano matrix
+            in leapfrog update equations, represents mom(t - stepsize/2),
+            momentum at time (t - stepsize/2)
         step: theano scalar
             scalar value controlling amount by which to move
 
@@ -51,37 +90,49 @@ def simulate_dynamics(initial_pos, initial_vel, stepsize, n_steps, energy_fn):
         -------
         rval1: [theano matrix, theano matrix]
             Symbolic theano matrices for new position pos(t + stepsize), and
-            velocity vel(t + stepsize/2)
+            momentum mom(t + stepsize/2)
         rval2: dictionary
             Dictionary of updates for the Scan Op
         """
-        # from pos(t) and vel(t-stepsize//2), compute vel(t+stepsize//2)
-        dE_dpos = TT.grad(energy_fn(pos).sum(), pos)
-        new_vel = vel - step * dE_dpos
-        # from vel(t+stepsize//2) compute pos(t+stepsize)
-        new_pos = pos + step * new_vel
-        return [new_pos, new_vel], {}
+        # from pos(t) and mom(t-stepsize//2), compute mom(t+stepsize//2)
+#==============================================================================
+#         THE LINE BELOW HAS TO BE IMPLEMENTED IN TORCH
+#==============================================================================
+        dE_dpos = TT.grad(potential_fn(pos).sum(), pos)
+        
+        
+        new_mom = mom - step * dE_dpos
+        # from mom(t+stepsize//2) compute pos(t+stepsize)
+        new_pos = pos + step * new_mom
+        return [new_pos, new_mom], {}
 
-    # compute velocity at time-step: t + stepsize//2
-    initial_energy = energy_fn(initial_pos)
-    dE_dpos = TT.grad(initial_energy.sum(), initial_pos)
-    vel_half_step = initial_vel - 0.5 * stepsize * dE_dpos
+    # compute momentum at time-step: t + stepsize//2
+    initial_potential = potential_fn(initial_pos)
+#==============================================================================
+#     THE LINE BELOW HAS TO BE IMPLEMENTED IN TORCH
+#==============================================================================
+    dE_dpos = TT.grad(initial_potential.sum(), initial_pos)
+    mom_half_step = initial_mom - 0.5 * stepsize * dE_dpos
 
     # compute position at time-step: t + stepsize
-    pos_full_step = initial_pos + stepsize * vel_half_step
+    pos_full_step = initial_pos + stepsize * mom_half_step
 
     # perform leapfrog updates: the scan op is used to repeatedly compute
-    # vel(t + (m-1/2)*stepsize) and pos(t + m*stepsize) for m in [2,n_steps].
-    (all_pos, all_vel), scan_updates = theano.scan(
+    # mom(t + (m-1/2)*stepsize) and pos(t + m*stepsize) for m in [2,n_steps].
+#==============================================================================
+#     Implement with a while LOOP, AS LONG AS THE INPUT IS A VARIABLE
+#    THERE WILL BE NO PROBLEMS 
+#==============================================================================
+    (all_pos, all_mom), scan_updates = theano.scan(
         leapfrog,
         outputs_info=[
             dict(initial=pos_full_step),
-            dict(initial=vel_half_step),
+            dict(initial=mom_half_step),
         ],
         non_sequences=[stepsize],
         n_steps=n_steps - 1)
     final_pos = all_pos[-1]
-    final_vel = all_vel[-1]
+    final_mom = all_mom[-1]
     # NOTE: Scan always returns an updates dictionary, in case the
     # scanned function draws samples from a RandomStream. These
     # updates must then be used when compiling the Theano function, to
@@ -90,32 +141,33 @@ def simulate_dynamics(initial_pos, initial_vel, stepsize, n_steps, energy_fn):
     # "scan_updates" because we know it is empty.
     assert not scan_updates
 
-    # The last velocity returned by scan is vel(t +
+    # The last momentum returned by scan is mom(t +
     # (n_steps - 1 / 2) * stepsize) We therefore perform one more half-step
-    # to return vel(t + n_steps * stepsize)
-    energy = energy_fn(final_pos)
-    final_vel = final_vel - 0.5 * stepsize * TT.grad(energy.sum(), final_pos)
+    # to return mom(t + n_steps * stepsize)
+    potential = potential_fn(final_pos)
+    
+    final_mom = final_mom - 0.5 * stepsize * TT.grad(potential.sum(), final_pos)
 
     # return new proposal state
-    return final_pos, final_vel
+    return final_pos, final_mom
 
-def hmc_move(s_rng, positions, energy_fn, stepsize, n_steps):
+def hmc_move(s_rng, positions, potential_fn, stepsize, n_steps):
     """
     This function performs one-step of Hybrid Monte-Carlo sampling. We start by
-    sampling a random velocity from a univariate Gaussian distribution, perform
+    sampling a random momentum from a univariate Gaussian distribution, perform
     `n_steps` leap-frog updates using Hamiltonian dynamics and accept-reject
     using Metropolis-Hastings.
 
     Parameters
     ----------
     s_rng: theano shared random stream
-        Symbolic random number generator used to draw random velocity and
+        Symbolic random number generator used to draw random momentum and
         perform accept-reject move.
     positions: shared theano matrix
         Symbolic matrix whose rows are position vectors.
-    energy_fn: python function
+    potential_fn: python function
         Python function, operating on symbolic theano variables, used to
-        compute the potential energy at a given position.
+        compute the potential potential at a given position.
     stepsize:  shared theano scalar
         Shared variable containing the stepsize to use for `n_steps` of HMC
         simulation steps.
@@ -129,34 +181,40 @@ def hmc_move(s_rng, positions, energy_fn, stepsize, n_steps):
     rval2: theano matrix
         Matrix whose rows contain the proposed "new position"
     """
-    # sample random velocity
-    initial_vel = s_rng.normal(size=positions.shape)
+    # sample random momentum
+#==============================================================================
+#     When implementing in pytorch, we need to sample from a normal accross
+#     multiple dimensions. All s_rng.normal does, is return an array 'tensor'
+#     of normal distrubuted random variables. So in pytorch, we just need a
+#     momentum that is a momentum tensor of random numbers of size N x D
+#==============================================================================
+    initial_mom = s_rng.normal(size=positions.shape)
         # perform simulation of particles subject to Hamiltonian dynamics
-    final_pos, final_vel = simulate_dynamics(
+    final_pos, final_mom = simulate_dynamics(
         initial_pos=positions,
-        initial_vel=initial_vel,
+        initial_mom=initial_mom,
         stepsize=stepsize,
         n_steps=n_steps,
-        energy_fn=energy_fn
+        potential_fn=potential_fn
     )
         # accept/reject the proposed move based on the joint distribution
     accept = metropolis_hastings_accept(
-        energy_prev=hamiltonian(positions, initial_vel, energy_fn),
-        energy_next=hamiltonian(final_pos, final_vel, energy_fn),
-        s_rng=s_rng
+        potential_prev=hamiltonian(positions, initial_mom, potential_fn),
+        potential_next=hamiltonian(final_pos, final_mom, potential_fn),
+        s_rng=s_rng # WILL HAVE TO CHANGE THIS PARAMETER
     )
 
-def metropolis_hastings_accept(energy_prev, energy_next, s_rng):
+def metropolis_hastings_accept(potential_prev, potential_next, s_rng):
     """
     Performs a Metropolis-Hastings accept-reject move.
 
     Parameters
     ----------
-    energy_prev: theano vector
-        Symbolic theano tensor which contains the energy associated with the
+    potential_prev: theano vector
+        Symbolic theano tensor which contains the potential associated with the
         configuration at time-step t.
-    energy_next: theano vector
-        Symbolic theano tensor which contains the energy associated with the
+    potential_next: theano vector
+        Symbolic theano tensor which contains the potential associated with the
         proposed configuration at time-step t+1.
     s_rng: theano.tensor.shared_randomstreams.RandomStreams
         Theano shared random stream object used to generate the random number
@@ -167,56 +225,57 @@ def metropolis_hastings_accept(energy_prev, energy_next, s_rng):
     return: boolean
         True if move is accepted, False otherwise
     """
-    ediff = energy_prev - energy_next
-    return (TT.exp(ediff) - s_rng.uniform(size=energy_prev.shape)) >= 0
+#==============================================================================
+#     Will need to implement exponential in torch, which is torch.exp(..)   https://github.com/torch/torch7/blob/master/doc/maths.md
+#     To get uniform random numbers in pytorch use: (a-b)*U + b
+#==============================================================================
+    ediff = potential_prev - potential_next
+    return (TT.exp(ediff) - s_rng.uniform(size=potential_prev.shape)) >= 0
 
-def hamiltonian(pos, vel, energy_fn):
+def hamiltonian(pos, mom, potential_fn):
     """
-    Returns the Hamiltonian (sum of potential and kinetic energy) for the given
-    velocity and position.
+    Returns the Hamiltonian (sum of potential and kinetic potential) for the given
+    momentum and position.
 
     Parameters
     ----------
     pos: theano matrix
         Symbolic matrix whose rows are position vectors.
-    vel: theano matrix
-        Symbolic matrix whose rows are velocity vectors.
-    energy_fn: python function
+    mom: theano matrix
+        Symbolic matrix whose rows are momentum vectors.
+    potential_fn: python function
         Python function, operating on symbolic theano variables, used tox
-        compute the potential energy at a given position.
+        compute the potential potential at a given position.
 
     Returns
     -------
     return: theano vector
         Vector whose i-th entry is the Hamiltonian at position pos[i] and
-        velocity vel[i].
+        momentum mom[i].
     """
     # assuming mass is 1
-    return energy_fn(pos) + kinetic_energy(vel)
+    return potential_fn(pos) + kinetic_energy(mom)
 
-def hamiltonian(pos, vel, energy_fn):
-    """
-    Returns the Hamiltonian (sum of potential and kinetic energy) for the given
-    velocity and position.
+
+def kinetic_energy(vel):
+    """Returns the kinetic energy associated with the given velocity
+    and mass of 1.
 
     Parameters
     ----------
-    pos: theano matrix
-        Symbolic matrix whose rows are position vectors.
     vel: theano matrix
         Symbolic matrix whose rows are velocity vectors.
-    energy_fn: python function
-        Python function, operating on symbolic theano variables, used tox
-        compute the potential energy at a given position.
 
     Returns
     -------
     return: theano vector
-        Vector whose i-th entry is the Hamiltonian at position pos[i] and
-        velocity vel[i].
+        Vector whose i-th entry is the kinetic entry associated with vel[i].
+
     """
-    # assuming mass is 1
-    return energy_fn(pos) + kinetic_energy(vel)
+#==============================================================================
+#     The kintetic enrgy will be the laplace momentum in  the discrete case
+#==============================================================================
+    return 0.5 * (vel ** 2).sum(axis=1)
 
 def hmc_updates(positions, stepsize, avg_acceptance_rate, final_pos, accept,
                 target_acceptance_rate, stepsize_inc, stepsize_dec,
@@ -271,7 +330,96 @@ def hmc_updates(positions, stepsize, avg_acceptance_rate, final_pos, accept,
     accept_matrix = accept.dimshuffle(0, *(('x',) * (final_pos.ndim - 1)))
     # if accept is True, update to `final_pos` else stay put
     new_positions = TT.switch(accept_matrix, final_pos, positions)
+
+
+def hmc_updates(positions, stepsize, avg_acceptance_rate, final_pos, accept,
+                target_acceptance_rate, stepsize_inc, stepsize_dec,
+                stepsize_min, stepsize_max, avg_acceptance_slowness):
+    """This function is executed after `n_steps` of HMC sampling
+    (`hmc_move` function). It creates the updates dictionary used by
+    the `simulate` function. It takes care of updating: the position
+    (if the move is accepted), the stepsize (to track a given target
+    acceptance rate) and the average acceptance rate (computed as a
+    moving average).
+
+    Parameters
+    ----------
+    positions: shared variable, theano matrix
+        Shared theano matrix whose rows contain the old position
+    stepsize: shared variable, theano scalar
+        Shared theano scalar containing current step size
+    avg_acceptance_rate: shared variable, theano scalar
+        Shared theano scalar containing the current average acceptance rate
+    final_pos: shared variable, theano matrix
+        Shared theano matrix whose rows contain the new position
+    accept: theano scalar
+        Boolean-type variable representing whether or not the proposed HMC move
+        should be accepted or not.
+    target_acceptance_rate: float
+        The stepsize is modified in order to track this target acceptance rate.
+    stepsize_inc: float
+        Amount by which to increment stepsize when acceptance rate is too high.
+    stepsize_dec: float
+        Amount by which to decrement stepsize when acceptance rate is too low.
+    stepsize_min: float
+        Lower-bound on `stepsize`.
+    stepsize_min: float
+        Upper-bound on `stepsize`.
+    avg_acceptance_slowness: float
+        Average acceptance rate is computed as an exponential moving average.
+        (1-avg_acceptance_slowness) is the weight given to the newest
+        observation.
+
+    Returns
+    -------
+    rval1: dictionary-like
+        A dictionary of updates to be used by the `HMC_Sampler.simulate`
+        function.  The updates target the position, stepsize and average
+        acceptance rate.
+
+    """
+
+    # POSITION UPDATES #
+    # broadcast `accept` scalar to tensor with the same dimensions as
+    # final_pos.
+#==============================================================================
+#     Co
+#==============================================================================
+    accept_matrix = accept.dimshuffle(0, *(('x',) * (final_pos.ndim - 1)))
+    # if accept is True, update to `final_pos` else stay put
+#==============================================================================
+#     Implement with if statement with pytorch tensor. 
+#==============================================================================
+    new_positions = TT.switch(accept_matrix, final_pos, positions)
+        # ACCEPT RATE UPDATES #
+    # perform exponential moving average
+    mean_dtype = theano.scalar.upcast(accept.dtype, avg_acceptance_rate.dtype)
+#==============================================================================
+#     In pytorch we can jjust use the '+' operator.  Will have to use the torch
+#     operator for the mean. 
+#==============================================================================
+    new_acceptance_rate = TT.add(
+        avg_acceptance_slowness * avg_acceptance_rate,
+        (1.0 - avg_acceptance_slowness) * accept.mean(dtype=mean_dtype))
+    # STEPSIZE UPDATES #
+    # if acceptance rate is too low, our sampler is too "noisy" and we reduce
+    # the stepsize. If it is too high, our sampler is too conservative, we can
+    # get away with a larger stepsize (resulting in better mixing).
+#==============================================================================
+#     USE IF STATEMENTS
+#==============================================================================
+    _new_stepsize = TT.switch(avg_acceptance_rate > target_acceptance_rate,
+                              stepsize * stepsize_inc, stepsize * stepsize_dec)
+    # maintain stepsize in [stepsize_min, stepsize_max]
+#==============================================================================
+#     Will have to change clip, all it does is ensures that if the step size
+#       is outside of the given range, then we assign the step value to the
+#       value that is closet to the bound.
+#==============================================================================
+    new_stepsize = TT.clip(_new_stepsize, stepsize_min, stepsize_max)
     
+    return [(positions, new_positions),(stepsize, new_stepsize),(avg_acceptance_rate, new_acceptance_rate)]
+  
 class HMC_sampler(object):
     """
     Convenience wrapper for performing Hybrid Monte Carlo (HMC). It creates the
@@ -295,7 +443,7 @@ class HMC_sampler(object):
     def new_from_shared_positions(
         cls,
         shared_positions,
-        energy_fn,
+        potential_fn,
         initial_stepsize=0.01,
         target_acceptance_rate=.9,
         n_steps=20,
@@ -311,12 +459,12 @@ class HMC_sampler(object):
         :param shared_positions: theano ndarray shared var with
             many particle [initial] positions
 
-        :param energy_fn:
-            callable such that energy_fn(positions)
+        :param potential_fn:
+            callable such that potential_fn(positions)
             returns theano vector of energies.
             The len of this vector is the batchsize.
 
-            The sum of this energy vector must be differentiable (with
+            The sum of this potential vector must be differentiable (with
             theano.tensor.grad) with respect to the positions for HMC
             sampling to work.
 
@@ -331,7 +479,7 @@ class HMC_sampler(object):
         accept, final_pos = hmc_move(
             s_rng,
             shared_positions,
-            energy_fn,
+            potential_fn,
             stepsize,
             n_steps)
 
@@ -395,8 +543,8 @@ def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=10):
     cov[numpy.arange(dim), numpy.arange(dim)] = 1.0
     cov_inv = numpy.linalg.inv(cov)
 
-    # Define energy function for a multi-variate Gaussian
-    def gaussian_energy(x):
+    # Define potential function for a multi-variate Gaussian
+    def gaussian_potential(x):
         return 0.5 * (theano.tensor.dot((x - mu), cov_inv) *
                       (x - mu)).sum(axis=1)
 
@@ -405,7 +553,7 @@ def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=10):
     position = theano.shared(position)
 
     # Create HMC sampler
-    sampler = sampler_cls(position, gaussian_energy,
+    sampler = sampler_cls(position, gaussian_potential,
                           initial_stepsize=1e-3, stepsize_max=0.5)
 
     # Start with a burn-in process

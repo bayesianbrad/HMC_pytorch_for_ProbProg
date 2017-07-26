@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.11.20)  20 JUL 2017 15:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.11.20)  25 JUL 2017 18:05
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -941,23 +941,26 @@ Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
 \ALG@tmplength=\skip53
 )
 Document Style - pseudocode environments for use with the `algorithmicx' style
-) (./progressdocs.aux)
+) (/usr/local/texlive/2016/texmf-dist/tex/latex/chngcntr/chngcntr.sty
+Package: chngcntr 2009/09/02 v1.0a change counter resetting
+)
+(./progressdocs.aux)
 \openout1 = `progressdocs.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
 
 (/usr/local/texlive/2016/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -990,7 +993,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box42
-Package hyperref Info: Link coloring OFF on input line 31.
+Package hyperref Info: Link coloring OFF on input line 32.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -1000,15 +1003,15 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count152
 )
-LaTeX Info: Redefining \ref on input line 31.
-LaTeX Info: Redefining \pageref on input line 31.
-LaTeX Info: Redefining \nameref on input line 31.
+LaTeX Info: Redefining \ref on input line 32.
+LaTeX Info: Redefining \pageref on input line 32.
+LaTeX Info: Redefining \nameref on input line 32.
 
 (./progressdocs.out) (./progressdocs.out)
 \@outlinefile=\write4
 \openout4 = `progressdocs.out'.
 
-LaTeX Info: Redefining \microtypecontext on input line 31.
+LaTeX Info: Redefining \microtypecontext on input line 32.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1024,7 +1027,7 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 )
 ABD: EveryShipout initializing macros
-LaTeX Font Info:    Try loading font information for U+msa on input line 33.
+LaTeX Font Info:    Try loading font information for U+msa on input line 34.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
@@ -1032,7 +1035,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2016/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 33.
+LaTeX Font Info:    Try loading font information for U+msb on input line 34.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -1043,12 +1046,12 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 {/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 42.
+put line 43.
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.68 \end{equation}
+l.70 \end{equation}
                     [1] [2] [3]
 
 ! Package algorithmicx Error: Some blocks are not closed!!!.
@@ -1057,30 +1060,31 @@ See the algorithmicx package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.173 	\end{algorithmic}
+l.171 	\end{algorithmic}
                         
 This error message was generated by an \errmessage
 command, so I can't give any explicit help.
 Pretend that you're Hercule Poirot: Examine all clues,
 and deduce the truth by order and method.
 
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 185.
+[4]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 186.
 
-(/usr/local/texlive/2016/texmf-dist/tex/latex/base/omscmr.fd
+ (/usr/local/texlive/2016/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 185.
- [4] [5] [6]
-Underfull \hbox (badness 10000) in paragraph at lines 225--226
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 186.
+ [5]
+Underfull \hbox (badness 10000) in paragraph at lines 226--227
 
  []
 
-[7]
+[6]
 ! Missing \endcsname inserted.
 <to be read again> 
                    \textwidth 
-l.252 ...cludegraphics[\textwidth]{bounceback.png}
+l.253 ...cludegraphics[\textwidth]{bounceback.png}
                                                   
 The control sequence marked <to be read again> should
 not appear between \csname and \endcsname.
@@ -1088,7 +1092,7 @@ not appear between \csname and \endcsname.
 ! Missing number, treated as zero.
 <to be read again> 
                    \endcsname 
-l.252 ...cludegraphics[\textwidth]{bounceback.png}
+l.253 ...cludegraphics[\textwidth]{bounceback.png}
                                                   
 A number should have been here; I inserted `0'.
 (If you can't figure out why I needed to see a number,
@@ -1097,7 +1101,7 @@ look up `weird error' in the index to The TeXbook.)
 ! Illegal unit of measure (pt inserted).
 <to be read again> 
                    \endcsname 
-l.252 ...cludegraphics[\textwidth]{bounceback.png}
+l.253 ...cludegraphics[\textwidth]{bounceback.png}
                                                   
 Dimensions can be in units of em, ex, in, pt, pc,
 cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
@@ -1109,7 +1113,7 @@ two letters. (See Chapter 27 of The TeXbook.)
 ! Extra \endcsname.
 <recently read> \endcsname 
                            
-l.252 ...cludegraphics[\textwidth]{bounceback.png}
+l.253 ...cludegraphics[\textwidth]{bounceback.png}
                                                   
 I'm ignoring this, since I wasn't doing a \csname.
 
@@ -1120,7 +1124,7 @@ See the keyval package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.252 ...cludegraphics[\textwidth]{bounceback.png}
+l.253 ...cludegraphics[\textwidth]{bounceback.png}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
@@ -1128,13 +1132,18 @@ If that doesn't work, type  X <return>  to quit.
 <bounceback.png, id=147, 314.67563pt x 240.9pt>
 File: bounceback.png Graphic file (type png)
  <use bounceback.png>
-Package pdftex.def Info: bounceback.png used on input line 252.
+Package pdftex.def Info: bounceback.png used on input line 253.
 (pdftex.def)             Requested size: 314.67485pt x 240.8994pt.
- [8 <./bounceback.png>]
+ [7]
+[8 <./bounceback.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 280--282
+
+ []
+
 ! Missing \endcsname inserted.
 <to be read again> 
                    \ALG@currentblock@0 
-l.285 			\Procedure
+l.287 			\Procedure
                    {Cordinate-wise integrator}{$\theta, p, i, \epsilon$}
 The control sequence marked <to be read again> should
 not appear between \csname and \endcsname.
@@ -1142,12 +1151,12 @@ not appear between \csname and \endcsname.
 ! Extra \endcsname.
 \ALG@makebeginrepeat ...\ALG@thisblock \endcsname 
                                                   \relax \def \ALG@thisblock...
-l.285 			\Procedure
+l.287 			\Procedure
                    {Cordinate-wise integrator}{$\theta, p, i, \epsilon$}
 I'm ignoring this, since I wasn't doing a \csname.
 
 ! Undefined control sequence.
-l.294 			\Endif
+l.296 			\Endif
                
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1162,77 +1171,104 @@ See the algorithmicx package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.296 		\end{algorithmic}
+l.298 		\end{algorithmic}
                          
 (That was another \errmessage.)
 
 [9]
+! Missing \endcsname inserted.
+<to be read again> 
+                   \ALG@currentblock@0 
+l.312 		\Procedure
+                  {DHMC full integrator}{$\theta, p, \epsilon, \phi = Permut...
+The control sequence marked <to be read again> should
+not appear between \csname and \endcsname.
+
+! Extra \endcsname.
+\ALG@makebeginrepeat ...\ALG@thisblock \endcsname 
+                                                  \relax \def \ALG@thisblock...
+l.312 		\Procedure
+                  {DHMC full integrator}{$\theta, p, \epsilon, \phi = Permut...
+I'm ignoring this, since I wasn't doing a \csname.
+
+
+! Package algorithmicx Error: Some blocks are not closed!!!.
+
+See the algorithmicx package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.321 		\end{algorithmic}
+                         
+(That was another \errmessage.)
+
+[10] [11]
 
 LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `!tbp') on input line 314.
+               Default added (so using `!tbp') on input line 347.
 
-<../Pytorch_learning/autograd.png, id=171, 185.9748pt x 130.086pt>
+<../Pytorch_learning/autograd.png, id=195, 185.9748pt x 130.086pt>
 File: ../Pytorch_learning/autograd.png Graphic file (type png)
 
 <use ../Pytorch_learning/autograd.png>
-Package pdftex.def Info: ../Pytorch_learning/autograd.png used on input line 31
-6.
+Package pdftex.def Info: ../Pytorch_learning/autograd.png used on input line 34
+9.
 (pdftex.def)             Requested size: 185.97433pt x 130.08566pt.
- [10]
-Underfull \hbox (badness 10000) in paragraph at lines 338--339
+ [12 <../Pytorch_learning/autograd.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 371--372
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 340--341
+Underfull \hbox (badness 10000) in paragraph at lines 373--374
 
  []
 
-[11 <../Pytorch_learning/autograd.png>]
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 354.
- [12]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 360.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 360.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 387.
+[13]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 393.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 393.
  (./progressdocs.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 360.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 360.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 393.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 393.
 Package rerunfilecheck Info: File `progressdocs.out' has not changed.
-(rerunfilecheck)             Checksum: 0FE071213BBED85C5D7639C23A57BFF5;1040.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 360.
+(rerunfilecheck)             Checksum: 840121E0DAA3056CEC2ADA9CDAB5A1D1;1137.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 393.
  ) 
 Here is how much of TeX's memory you used:
- 18966 strings out of 493013
- 345455 string characters out of 6133342
- 451692 words of memory out of 5000000
- 21995 multiletter control sequences out of 15000+600000
- 15703 words of font info for 96 fonts, out of 8000000 for 9000
+ 19005 strings out of 493013
+ 346058 string characters out of 6133342
+ 452199 words of memory out of 5000000
+ 22013 multiletter control sequences out of 15000+600000
+ 15958 words of font info for 101 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,15n,54p,852b,607s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 55i,15n,54p,904b,609s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb>
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
-/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
-usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></us
-r/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/
-local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/lo
-cal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loca
-l/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/
-texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/te
-xlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texli
-ve/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/
-2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/201
-6/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2016/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2016/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2016/texmf-d
-ist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on progressdocs.pdf (13 pages, 301822 bytes).
+/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.pf
+b></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
+></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb><
+/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></u
+sr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr
+/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/l
+ocal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/loc
+al/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local
+/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/te
+xlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texli
+ve/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/
+2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/201
+6/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2016/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2016/texm
+f-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on progressdocs.pdf (14 pages, 324433 bytes).
 PDF statistics:
- 283 PDF objects out of 1000 (max. 8388607)
- 241 compressed objects within 3 object streams
- 77 named destinations out of 1000 (max. 500000)
- 15487 words of extra memory for PDF output out of 17280 (max. 10000000)
+ 306 PDF objects out of 1000 (max. 8388607)
+ 262 compressed objects within 3 object streams
+ 84 named destinations out of 1000 (max. 500000)
+ 15495 words of extra memory for PDF output out of 17280 (max. 10000000)
 

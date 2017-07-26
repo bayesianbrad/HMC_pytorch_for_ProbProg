@@ -1,13 +1,14 @@
 \BOOKMARK [1][-]{section.0.1}{Intro to HMC MCMC}{}% 1
 \BOOKMARK [2][-]{subsection.0.1.1}{Metropolis-hastings algorithm}{section.0.1}% 2
 \BOOKMARK [2][-]{subsection.0.1.2}{HMC for MCMC}{section.0.1}% 3
-\BOOKMARK [2][-]{subsection.0.1.3}{The Algorithm}{section.0.1}% 4
+\BOOKMARK [2][-]{subsection.0.1.3}{The Integrator}{section.0.1}% 4
 \BOOKMARK [1][-]{section.0.2}{Discrete 'Discontinuous' Hamiltonian Monte Carlo \(DHMC\)}{}% 5
 \BOOKMARK [2][-]{subsection.0.2.1}{Embedding Discrete Parameters Into a Continuous Space}{section.0.2}% 6
 \BOOKMARK [2][-]{subsection.0.2.2}{Resolution}{section.0.2}% 7
 \BOOKMARK [2][-]{subsection.0.2.3}{Defining the trajectory}{section.0.2}% 8
-\BOOKMARK [2][-]{subsection.0.2.4}{The Need For A New Momentum}{section.0.2}% 9
+\BOOKMARK [2][-]{subsection.0.2.4}{The need for a new momentum}{section.0.2}% 9
 \BOOKMARK [2][-]{subsection.0.2.5}{Creating an Integrator for Laplace Momentum via Operator Splitting}{section.0.2}% 10
-\BOOKMARK [1][-]{section.0.3}{Automatic differentiation AD}{}% 11
-\BOOKMARK [2][-]{subsection.0.3.1}{Automatic Differentiation in Pytorch}{section.0.3}% 12
-\BOOKMARK [2][-]{subsection.0.3.2}{Neural Networks in Torch}{section.0.3}% 13
+\BOOKMARK [2][-]{subsection.0.2.6}{Mixing Continuous and Discrete Parameters }{section.0.2}% 11
+\BOOKMARK [1][-]{section.0.3}{Automatic differentiation AD}{}% 12
+\BOOKMARK [2][-]{subsection.0.3.1}{Automatic Differentiation in Pytorch}{section.0.3}% 13
+\BOOKMARK [2][-]{subsection.0.3.2}{Neural Networks in Torch}{section.0.3}% 14

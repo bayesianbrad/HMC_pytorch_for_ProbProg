@@ -18,6 +18,7 @@
 %%\usepackage{tikz}
 %\usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{chngcntr}
 %\usepackage{graphicx}
 %\usepackage{subfig}
 \newcommand{\tif}{\textit}
@@ -42,17 +43,18 @@ The Metropolis hastings algorithm is the work horse of Monte Carlo Markov Chain 
 \caption{Metropolis-Hasting algorithm}
 \begin{algorithmic}[1]
 	\State  $x^{0} \sim P_{0}(x)$ \Comment{Where $p(x)$ is the proposed initial distribution}
-		\For {$s = 0,1,2,\ldots$}
-		\State $ x \gets x^{s} $
-		\State $ x^{'} \sim Q(x^{'}|x)$
-		\State $a = \frac{\tilde{P}(x')Q(x|x')}{\tilde{P}(x)Q(x'|x)}$ \Comment{Acceptance ratio}
-		\State $r = min(1, a) $ \Comment{Acceptance condition}
-		\State $u \sim  U(0,1)$ 
-		\State $x^{s+1} = \begin{cases}
-		x' \text{ if $u < r$}\\
-		x^{s} \text{ if $u \geq r$}
-		\end{cases}$
-		\EndFor
+	\For {$i = 0,1,2,\ldots$}
+	\State $ x \gets x^{s} $
+	\State $ x^{'} \sim Q(x^{'}|x)$
+	\State $a = \frac{\tilde{P}(x')Q(x|x')}{\tilde{P}(x)Q(x'|x)}$ \Comment{Acceptance ratio}
+	\State $r = min(1, a) $ \Comment{Acceptance condition}
+	\State $u \sim  U(0,1)$ 
+	\State $x^{i+1} = \begin{cases}
+	x' \text{ if $u < r$}\\
+	x^{i} \text{ if $u \geq r$}
+	\end{cases}$
+	\EndFor
+	\State \Return $x^{i+1}$
 \end{algorithmic} 
 \end{algorithm}
 
@@ -103,7 +105,7 @@ U(q) = -\log[\pi(q)L(q|D)]
 \end{equation}
 where $\pi(q)$ is the prior distribution, and $L(q|D)$ is the likelihood, not the Lagrangian, of the given data $D$. 
 
-\subsection{The Algorithm}
+\subsection{The Integrator}
 
 \subsubsection{The leapfrog method}
 The leapfrog method enables reduced error and allows us to dicretize Hamiltons equations, so that we can implement them numerically. 
@@ -140,38 +142,37 @@ In \textbf{Step 2} a Metropolis update is performed, using the Hamiltonian dynam
 The momentum vairables at the end of this $L$-step trajectory are then negated, giving s proposed state $(q^{*}. p^{*})$. This proposed state is accepted as the next state in the Markov Chain with probability: \begin{equation}
 \min[1, \exp(-H(q^{*}, p^{*}) + H(p,q)] = \min[1, \exp(-U(q^{*}) + U(q) - K(p^{*}) + K(p))]
 \end{equation} 
-If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
-The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.\label{key}
-
 \begin{algorithm}
 	\label{alg:simpHMC}
-	\caption{\textbf{MISTAKES - needs edit}Simple Hamiltonian Monte Carlo MCMC}
-	\begin{algorithmic}[1]
-	\Procedure{HMC single iteration}{$\epsilon$, $L$, $q_{current}$}
-		\State $ q \gets q_{current}$
-		\State $ p \sim \mathcal{N}(len(q),0,1)$
-		\State $ p_{current} \gets p$
-		\State $ p \gets p - \frac{\epsilon}{2}\nabla_{q} U(q)$ \Comment{make half step for momentum} 
-		\For{$i \text{ in } 1:L$}
-		\State $q \gets q + epsilon * \nabla_{p} K (p(t + \frac{\epsilon}{2}))$ \Comment{make full step for the position} 
-		\If{$i != L$}
-		\State $p \gets p- \epsilon \nabla_{q} U(q)$
-		\EndIf
-		\EndFor
-		\State $p - \frac{\epsilon}{2}\nabla_{q} U(q)$ \Comment{Half step for momentum}
-		\State $p \gets - p$ \Comment{Ensuring symmetry of Metropolis proposal}
-		\State $U_{current} \gets U(q_{current})$
-		\State $U_{proposed} \gets U(q)$
-		\State $K_{current} \gets \frac{1}{2} p_{current} \cdot p_{current} $
-		\State $K_{proposed} \gets \frac{1}{2} p \cdot p$
-		\State $ u \sim Uniform(0,1)$
-		\If{$u < exp(U_{current} - U_{proposed} + K_{current} - K_{proposed})$}
-		\State $\text{return } q \gets q$ \Comment{Accept}
-		\Else
-		\State $\text{return } q_{current} \gets q_{current}$ \Comment{Reject}
-		\EndIf
+	\caption{\textbf{Continuous Hamiltonian Monte Carlo MCMC}}
+		\begin{algorithmic}[1]
+			\Procedure{HMC}{$\theta_{0}$, $\epsilon$, $L$,$U$, $M$}
+			\For{$m = 1 \text{ to } M$}
+			\State $ p^{0} \sim \mathcal{N}(0,\mathbb{I})$
+			\State $ \theta^{m} \gets \theta^{m-1}$
+			\State $\theta^{'} \gets \theta^{m-1}$
+			\State $ p^{'} \gets p^{0}$
+			\For {$i = 1 \text{ to } L$}
+			\State $\theta^{'}$ , $p \gets$ Leapfrog($\theta^{'}, p^{'}, \epsilon$)
+			\EndFor
+			\State $\alpha = \min\left\{1, \frac{\exp \left\{-U(\theta^{'}) - K(p^{'})\right\}}{\exp \left\{U(\theta^{m-1}) - K(p^{0})\right\}}\right\}$ \Comment{Acceptance probability}
+			\State $u \sim Uniform(0,1)$
+			\If{ $u < \alpha $}
+			\State \Return $ \theta^{m} \gets \theta^{'}$, $p^{m} \gets -p $  \Comment{Accept}
+			\Else
+			\State \Return $\theta^{m}  \gets \theta^{m-1}$ , $p^{m} \gets p^{0}$ \Comment{Reject}
+			\EndIf
+			\EndFor
+			\State {Leapfrog($\theta$, $p$, $\epsilon$)} 
+			\State $p^{'} \gets p - \frac{\epsilon}{2}\nabla_{\theta} U(\theta)$ \Comment{Half step for momentum}
+			\State $\theta^{'} \gets \theta + \epsilon \nabla_{p} K(p^{'})$ \Comment{Full step for the the position} 
+			\State $p^{'} \gets \frac{\epsilon}{2}\nabla_{\theta}U(\theta^{'})$ \Comment{Final half step for momentum}
+			\State \Return $\theta^{'}$ , $p^{'}$
 	\end{algorithmic} 
 \end{algorithm}
+If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
+The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.
+where $U = -\log(\pi(\theta))$,  $M$ is the number of samples we wish to take , $(\theta^{'}, p^{'})$ is the generated proposal and we propose setting $\theta^{m} = \theta^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
 A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $q$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $q$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $q_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
 
 \section{Discrete 'Discontinuous' Hamiltonian Monte Carlo (DHMC)}
@@ -195,7 +196,7 @@ Given any target distribution, for each iteration, DHMC only requires evaluation
 \subsection{Embedding Discrete Parameters Into a Continuous Space}
 
 Let $N$ denote a discrete parameter with prior distribution $\pi_{n}(\cdot)$, assume with out loss of generality that $N \in \mathbb{N}$. To embed $N$ into a continuous space, we introduce
-a latent parameter $\tilde{N}$, whose relationship with $N$ is defined as follows: $N = N \iff \tilde{N}\in(a_{n}, a_{n+1}] $ for a sequence $0 = a_{1} \leq a_{2} \leq \ldots$, where $a_{n} \in \mathbb{R}$. \\
+a latent parameter $\tilde{N}$, whose relationship with $N$ is defined as follows: $N = n \iff \tilde{N}\in(a_{n}, a_{n+1}] $ for a sequence $0 = a_{1} \leq a_{2} \leq \ldots$, where $a_{n} \in \mathbb{R}$. \\
 \begin{figure}[h!]
 	\centering
 \begin{tikzpicture}
@@ -212,7 +213,7 @@ a latent parameter $\tilde{N}$, whose relationship with $N$ is defined as follow
 \end{tikzpicture}
 \caption{A view of our continuous embedding of a discrete parameter. The shaded region represents the piecewise constant prior density $\pi_{\tilde{N}}(\tilde{n})$ over $\tilde{N}$}\label{fig:contembedding}
 \end{figure}
-To match the priordistribution $\pi(N)$, the corresponding, piecewise constant, prior over the latent parameter $\tilde{N}$ is given by: \begin{equation}
+To match the prior distribution $\pi(N)$, the corresponding, piecewise constant, prior over the latent parameter $\tilde{N}$ is given by: \begin{equation}
 \pi_{\tilde{N}}(\tilde{n}) = \sum_{n \geq 1} \frac{\pi_{N}(n)}{a_{n+1} - a_{n}} \mathbb{I}(a_{n} < \tilde{n} \leq a_{n+1}) 
 \end{equation}
 where the Jacobian-like factor $(a_{n+1} - a_{n})^{-1}$ adjusts for embedding into non-uniform intervals. Rather than pick uniform embedding such as $a_{n} = n$ for all $n$, it is better to use a non-uniform one. For example $a_{n} = log(a_{n})$.
@@ -228,7 +229,7 @@ Whilst it is true that a discontinuous function does not have a \tif{well define
 In general, the process is as follows: Define a sequence of smooth approximations $U_{\delta}(\theta)$ of $U(\theta)$, for $\delta > 0$. We construct the smooth approximations through a convolution $U_{\delta} = U \ast \phi_{\delta}$, with $\phi_{\delta}(\theta) = \delta^{-d}\phi(\delta^{-1}\theta)$. Where $\phi$ is a compactly smooth function, i.e a function that has all the required properties to be a probability distribution $\phi \ge 0$ s.t. $\int \phi = 1$ and $d$ is the dimension of $\theta$.
 
 \subsection{Defining the trajectory}
-Let $\theta_{\delta}(t), p_{\delta}(t)$ be a solution to Hamiltons equations, with potential energy $U_{\delta}$. Taking the limit as $\delta \rightarrow 0$ leads to the true trajectory $(\theta(t), p(t))$. Although the limit exists for most trajectories, it does exist for all (proof?). Despite this we define the dynamics of $U(\theta)$ in terms of this pointwise limit. 
+Let $\theta_{\delta}(t), p_{\delta}(t)$ be a solution to Hamilton's equations, with potential energy $U_{\delta}$. Taking the limit as $\delta \rightarrow 0$ leads to the true trajectory $(\theta(t), p(t))$. Although the limit exists for most trajectories, it does exist for all (proof?). Despite this we define the dynamics of $U(\theta)$ in terms of this point wise limit. 
 Suppose the trajectory $(\theta(t), p(t))$ hits the discontinuity at an event time $t_{e}$. Let $t_{e_{-}}$ and $t_{e_{+}}$ denote the infinitesimal moment before and after that point, i.e our limiting values.\\
 Since the discontinuity set of $U(\theta)$ was assumed to be piecewise smooth, at a discontinuity point $\theta$ we have:
 \begin{equation}
@@ -254,37 +255,38 @@ K(p(t_{e_{+}})) - K(p(t_{e_{-}})) = U(\theta(t_{e_{-}})) - U(\theta(t_{e_{+}}))
 \end{figure}
 
 
-\subsection{The Need For A New Momentum}
+\subsection{The need for a new momentum}
 In the discrete setting Gaussian momentum defined in the Kinetic energy, $K(p) = \frac{p\cdot p}{m}$ does not work efficiently, as we now need to perform additional computations to detect the discontinuities. This leads [Nishimura et al. 2017] to use independent Laplace momentums, drawn from a Laplace distribution $\pi_{p}(p) \propto \Pi_{i} \exp(-\frac{|p_{i}|}{m_{i}})$. This allows us to construct a reversible integrator that can jump through multiple discontinuities in a small number of target density evaluations, while preserving the total energy. 
 Under the Laplace momentum Hamiltonians equations become: \begin{align}
 \label{eq:hamlaplace1}
-\dot{\theta} &= m^{-1} \odot sign(p)\\
+\dot{\theta} &= m^{-1} \odot \text{sign}(p)\\
 \label{eq:hamlaplace2}
 \dot{p} &= -\nabla_{\theta} U(\theta)
 \end{align}
 and so we only depend on the sign of $p$ and not the magnitudes. If we know that $p_{i}(t)$'s do not change their signs on the time interval $t \in [\tau, \tau + \epsilon]$, then we also know that the full step for the position will be:\begin{equation}
-\theta(t + \epsilon) = \theta(\tau) + \epsilon m^{-1} \odot sign(p(\tau))
+\theta(t + \epsilon) = \theta(\tau) + \epsilon m^{-1} \odot \text{sign}(p(\tau))
 \end{equation} irrespective of the intermediate values $U(\theta(t))$ along the trajectory $(\theta(t),p(t))$ for $t \in [\tau, \tau + \epsilon]$. The ability of the integrator to jump through multiple discontinuities of $U(\theta)$ in a single target density evaluation depends critically on $\theta(\tau + \frac{\epsilon}{2})$. Where as the momentum step $p(\tau + \epsilon)$ is dependent on the intermediate values $U(\theta(t))$. This can actually be solved by splitting the differential operator in \ref{eq:hamlaplace2}\, into its coordinate-wise component. 
 \subsection{Creating an Integrator for Laplace Momentum via Operator Splitting}
 
 To derive a scheme for the integrator under a independent Laplace momentum, we consider the equation for each coordinate $(\theta_{i}, p_{i})$, while the other parameters $(\theta_{-i},p_{-i})$ are fixed, which would mean that the only non-zero derivatives are given by:\begin{equation}
-	\dot{\theta_{i}} = m^{-1}_{i} sign(p_{i}), \hspace{2mm} \dot{p_{i}} = -\nabla_{\theta_{i}} U(\theta) 
+	\dot{\theta_{i}} = m^{-1}_{i} \text{sign}(p_{i}), \hspace{2mm} \dot{p_{i}} = -\nabla_{\theta_{i}} U(\theta) 
 \end{equation}
 In the case that the initial momentum is large enough that $m^{-1}_{i}|p_{i}(\tau)| > U(\theta^{*}(t)) - U(\theta(\tau))$ for all $t \in [\tau, \tau + \epsilon]$, we have: \begin{equation}
-	\theta(t + \epsilon) = \theta^{*}(\tau + \epsilon) + \epsilon m^{-1} \odot sign(p(\tau))
+	\theta(t + \epsilon) = \theta^{*}(\tau + \epsilon) + \epsilon m^{-1} \odot \text{sign}(p(\tau))
 \end{equation}
 
 Otherwise, the momentum is $p_{i}$ flips, and the trajectory $\theta(t)$ reverses its course at the event time $t_{e}$, figure \ref{fig:bounceback}\,  given by:\begin{equation}
 	t_{e} = \inf\{t \in [\tau. \tau + \epsilon] : U(\theta^{*}(t)) - U(\theta(\tau)) > K(p(\tau))\}
 \end{equation}
-The reversibility of the described integrator is guaranteed by randomly permuting the order of the coordinate updates. 
+The reversibility of the described integrator is guaranteed by randomly permuting the order of the coordinate updates.\\
+
 \begin{algorithm}
 	\label{alg:intcord}
 	\caption{Integrator step for purely discrete parameters, with Laplace momentum}
 		\begin{algorithmic}[1]
 			\Procedure{Cordinate-wise integrator}{$\theta, p, i, \epsilon$}
 			\State $ \theta_{i}^{*} \gets \theta$
-			\State $ \theta_{i}^{*} \gets \theta^{*}_{i} + \epsilon m^{-1}_{i} sign(p_{i})$
+			\State $ \theta_{i}^{*} \gets \theta^{*}_{i} + \epsilon m^{-1}_{i} \text{sign}(p_{i})$
 			\State $ \nabla U \gets U(\theta^{*}) - U(\theta)$
 			\If{$m^{-1}_{i}|p_{i}| > \nabla U$}
 			\State $ \theta \gets \theta^{*} $
@@ -292,11 +294,42 @@ The reversibility of the described integrator is guaranteed by randomly permutin
 			\Else
 			\State $p_{i} \gets - p_{i}$
 			\Endif 
-			\State $\text{ reuturn } \theta, p$
+			\State \Return $\theta, p$
 		\end{algorithmic} 
 \end{algorithm}
+Note: To ensure ergodicity we can do as Neal (2010) suggests for the standard HMC by drawing the stepsize from a uniform distribution, where the bounds are the maximum and minimum stepsize, $\epsilon \sim \text{Uniform}(\epsilon_{min}, \epsilon_{max})$. 
 
-
+\subsection{Mixing Continuous and Discrete Parameters }
+Algorithm \ref{alg:intcord} [Should be algo 3] would be valid regardless of whether we are dealing with a discrete or continuous parameter space. However, to increase efficiency and create a faster alogorithm, we can take advantage of the fact that the discontinuities of $U(\theta)$ only occur at a finite number of locations in the trajectory $\theta_{j}$, described via the discontinuity set $\mathcal{D}$, where each discontinuity is indexed by the set $\text{J} = \{j = 1,\ldots,d\} \notin \text{I}$.  Whereas the continuity set, where the trajectory $\theta_{i}$ will be smooth and so to the potential, can be indexed by the set $\text{I} = \{i = 1,\ldots, d\}$. For this system the corresponding kinetic energy is given by: \begin{equation}
+K(p) = \frac{1}{2} p_{I}^{T}M_{I}^{-1}p_{I} + \sum_{j \in J}m_{j}^{-1} |p_{j}|
+\end{equation}
+ where $M_{I}$ and $M_{J} = diag(m_{j})$ are mass matrices.  In constructing the new integrator we first update the smooth parameter $(\theta_{I}, p_{I})$ , second we update the discontinuous parameters $(\theta_{J}, p_{J})$ via algorithm ~\ref{alg:intcord} and finally update $(\theta_{I},p_{I})$.  Where we update $(\theta_{I}, p_{I})$ via the usual leap frog method.  The more efficient integrator is shown in algorithm ~\ref{alg:intforDHMC}.
+ 
+\begin{algorithm}
+	\label{alg:intforDHMC}
+	\caption{Integrator for discontinuous HMC}
+	\begin{algorithmic}[1]
+		\Procedure{DHMC full integrator}{$\theta, p, \epsilon, \phi = Permute(J)$}
+		\State $ p_{I} \gets p_{I} + \frac{\epsilon}{2}\nabla_{\theta}\log(\pi(\theta_{I}))$
+		\State $ \theta_{I} \gets \theta_{I} + \frac{\epsilon}{2} M^{-1}_{I} p_{I}$ \Comment{As I is the continuous set, the momentum here could be Gaussian}
+		\For{$j \text{   in   } J$}
+		\State $\theta , p \gets \text{Cordinate-wise integrator}(\theta,p,\phi(j), \epsilon)$ 
+		\EndFor
+		\State $\theta_{I} \gets \theta_{I} + \frac{\epsilon}{2}M_{I}^{-1}p_{I}$
+		\State $p_{I} \gets p_{I} + \frac{\epsilon}{2}\nabla_{\theta_{I}}\log(\pi(\theta))$
+		\State \Return $\theta, p$ 
+		\end{algorithmic} 
+\end{algorithm}
+\subsubsection{The Role of the mass matrix and stepsize}
+As in (Neal 2010) for the standard HMC, if we use a non-identity mass matrix $M$, then that has the effect of reconditioning the target distribution through reparameterization. In general, it is expected that the sampling is facilitated by a reparametrization $\theta_{J} \rightarrow \Lambda_{J}^{-\frac{1}{2}}$ for $\Lambda_{J}  = diag(var(\theta_{J}))$, thus the mass in the momentum distribution is approximately $m_{i} \approx \text{var}(\theta_{j})^{\frac{1}{2}}$. This is also directly related to the step size $\epsilon$, as we increment the parameter $\theta_{j}$ by $\pm \epsilon m_{j}^{-1}$. The problem with this is that it is possible that the if condition in Algorithm \ref{alg:intcord}\ [Should say algo 3] is never satisfied, and so we continually flip the momentum, without ever updating $\theta_{j}$. This will only update when \begin{equation}
+\label{eq:condforeps}
+	U(\theta + \epsilon m_{j}^{-1} \text{sign}(p_{j}) e_{j})  -U(\theta) < m^{-1}_{j} |p_{j}| = \exp(1)
+\end{equation} 
+where $e_{j}$ represents the natural basis vector. Therefore, if $\epsilon m^{-1}_{j}$ becomes larger than the scale of $\theta_{j}$ then it will be unlikely that \ref{eq:condforeps}\  will be satisfied. Thus, to tune $\epsilon$ optimally we use the following statistics: \begin{multline}
+	\mathbb{P}_{\pi_{\Theta} \times \pi_{P}}\left\{U(\theta + \epsilon m_{j}^{-1} \text{sign}(p_{j}) e_{j}) - U(\theta) > m^{-1}_{j} |p_{j}| \right\} \\	
+		= \mathbb{E}_{\pi_{\Theta} \times \pi_{P}}\left[\min\left(1, \exp(U(\theta) - U(\epsilon m_{j}^{-1} \text{sign}(p_{j}) e_{j}))\right)\right]
+\end{multline}
+We can then estimate the statistics by counting the frequency of the momentum flips during each DHMC iteration, which can then be used to calculate the stepsize via stochastic optimization. For information on stochastic optimization look at (Hoffman and Gelman 2014) and (Andrieu and Thoms 2008). In practice you typically want the statistic to be between 0.7 to 0.9.   
 \section{Automatic differentiation AD}
 Automatic differentiation is quite different from both Numerical and Analytical differentiation. It is, in a very loose sense a hybrid of the two, that is optimal for computational performance. It works by systematically applying the chain rule of differential calculus at the elementary operator level, enabling us to generate numerical derivative evaluations through the accumulation of values.   
 This “interleaving” idea forms the basis of AD and provides an account of
