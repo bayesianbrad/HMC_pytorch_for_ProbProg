@@ -101,12 +101,12 @@ def leapfrog(theta, p, stepsize):
     
     return theta, p
         
-def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_iter):
+def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_iter, batch = 1):
     '''This function implements algorithm 5 of the NUTS sampler 
     Hoffman and Gelman 2014, to create the optimal value for the stepsize
     using stochastic optimization.
     
-    thtea_init          - 
+    thtea_init          - initial theta, \mathbb{R}^{1 \times D}
     delta               - desired average acceptance probability
     simulation length   - stepsize * L - L is the number of trajectories run
     no_samples          - How many samples that we want to collect
@@ -122,21 +122,73 @@ def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_
                           are shrunk towards
     kappa               - free parameter between (0.5,1] - mainly to reduce 
                          the computation time to find optimal stepsize
+    batch               - Note: All code is currently suited for just one 
+                          batch
+    returns 
+    
+    theta_new
+    p__new
+    theta              - All trajectories calculated for all runs - for 
+                         calculating required statistics and plotting (in 3d
+                         or less)
+    
     '''
     # initial parameters
     
-    stepsize_init       = findreasonable_epsilon(theta_init)
+    stepsize_current    = findreasonable_epsilon(theta_init)
     mu                  = torch.log(10*stepsize_init)
     stepsize_avg        = torch.ones(1,1)
     H_avg_init          = torch.zeros(1,1)
     gamma               = 0.05
     t_0                 = 10
     kappa               = 0.75
+    theta_prev          = theta_init
+    # To store all trajectories
+    theta               = torch.Tensor(no_samples, theta_init.size(1))
+    theta[0][:]         = theta_init
     
     for i in range(1,no_samples):
-        p_init     = torch.randn(theta_init.size())
-        theta_next = theta_prev
+        p_init        = torch.randn(theta_init.size())
+        # Everything starts with intial values and will be modified 
+        # accordingly
+        theta_current = theta_prev.clone()
+        theta_tilde   = theta_prev.clone()
+        p_tilde       = p_init
+        # the max operation only returns a float
+        ratio         = torch.round(torch.div(simulationlength,stepsize_current))
+        L             = torch.max(torch.ones(1,batch), ratio)
         
+        # simulate trajectories.
+        for j in range(0,L):
+            theta_next, p_next = leapfrog(theta_tilde, p_tilde, stepsize_current)
+        
+        theta[i][:]   = theta_next
+        
+    
+    
+
+def metropolis_accept_reject(theta_next,theta_current, p_next, p_current):
+    ''' Performs the metropolis accept/ reject step by calculating the
+    hamiltonians, exponentiating and checks the required MH condition. 
+    If satified the new proposed steps are returned, else the next step
+    has the same initial conditions as the previous step.
+    
+    theta_next        - the proposed position
+    theta_current     - the current position
+    p_next            - the proposed momentum
+    p_current         - the current momentum
+    
+    returns
+    
+    theta_next, p_next
+    '''
+    
+    ham_proposed = Hamiltonian(theta_next, p_next)
+    ham_current  = Hamiltonian(theta_current, p_current)
+    energy_diff  = ham_proposed - ham_current
+    accept_prob  = torch.min(torch.ones(1,1),torch.exp(energy_diff))
+    # sample from uniform dist
+    u            = torch.rand(1,1)
     
     
     
