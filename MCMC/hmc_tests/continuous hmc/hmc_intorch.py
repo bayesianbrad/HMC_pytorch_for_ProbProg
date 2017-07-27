@@ -1,587 +1,153 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jul 20 15:24:46 2017
+Created on Wed Jul 26 14:59:28 2017
 
 @author: bradley
 
-simulate_dynamics: a symbolic Python function which, given an initial position 
-and velocity, will perform n_steps leapfrog updates and return the symbolic
- variables for the proposed state \chi'.
-hmc_move: a symbolic Python function which given a starting position, 
-generates \chi by randomly sampling a velocity vector. 
-It then calls simulate_dynamics and determines whether the transition \chi
-\rightarrow \chi' is to be accepted.
-hmc_updates: a Python function which, given the symbolic outputs of 
-hmc_move, generates the list of updates for a single iteration of HMC.
-HMC_sampler: a Python helper class which wraps everything together.
-
+Notes:
+    
+    Ensure in the potential and energy functions that we are doing element
+    wise multiplication and returning R^{1 \times D}
+    
+    Do we really want that?????
+    U(theta) should return a scalar given some vector R^{1 \times D}
+    
 """
-from __future__ import print_function
+# alogirthm 4
+import numpy as np
 import torch
-import numpy
-from torch import autograd
-import torch.optim as optim
-import theano
-from theano import function, shared
-from theano import tensor as TT
-import theano.sandbox
+from torch.autograd import Variable
 
-def kinetic_energy(vel):
-    """Returns the kinetic energy associated with the given velocity
-    and mass of 1.
 
-    Parameters
-    ----------
-    vel: theano matrix
-        Symbolic matrix whose rows are velocity vectors.
-
-    Returns
-    -------
-    return: theano vector
-        Vector whose i-th entry is the kinetic entry associated with vel[i].
-
-    """
-    return 0.5 * (vel ** 2).sum(axis=1)
-
-def simulate_dynamics(initial_pos, initial_mom, stepsize, n_steps, potential_fn):
-    """
-    Return final (position, momentum) obtained after an `n_steps` leapfrog
-    updates, using Hamiltonian dynamics.
-
-    Parameters
-    ----------
-    initial_pos: shared theano matrix
-        Initial position at which to start the simulation
-    initial_mom: shared theano matrix
-        Initial momentum of particles
-    stepsize: shared theano scalar
-        Scalar value controlling amount by which to move
-    potential_fn: python function
-        Python function, operating on symbolic theano variables, used to
-        compute the potential potential at a given position.
-
-    Returns
-    -------
-    rval1: theano matrix
-        Final positions obtained after simulation
-    rval2: theano matrix
-        Final momentum obtained after simulation
-    """
-#==============================================================================
-# WITH PYTORCH WE CAN SIMPLY CONVERT THIS TO A FOR LOOP AND WHILE LOOP! 
-#==============================================================================
-    def leapfrog(pos, mom, step):
-        """
-        Inside loop of Scan. Performs one step of leapfrog update, using
-        Hamiltonian dynamics.
-
-        Parameters
-        ----------
-        pos: theano matrix
-            in leapfrog update equations, represents pos(t), position at time t
-        mom: theano matrix
-            in leapfrog update equations, represents mom(t - stepsize/2),
-            momentum at time (t - stepsize/2)
-        step: theano scalar
-            scalar value controlling amount by which to move
-
-        Returns
-        -------
-        rval1: [theano matrix, theano matrix]
-            Symbolic theano matrices for new position pos(t + stepsize), and
-            momentum mom(t + stepsize/2)
-        rval2: dictionary
-            Dictionary of updates for the Scan Op
-        """
-        # from pos(t) and mom(t-stepsize//2), compute mom(t+stepsize//2)
-#==============================================================================
-#         THE LINE BELOW HAS TO BE IMPLEMENTED IN TORCH
-#==============================================================================
-        dE_dpos = TT.grad(potential_fn(pos).sum(), pos)
-        
-        
-        new_mom = mom - step * dE_dpos
-        # from mom(t+stepsize//2) compute pos(t+stepsize)
-        new_pos = pos + step * new_mom
-        return [new_pos, new_mom], {}
-
-    # compute momentum at time-step: t + stepsize//2
-    initial_potential = potential_fn(initial_pos)
-#==============================================================================
-#     THE LINE BELOW HAS TO BE IMPLEMENTED IN TORCH
-#==============================================================================
-    dE_dpos = TT.grad(initial_potential.sum(), initial_pos)
-    mom_half_step = initial_mom - 0.5 * stepsize * dE_dpos
-
-    # compute position at time-step: t + stepsize
-    pos_full_step = initial_pos + stepsize * mom_half_step
-
-    # perform leapfrog updates: the scan op is used to repeatedly compute
-    # mom(t + (m-1/2)*stepsize) and pos(t + m*stepsize) for m in [2,n_steps].
-#==============================================================================
-#     Implement with a while LOOP, AS LONG AS THE INPUT IS A VARIABLE
-#    THERE WILL BE NO PROBLEMS 
-#==============================================================================
-    (all_pos, all_mom), scan_updates = theano.scan(
-        leapfrog,
-        outputs_info=[
-            dict(initial=pos_full_step),
-            dict(initial=mom_half_step),
-        ],
-        non_sequences=[stepsize],
-        n_steps=n_steps - 1)
-    final_pos = all_pos[-1]
-    final_mom = all_mom[-1]
-    # NOTE: Scan always returns an updates dictionary, in case the
-    # scanned function draws samples from a RandomStream. These
-    # updates must then be used when compiling the Theano function, to
-    # avoid drawing the same random numbers each time the function is
-    # called. In this case however, we consciously ignore
-    # "scan_updates" because we know it is empty.
-    assert not scan_updates
-
-    # The last momentum returned by scan is mom(t +
-    # (n_steps - 1 / 2) * stepsize) We therefore perform one more half-step
-    # to return mom(t + n_steps * stepsize)
-    potential = potential_fn(final_pos)
+def findreasonable_epsilon(theta):
+    '''A function that uses (Hoffman and Gelmans 2014) approach to finding
+    the right step size \epsilon. 
     
-    final_mom = final_mom - 0.5 * stepsize * TT.grad(potential.sum(), final_pos)
-
-    # return new proposal state
-    return final_pos, final_mom
-
-def hmc_move(s_rng, positions, potential_fn, stepsize, n_steps):
-    """
-    This function performs one-step of Hybrid Monte-Carlo sampling. We start by
-    sampling a random momentum from a univariate Gaussian distribution, perform
-    `n_steps` leap-frog updates using Hamiltonian dynamics and accept-reject
-    using Metropolis-Hastings.
-
-    Parameters
-    ----------
-    s_rng: theano shared random stream
-        Symbolic random number generator used to draw random momentum and
-        perform accept-reject move.
-    positions: shared theano matrix
-        Symbolic matrix whose rows are position vectors.
-    potential_fn: python function
-        Python function, operating on symbolic theano variables, used to
-        compute the potential potential at a given position.
-    stepsize:  shared theano scalar
-        Shared variable containing the stepsize to use for `n_steps` of HMC
-        simulation steps.
-    n_steps: integer
-        Number of HMC steps to perform before proposing a new position.
-
-    Returns
-    -------
-    rval1: boolean
-        True if move is accepted, False otherwise
-    rval2: theano matrix
-        Matrix whose rows contain the proposed "new position"
-    """
-    # sample random momentum
-#==============================================================================
-#     When implementing in pytorch, we need to sample from a normal accross
-#     multiple dimensions. All s_rng.normal does, is return an array 'tensor'
-#     of normal distrubuted random variables. So in pytorch, we just need a
-#     momentum that is a momentum tensor of random numbers of size N x D
-#==============================================================================
-    initial_mom = s_rng.normal(size=positions.shape)
-        # perform simulation of particles subject to Hamiltonian dynamics
-    final_pos, final_mom = simulate_dynamics(
-        initial_pos=positions,
-        initial_mom=initial_mom,
-        stepsize=stepsize,
-        n_steps=n_steps,
-        potential_fn=potential_fn
-    )
-        # accept/reject the proposed move based on the joint distribution
-    accept = metropolis_hastings_accept(
-        potential_prev=hamiltonian(positions, initial_mom, potential_fn),
-        potential_next=hamiltonian(final_pos, final_mom, potential_fn),
-        s_rng=s_rng # WILL HAVE TO CHANGE THIS PARAMETER
-    )
-
-def metropolis_hastings_accept(potential_prev, potential_next, s_rng):
-    """
-    Performs a Metropolis-Hastings accept-reject move.
-
-    Parameters
-    ----------
-    potential_prev: theano vector
-        Symbolic theano tensor which contains the potential associated with the
-        configuration at time-step t.
-    potential_next: theano vector
-        Symbolic theano tensor which contains the potential associated with the
-        proposed configuration at time-step t+1.
-    s_rng: theano.tensor.shared_randomstreams.RandomStreams
-        Theano shared random stream object used to generate the random number
-        used in proposal.
-
-    Returns
-    -------
-    return: boolean
-        True if move is accepted, False otherwise
-    """
-#==============================================================================
-#     Will need to implement exponential in torch, which is torch.exp(..)   https://github.com/torch/torch7/blob/master/doc/maths.md
-#     To get uniform random numbers in pytorch use: (a-b)*U + b
-#==============================================================================
-    ediff = potential_prev - potential_next
-    return (TT.exp(ediff) - s_rng.uniform(size=potential_prev.shape)) >= 0
-
-def hamiltonian(pos, mom, potential_fn):
-    """
-    Returns the Hamiltonian (sum of potential and kinetic potential) for the given
-    momentum and position.
-
-    Parameters
-    ----------
-    pos: theano matrix
-        Symbolic matrix whose rows are position vectors.
-    mom: theano matrix
-        Symbolic matrix whose rows are momentum vectors.
-    potential_fn: python function
-        Python function, operating on symbolic theano variables, used tox
-        compute the potential potential at a given position.
-
-    Returns
-    -------
-    return: theano vector
-        Vector whose i-th entry is the Hamiltonian at position pos[i] and
-        momentum mom[i].
-    """
-    # assuming mass is 1
-    return potential_fn(pos) + kinetic_energy(mom)
-
-
-def kinetic_energy(vel):
-    """Returns the kinetic energy associated with the given velocity
-    and mass of 1.
-
-    Parameters
-    ----------
-    vel: theano matrix
-        Symbolic matrix whose rows are velocity vectors.
-
-    Returns
-    -------
-    return: theano vector
-        Vector whose i-th entry is the kinetic entry associated with vel[i].
-
-    """
-#==============================================================================
-#     The kintetic enrgy will be the laplace momentum in  the discrete case
-#==============================================================================
-    return 0.5 * (vel ** 2).sum(axis=1)
-
-def hmc_updates(positions, stepsize, avg_acceptance_rate, final_pos, accept,
-                target_acceptance_rate, stepsize_inc, stepsize_dec,
-                stepsize_min, stepsize_max, avg_acceptance_slowness):
-    """This function is executed after `n_steps` of HMC sampling
-    (`hmc_move` function). It creates the updates dictionary used by
-    the `simulate` function. It takes care of updating: the position
-    (if the move is accepted), the stepsize (to track a given target
-    acceptance rate) and the average acceptance rate (computed as a
-    moving average).
-
-    Parameters
-    ----------
-    positions: shared variable, theano matrix
-        Shared theano matrix whose rows contain the old position
-    stepsize: shared variable, theano scalar
-        Shared theano scalar containing current step size
-    avg_acceptance_rate: shared variable, theano scalar
-        Shared theano scalar containing the current average acceptance rate
-    final_pos: shared variable, theano matrix
-        Shared theano matrix whose rows contain the new position
-    accept: theano scalar
-        Boolean-type variable representing whether or not the proposed HMC move
-        should be accepted or not.
-    target_acceptance_rate: float
-        The stepsize is modified in order to track this target acceptance rate.
-    stepsize_inc: float
-        Amount by which to increment stepsize when acceptance rate is too high.
-    stepsize_dec: float
-        Amount by which to decrement stepsize when acceptance rate is too low.
-    stepsize_min: float
-        Lower-bound on `stepsize`.
-    stepsize_min: float
-        Upper-bound on `stepsize`.
-    avg_acceptance_slowness: float
-        Average acceptance rate is computed as an exponential moving average.
-        (1-avg_acceptance_slowness) is the weight given to the newest
-        observation.
-
-    Returns
-    -------
-    rval1: dictionary-like
-        A dictionary of updates to be used by the `HMC_Sampler.simulate`
-        function.  The updates target the position, stepsize and average
-        acceptance rate.
-
-    """
-
-    # POSITION UPDATES #
-    # broadcast `accept` scalar to tensor with the same dimensions as
-    # final_pos.
-    accept_matrix = accept.dimshuffle(0, *(('x',) * (final_pos.ndim - 1)))
-    # if accept is True, update to `final_pos` else stay put
-    new_positions = TT.switch(accept_matrix, final_pos, positions)
-
-
-def hmc_updates(positions, stepsize, avg_acceptance_rate, final_pos, accept,
-                target_acceptance_rate, stepsize_inc, stepsize_dec,
-                stepsize_min, stepsize_max, avg_acceptance_slowness):
-    """This function is executed after `n_steps` of HMC sampling
-    (`hmc_move` function). It creates the updates dictionary used by
-    the `simulate` function. It takes care of updating: the position
-    (if the move is accepted), the stepsize (to track a given target
-    acceptance rate) and the average acceptance rate (computed as a
-    moving average).
-
-    Parameters
-    ----------
-    positions: shared variable, theano matrix
-        Shared theano matrix whose rows contain the old position
-    stepsize: shared variable, theano scalar
-        Shared theano scalar containing current step size
-    avg_acceptance_rate: shared variable, theano scalar
-        Shared theano scalar containing the current average acceptance rate
-    final_pos: shared variable, theano matrix
-        Shared theano matrix whose rows contain the new position
-    accept: theano scalar
-        Boolean-type variable representing whether or not the proposed HMC move
-        should be accepted or not.
-    target_acceptance_rate: float
-        The stepsize is modified in order to track this target acceptance rate.
-    stepsize_inc: float
-        Amount by which to increment stepsize when acceptance rate is too high.
-    stepsize_dec: float
-        Amount by which to decrement stepsize when acceptance rate is too low.
-    stepsize_min: float
-        Lower-bound on `stepsize`.
-    stepsize_min: float
-        Upper-bound on `stepsize`.
-    avg_acceptance_slowness: float
-        Average acceptance rate is computed as an exponential moving average.
-        (1-avg_acceptance_slowness) is the weight given to the newest
-        observation.
-
-    Returns
-    -------
-    rval1: dictionary-like
-        A dictionary of updates to be used by the `HMC_Sampler.simulate`
-        function.  The updates target the position, stepsize and average
-        acceptance rate.
-
-    """
-
-    # POSITION UPDATES #
-    # broadcast `accept` scalar to tensor with the same dimensions as
-    # final_pos.
-#==============================================================================
-#     Co
-#==============================================================================
-    accept_matrix = accept.dimshuffle(0, *(('x',) * (final_pos.ndim - 1)))
-    # if accept is True, update to `final_pos` else stay put
-#==============================================================================
-#     Implement with if statement with pytorch tensor. 
-#==============================================================================
-    new_positions = TT.switch(accept_matrix, final_pos, positions)
-        # ACCEPT RATE UPDATES #
-    # perform exponential moving average
-    mean_dtype = theano.scalar.upcast(accept.dtype, avg_acceptance_rate.dtype)
-#==============================================================================
-#     In pytorch we can jjust use the '+' operator.  Will have to use the torch
-#     operator for the mean. 
-#==============================================================================
-    new_acceptance_rate = TT.add(
-        avg_acceptance_slowness * avg_acceptance_rate,
-        (1.0 - avg_acceptance_slowness) * accept.mean(dtype=mean_dtype))
-    # STEPSIZE UPDATES #
-    # if acceptance rate is too low, our sampler is too "noisy" and we reduce
-    # the stepsize. If it is too high, our sampler is too conservative, we can
-    # get away with a larger stepsize (resulting in better mixing).
-#==============================================================================
-#     USE IF STATEMENTS
-#==============================================================================
-    _new_stepsize = TT.switch(avg_acceptance_rate > target_acceptance_rate,
-                              stepsize * stepsize_inc, stepsize * stepsize_dec)
-    # maintain stepsize in [stepsize_min, stepsize_max]
-#==============================================================================
-#     Will have to change clip, all it does is ensures that if the step size
-#       is outside of the given range, then we assign the step value to the
-#       value that is closet to the bound.
-#==============================================================================
-    new_stepsize = TT.clip(_new_stepsize, stepsize_min, stepsize_max)
+    theta - a slice of a torch.Variable -  our parameter of interest 
+    theta (label x) is constructed as follows:
+                [ x11 x12 .... x1D]         [ p11 p12 .... p1D]
+                [ x21   ....   x2D]         [ p21   ....   p2D]
+   theta =      [ :    ....      :]    p   =[ :   ....      : ] 
+                [ :   ....       :]         [ :   ....       :]
+                [xN1 ....      xND]         [pN1 ....      pND]
+                
     
-    return [(positions, new_positions),(stepsize, new_stepsize),(avg_acceptance_rate, new_acceptance_rate)]
-  
-class HMC_sampler(object):
-    """
-    Convenience wrapper for performing Hybrid Monte Carlo (HMC). It creates the
-    symbolic graph for performing an HMC simulation (using `hmc_move` and
-    `hmc_updates`). The graph is then compiled into the `simulate` function, a
-    theano function which runs the simulation and updates the required shared
-    variables.
+    this function deals with a slice theta[i][:] = [xi1,...,xiD]
+    We have to make n calls of this function for each batch - POTENTIALLY SLOW
+    '''
+    
+    # for each row vector in theta, representing a particle at a point in 
+    # space. We would like to associate a good intial starting value
+    stepsize = tensor.ones(theta.size(0))
+    p_init   = Variable(torch.randn(theta.size()),requires_grad = True)
+    # may have to intialise theta_new and p_new as variables with 
+    # reqires_grad = True. If properties are not carried forward. 
+    
+    theta_next, p_next = leapfrog(theta, p_init, stepsize)
+    
+    # This will return a scalar for each batch. 
+    p_joint_next     = cal_joint(theta_next,p_next)
+    p_joint_prev     = cal_joint(theta , p_init)
+    
+    alpha            = p_joint_new / p_joint_prev
+   #implement if statement in tensors
+   # if we decide to processes all batches at once we can use the following 
+   # line:    a_values         = 2*(alpha>0.5).float() - 1 
+    a_value           = 2*(alpha>0.5).float() - 1
+    truth             = torch.gt(torch.pow(alpha,a),torch.pow(2,-a_values))
+    
+    # The following while loop, should return a stepsize, as a tensor, with 
+    # the optimal starting value. 
+    while(truth[0][0]):
+        stepsize           = torch.pow(2,a_values) * stepsize
+        theta_next, p_next = leapfrog(theta, p_init, stepsize)
+        
+        p_joint_next     = cal_joint(theta_next,p_next)
+        p_joint_prev     = cal_joint(theta , p_init)
+        alpha            = p_joint_new / p_joint_prev
+        truth            = torch.gt(torch.pow(alpha,a),torch.pow(2,-a_values))
 
-    Users should interface with the sampler thorugh the `draw` function which
-    advances the markov chain and returns the current sample by calling
-    `simulate` and `get_position` in sequence.
+    return stepsize 
 
-    The hyper-parameters are the same as those used by Marc'Aurelio's
-    'train_mcRBM.py' file (available on his personal home page).
-    """
+def cal_joint(theta_row, p_row):
+    '''Takes the one of column of theta and the corresponding column 
+    of p, and returns a scalar value of the joint P(\theta, p) at
+    the corresponding values. The potential_fn and kinetic_fn both return
+    scalars, thus the output is a scalar. But it is a torch.Tensor scalar
+    of size (1,1)'''
+    return torch.exp(-Hamiltonian(theta_row,p_row))
 
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+def Hamiltonian(theta, p):
+    ''' Returns the Hamiltonian K(P;theta) + U(theta). The notation ; 
+    corresponds to: this function may be dependent on this variable. '''
+    return potential_fn(theta) + kinetic_fn(p)
 
-    @classmethod
-    def new_from_shared_positions(
-        cls,
-        shared_positions,
-        potential_fn,
-        initial_stepsize=0.01,
-        target_acceptance_rate=.9,
-        n_steps=20,
-        stepsize_dec=0.98,
-        stepsize_min=0.001,
-        stepsize_max=0.25,
-        stepsize_inc=1.02,
-        # used in geometric avg. 1.0 would be not moving at all
-        avg_acceptance_slowness=0.9,
-        seed=12345
-    ):
-        """
-        :param shared_positions: theano ndarray shared var with
-            many particle [initial] positions
-
-        :param potential_fn:
-            callable such that potential_fn(positions)
-            returns theano vector of energies.
-            The len of this vector is the batchsize.
-
-            The sum of this potential vector must be differentiable (with
-            theano.tensor.grad) with respect to the positions for HMC
-            sampling to work.
-
-        """
-        # allocate shared variables
-        stepsize = sharedX(initial_stepsize, 'hmc_stepsize')
-        avg_acceptance_rate = sharedX(target_acceptance_rate,
-                                      'avg_acceptance_rate')
-        s_rng = theano.sandbox.rng_mrg.MRG_RandomStreams(seed)
-
-        # define graph for an `n_steps` HMC simulation
-        accept, final_pos = hmc_move(
-            s_rng,
-            shared_positions,
-            potential_fn,
-            stepsize,
-            n_steps)
-
-        # define the dictionary of updates, to apply on every `simulate` call
-        simulate_updates = hmc_updates(
-            shared_positions,
-            stepsize,
-            avg_acceptance_rate,
-            final_pos=final_pos,
-            accept=accept,
-            stepsize_min=stepsize_min,
-            stepsize_max=stepsize_max,
-            stepsize_inc=stepsize_inc,
-            stepsize_dec=stepsize_dec,
-            target_acceptance_rate=target_acceptance_rate,
-            avg_acceptance_slowness=avg_acceptance_slowness)
-
-        # compile theano function
-        simulate = function([], [], updates=simulate_updates)
-
-        # create HMC_sampler object with the following attributes ...
-        return cls(
-            positions=shared_positions,
-            stepsize=stepsize,
-            stepsize_min=stepsize_min,
-            stepsize_max=stepsize_max,
-            avg_acceptance_rate=avg_acceptance_rate,
-            target_acceptance_rate=target_acceptance_rate,
-            s_rng=s_rng,
-            _updates=simulate_updates,
-            simulate=simulate)
-
-    def draw(self, **kwargs):
-        """
-        Returns a new position obtained after `n_steps` of HMC simulation.
-
-        Parameters
-        ----------
-        kwargs: dictionary
-            The `kwargs` dictionary is passed to the shared variable
-            (self.positions) `get_value()` function.  For example, to avoid
-            copying the shared variable value, consider passing `borrow=True`.
-
-        Returns
-        -------
-        rval: numpy matrix
-            Numpy matrix whose of dimensions similar to `initial_position`.
-       """
-        self.simulate()
-        return self.positions.get_value(borrow=False)
-
-def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=10):
-    batchsize = 3
-
-    rng = numpy.random.RandomState(123)
-
-    # Define a covariance and mu for a gaussian
-    mu = numpy.array(rng.rand(dim) * 10, dtype=theano.config.floatX)
-    cov = numpy.array(rng.rand(dim, dim), dtype=theano.config.floatX)
-    cov = (cov + cov.T) / 2.
-    cov[numpy.arange(dim), numpy.arange(dim)] = 1.0
-    cov_inv = numpy.linalg.inv(cov)
-
-    # Define potential function for a multi-variate Gaussian
-    def gaussian_potential(x):
-        return 0.5 * (theano.tensor.dot((x - mu), cov_inv) *
-                      (x - mu)).sum(axis=1)
-
-    # Declared shared random variable for positions
-    position = rng.randn(batchsize, dim).astype(theano.config.floatX)
-    position = theano.shared(position)
-
-    # Create HMC sampler
-    sampler = sampler_cls(position, gaussian_potential,
-                          initial_stepsize=1e-3, stepsize_max=0.5)
-
-    # Start with a burn-in process
-    garbage = [sampler.draw() for r in range(burnin)]  # burn-in Draw
-    # `n_samples`: result is a 3D tensor of dim [n_samples, batchsize,
-    # dim]
-    _samples = numpy.asarray([sampler.draw() for r in range(n_samples)])
-    # Flatten to [n_samples * batchsize, dim]
-    samples = _samples.T.reshape(dim, -1).T
-
-    print('****** TARGET VALUES ******')
-    print('target mean:', mu)
-    print('target cov:\n', cov)
-
-    print('****** EMPIRICAL MEAN/COV USING HMC ******')
-    print('empirical mean: ', samples.mean(axis=0))
-    print('empirical_cov:\n', numpy.cov(samples.T))
-
-    print('****** HMC INTERNALS ******')
-    print('final stepsize', sampler.stepsize.get_value())
-    print('final acceptance_rate', sampler.avg_acceptance_rate.get_value())
-
-    return sampler
-
-def test_hmc():
-    sampler = sampler_on_nd_gaussian(HMC_sampler.new_from_shared_positions,
-                                     burnin=1000, n_samples=1000, dim=5)
-    assert abs(sampler.avg_acceptance_rate.get_value() -
-               sampler.target_acceptance_rate) < .1
-    assert sampler.stepsize.get_value() >= sampler.stepsize_min
-    assert sampler.stepsize.get_value() <= sampler.stepsize_max
+def leapfrog(theta, p, stepsize):
+    '''Performs the integrator step, via the leapfrog method, as described in 
+        Dune 1987. 
+        
+        theta     -   torch.Variable \mathbb{R}^{1 x D} type tensor float64
+        p         -   torch.Variable \mathbb{R}^{1 x D} type tensor float64
+        stepsize  -   scalar 
+        
+    '''
+    # first half step momentum - hopefully can replace with pytorch command.
+    p        = p + 0.5*stepsize*grad_potential_fn(theta)
+    # full step theta
+    theta    = theta + stepsize*grad_kinetic_fn(p)
+    # completing full step of momentum
+    p        = p + 0.5*stepsize*grad_potential_fn(theta)
+    
+    return theta, p
+        
+def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_iter):
+    '''This function implements algorithm 5 of the NUTS sampler 
+    Hoffman and Gelman 2014, to create the optimal value for the stepsize
+    using stochastic optimization.
+    
+    thtea_init          - 
+    delta               - desired average acceptance probability
+    simulation length   - stepsize * L - L is the number of trajectories run
+    no_samples          - How many samples that we want to collect
+    no_adapt_iter       - Number of iterations after which to stop the adaptation
+    H                   - Statistic that describes some aspect of the behivour
+                          of an MCMC algo
+    h(stepsize)         - Expectation of H, h(stepsize) = \mathbb{E}_{t}[H_{t} | stepsize]
+    t_{0}               - A free parameter taht stabilzes the intial 
+                          iterations of the algorithm
+    gamma               - is free parameter that controls the amount of
+                          shrinkage towards mu
+    mu                  - freely choosen pt that the iterates stepsize_{t} 
+                          are shrunk towards
+    kappa               - free parameter between (0.5,1] - mainly to reduce 
+                         the computation time to find optimal stepsize
+    '''
+    # initial parameters
+    
+    stepsize_init       = findreasonable_epsilon(theta_init)
+    mu                  = torch.log(10*stepsize_init)
+    stepsize_avg        = torch.ones(1,1)
+    H_avg_init          = torch.zeros(1,1)
+    gamma               = 0.05
+    t_0                 = 10
+    kappa               = 0.75
+    
+    for i in range(1,no_samples):
+        p_init     = torch.randn(theta_init.size())
+        theta_next = theta_prev
+        
+    
+    
+    
+#def HMC(theat_init, stepsize, steplength, potential_ft, kinetic_ft, no_samples):
+#    '''Performs the integrator step, via the leapfrog method, as described in 
+#    Dune 1987. 
+#    theta_init    - torch.Variable \mathbb{R}^{N x D}
+#    stepsize      - scalar
+#    steplength    - scalar
+#    potential_ft  - USER_DEFINED
+#    kiniteic_ft   - USER_DEFINED
+#    no_samples    - scalar
+#    for n = 1 to no_samples:
+#        

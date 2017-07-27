@@ -367,6 +367,8 @@ class HMC_sampler(object):
 
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
+        # could use for key, value in kwargs.items():
+#            setattr(self,key,value)
 
     @classmethod
     def new_from_shared_positions(
@@ -459,8 +461,8 @@ class HMC_sampler(object):
        """
         self.simulate()
         return self.positions.get_value(borrow=False)
-def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=10):
-    batchsize = 3
+def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=3):
+    batchsize = 1
 
     rng = numpy.random.RandomState(123)
 
@@ -505,10 +507,9 @@ def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=10):
     print('final acceptance_rate', sampler.avg_acceptance_rate.get_value())
 
     return sampler
-def test_hmc():
-    sampler = sampler_on_nd_gaussian(HMC_sampler.new_from_shared_positions,
-                                     burnin=1000, n_samples=1000, dim=2)
-    assert abs(sampler.avg_acceptance_rate.get_value() -
-               sampler.target_acceptance_rate) < .1
-    assert sampler.stepsize.get_value() >= sampler.stepsize_min
-    assert sampler.stepsize.get_value() <= sampler.stepsize_max
+sampler = sampler_on_nd_gaussian(HMC_sampler.new_from_shared_positions,
+                                 burnin=1000, n_samples=1000, dim=3)
+assert abs(sampler.avg_acceptance_rate.get_value() -
+           sampler.target_acceptance_rate) < .1
+assert sampler.stepsize.get_value() >= sampler.stepsize_min
+assert sampler.stepsize.get_value() <= sampler.stepsize_max

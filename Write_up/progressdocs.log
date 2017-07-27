@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.11.20)  25 JUL 2017 18:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.11.20)  27 JUL 2017 14:19
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1226,7 +1226,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 373--374
 
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 387.
-[13]
+[13] [14]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 393.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 393.
  (./progressdocs.aux)
@@ -1237,8 +1237,8 @@ Package rerunfilecheck Info: File `progressdocs.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 393.
  ) 
 Here is how much of TeX's memory you used:
- 19005 strings out of 493013
- 346058 string characters out of 6133342
+ 19006 strings out of 493013
+ 346065 string characters out of 6133342
  452199 words of memory out of 5000000
  22013 multiletter control sequences out of 15000+600000
  15958 words of font info for 101 fonts, out of 8000000 for 9000
@@ -1265,10 +1265,10 @@ ve/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/
 exmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2016/texm
 f-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on progressdocs.pdf (14 pages, 324433 bytes).
+Output written on progressdocs.pdf (15 pages, 324725 bytes).
 PDF statistics:
- 306 PDF objects out of 1000 (max. 8388607)
- 262 compressed objects within 3 object streams
- 84 named destinations out of 1000 (max. 500000)
+ 311 PDF objects out of 1000 (max. 8388607)
+ 266 compressed objects within 3 object streams
+ 85 named destinations out of 1000 (max. 500000)
  15495 words of extra memory for PDF output out of 17280 (max. 10000000)
 

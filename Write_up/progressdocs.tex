@@ -172,7 +172,7 @@ The momentum vairables at the end of this $L$-step trajectory are then negated, 
 \end{algorithm}
 If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
 The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.
-where $U = -\log(\pi(\theta))$,  $M$ is the number of samples we wish to take , $(\theta^{'}, p^{'})$ is the generated proposal and we propose setting $\theta^{m} = \theta^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
+Where $U = -\log(\pi(\theta))$,  $M$ is the number of samples we wish to take , $(\theta^{'}, p^{'})$ is the generated proposal and we propose setting $\theta^{m} = \theta^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
 A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $q$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $q$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $q_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
 
 \section{Discrete 'Discontinuous' Hamiltonian Monte Carlo (DHMC)}
@@ -351,7 +351,7 @@ Another important class is \textit{autograd.Function}, which is interconnected w
 
 \subsubsection{Gradients}
 
-To calculate \textbf{gradients} from our \textit{Variable} object we apply the method \textit{<newVariable>.backward()} (where \textit{newVariable} is created from the original variable) and then extract the attribute \textit{<Variable>.grad} from the original variable. We are interested in the relation between the \textit{newVariable} and the \textit{Variable} as composition of functions, and the gradients of those functions evaluated at the a particular point. 
+To calculate \textbf{gradients} from our \textit{Variable} object we apply the method \textit{<newVariable>.backward()} (where \textit{newVariable} is created from the original variable) and then extract the attribute \textit{<Variable>.grad} from the original variable. We are interested in the relation between the \textit{newVariable} and the \textit{Variable} as composition of functions, and the gradients of those functions evaluated at the a particular point. For inference it is much better to use \tif{volitile} flag when creating the variable. As we do not require backpropogation of gradients. Only the forward propagation. This is much more memory efficient. 
 
 
 \subsection{Neural Networks in Torch}
