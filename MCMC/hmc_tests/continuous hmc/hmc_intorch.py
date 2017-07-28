@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Wed Jul 26 14:59:28 2017
 
+# -*- coding: utf-8 -*-
 @author: bradley
 
 Notes:
@@ -14,13 +14,14 @@ Notes:
     U(theta) should return a scalar given some vector R^{1 \times D}
     
 """
+
 # alogirthm 4
 import numpy as np
 import torch
 from torch.autograd import Variable
 
 
-def findreasonable_epsilon(theta):
+def findreasonable_epsilon(theta,dim):
     '''A function that uses (Hoffman and Gelmans 2014) approach to finding
     the right step size \epsilon. 
     
@@ -35,11 +36,17 @@ def findreasonable_epsilon(theta):
     
     this function deals with a slice theta[i][:] = [xi1,...,xiD]
     We have to make n calls of this function for each batch - POTENTIALLY SLOW
+    
+    dim    - the number of dimensions we wish to sample from
     '''
     
     # for each row vector in theta, representing a particle at a point in 
     # space. We would like to associate a good intial starting value
     stepsize = tensor.ones(theta.size(0))
+    
+    # we can switch the option volitile - True, rather than require_grad.
+    # much fast for inference. See pytorch documentation. 
+    
     p_init   = Variable(torch.randn(theta.size()),requires_grad = True)
     # may have to intialise theta_new and p_new as variables with 
     # reqires_grad = True. If properties are not carried forward. 
@@ -93,9 +100,9 @@ def leapfrog(theta, p, stepsize):
         
     '''
     # first half step momentum - hopefully can replace with pytorch command.
-    p        = p + 0.5*stepsize*grad_potential_fn(theta)
+    p        = p + 0.5*stepsize*potential_fn(theta, gauss = True, grad = True)
     # full step theta
-    theta    = theta + stepsize*grad_kinetic_fn(p)
+    theta    = theta + stepsize*grad_kinetic_fn(p, gauss = True)
     # completing full step of momentum
     p        = p + 0.5*stepsize*grad_potential_fn(theta)
     
@@ -213,3 +220,75 @@ def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_
         else:
             stepsize = stepsize_avg
     return theta
+
+def potential_fn(theta,dim, grad = False):
+    '''Calulates the potential energy. Uses the pytorch back end to 
+     automatically calcualte the gradients. 
+     
+     theta     - Variable object in pytorch.\mathbb{R}^{1 \times D}
+     grad      - bool - If true returns gradient w.r.t theta.
+     dim       - dimension of system 
+     
+     returns  U(\theta) if grad = False
+          or  dU_dtheta if grad = True
+     
+     ************* N-dim Gaussian implemented here for testing *************
+     '''
+    mu   = torch.rand(dim)
+    cov  = torch.rand(dim,dim)
+    # ensures postive definite and symmetric
+    cov  = (cov + torch.transpose(cov, dim0 = 0, dim1 = 1)) / 2
+    for i in range(dim):
+        cov[i][i]  = 1
+    cov_inv = torch.inverse(cov)
+     
+     if grad:
+         return theta.         
+     else:
+         return 0.5 * torch.mm(torch.mm((theta - mu), cov_inv),
+                      torch.transpose(theta - mu),0,1)
+
+
+def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
+    '''Implements the given kinetic energy of the system. Automatically 
+    calulates gradients if required. 
+    
+    p       - Variable object in pytorch. \mathbb{R}^{1 \times D}
+    M_inv   - Is a positive symmetric, diagonal matrix. Each diag represents
+              M_inv_{ii} represents the component p_{i} 
+    gauss   - bool - if True calculates the stadard gaussian K.E.
+                     K(p) = 0.5*M^{-1}* p*p  Does elementwise multiplication
+    laplace - bool - if True calculates the Laplace momentum instead
+                     K(p) = m^{-1} | p | 
+    grad    - bool - if True calcules gradient dk/dp
+    
+    returns
+    
+    K(p) or dk_dp
+    '''
+    if grad:
+        if gauss:
+            return torch.mm(p,M_inv)
+        else:
+            return 0 #only makes sense in the discrete case as derivative of |x| is undefined 
+    else:
+        if gauss:
+            return torch.mm(torch.mm(p,M_inv),torch.transpose(p,0,1))
+        else:
+            return torch.mm(torch.abs(p),M_inv)
+        
+
+
+#    Needed for when running the sampler
+#  
+#    print('****** TARGET VALUES ******')
+#    print('target mean:', mu)
+#    print('target cov:\n', cov)
+#
+#    print('****** EMPIRICAL MEAN/COV USING HMC ******')
+#    print('empirical mean: ', samples.mean(axis=0))
+#    print('empirical_cov:\n', numpy.cov(samples.T))
+#
+#    print('****** HMC INTERNALS ******')
+#    print('final stepsize', sampler.stepsize.get_value())
+#    print('final acceptance_rate', sampler.avg_acceptance_rate.get_value())
