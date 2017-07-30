@@ -7,12 +7,7 @@ Created on Wed Jul 26 14:59:28 2017
 
 Notes:
     
-    Ensure in the potential and energy functions that we are doing element
-    wise multiplication and returning R^{1 \times D}
-    
-    Do we really want that?????
-    U(theta) should return a scalar given some vector R^{1 \times D}
-    
+
 """
 
 # alogirthm 4
@@ -120,7 +115,7 @@ def metropolis_accept_reject(theta_next,theta_current, p_next, p_current):
     p_next            - the proposed momentum
     p_current         - the current momentum
     
-    returns bool
+    returns *to update*
     
     '''
     
@@ -266,17 +261,19 @@ def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
     
     K(p) or dk_dp
     '''
-    if grad:
-        if gauss:
-            return torch.mm(p,M_inv)
+    if gauss:
+        K =  torch.mm(torch.mm(p,M_inv),torch.transpose(p,0,1))
+        if grad:
+            K.backward()
+            return p.grad
         else:
-            return 0 #only makes sense in the discrete case as derivative of |x| is undefined 
+            return K
     else:
-        if gauss:
-            return torch.mm(torch.mm(p,M_inv),torch.transpose(p,0,1))
-        else:
-            return torch.mm(torch.abs(p),M_inv)
-        
+         K = torch.mm(torch.abs(p),M_inv) 
+         if grad:
+             return 0#only makes sense in the discrete case as derivative of |x| is undefined
+         else:
+             return K
 
 
 #    Needed for when running the sampler
