@@ -10,15 +10,17 @@ Notes:
 
 """
 
-# alogirthm 4
+
 import numpy as np
 import torch
 from torch.autograd import Variable
 
+class SizeError(Exception):
+    pass
 
 def findreasonable_epsilon(theta,dim):
-    '''A function that uses (Hoffman and Gelmans 2014) approach to finding
-    the right step size \epsilon. 
+    '''A function that implements algorithm 4 from (Hoffman and Gelmans 2014) 
+    a heuristic approach for finding the right step size \epsilon. 
     
     theta - a slice of a torch.Variable -  our parameter of interest 
     theta (label x) is constructed as follows:
@@ -42,7 +44,7 @@ def findreasonable_epsilon(theta,dim):
     # we can switch the option volitile - True, rather than require_grad.
     # much fast for inference. See pytorch documentation. 
     
-    p_init   = Variable(torch.randn(theta.size()),requires_grad = True)
+    p_init   = torch.randn(theta.size())
     # may have to intialise theta_new and p_new as variables with 
     # reqires_grad = True. If properties are not carried forward. 
     
@@ -89,17 +91,19 @@ def leapfrog(theta, p, stepsize):
     '''Performs the integrator step, via the leapfrog method, as described in 
         Dune 1987. 
         
-        theta     -   torch.Variable \mathbb{R}^{1 x D} type tensor float64
-        p         -   torch.Variable \mathbb{R}^{1 x D} type tensor float64
-        stepsize  -   scalar 
+        theta     -   torch.Variable \mathbb{R}^{1 x D} type tensor float
+        p         -   torch.Variable \mathbb{R}^{1 x D} type tensor float        stepsize  -   scalar 
         
     '''
+    if isinstance(p, np.ndarray):
+        p     = torch.from_numpy(p).float()
+        
     # first half step momentum - hopefully can replace with pytorch command.
     p        = p + 0.5*stepsize*potential_fn(theta, gauss = True, grad = True)
     # full step theta
-    theta    = theta + stepsize*grad_kinetic_fn(p, gauss = True)
+    theta    = theta + stepsize*kinetic_fn(p, gauss = True, grad = True)
     # completing full step of momentum
-    p        = p + 0.5*stepsize*grad_potential_fn(theta)
+    p        = p + 0.5*stepsize*potential_fn(theta, gauss = True, grad = True)
     
     return theta, p
         
@@ -219,6 +223,10 @@ def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_
 def potential_fn(theta,dim, grad = False):
     '''Calulates the potential energy. Uses the pytorch back end to 
      automatically calcualte the gradients. 
+     All variables that go into the potential_fn will have to be declared
+     as torch.autograd.Variable(<variable>, requires_grad = <bool>)
+     Where only if the gradient of the variable is required do you
+     set the bool to True, else set to False. 
      
      theta     - Variable object in pytorch.\mathbb{R}^{1 \times D}
      grad      - bool - If true returns gradient w.r.t theta.
@@ -229,28 +237,53 @@ def potential_fn(theta,dim, grad = False):
      
      ************* N-dim Gaussian implemented here for testing *************
      '''
-    mu   = torch.rand(dim)
-    cov  = torch.rand(dim,dim)
+     # convert to torch float, if np array .
+    if isinstance(theta, np.ndarray):
+       theta = torch.from_numpy(theta).float()
+    
+    # convert theta to a variable.
+    theta    = Variable(theta, requires_grad = True)
+#==============================================================================
+#     May want to move the construction of the mean and cov outside of
+#     the function. It will be much cleaner and much more useful fo0r 
+#     testing. 
+#==============================================================================
+    # randn draws from N(0,1) use .normal_(mean = <mean>, std = <std> )
+    mu   = Variable(torch.randn(dim), requires_grad = False) 
+    cov  = torch.randn(dim,dim)
     # ensures postive definite and symmetric
     cov  = (cov + torch.transpose(cov, dim0 = 0, dim1 = 1)) / 2
     for i in range(dim):
         cov[i][i]  = 1
-    cov_inv = torch.inverse(cov)
-     
-     if grad:
-         return theta.         
-     else:
-         return 0.5 * torch.mm(torch.mm((theta - mu), cov_inv),
-                      torch.transpose(theta - mu),0,1)
+    cov_inv = Variable(torch.inverse(cov), requites_grad = False)
+    
+    # calcualte the potential 
+    potential = 0.5 * (theta - mu).mm(cov_inv).mm(torch.transpose(theta - mu),0,1))
+    if grad:
+        potential.backward()
+        dU_dtheta = theta.grad.data
+        # zero gradients
+        theta.grad.data.zero()
+        ##*#****$**$*$*$*$$**$
+        # try:except, only for testing
+        ##*#****$**$*$*$*$$**$
+        # ensure size of gradient \equiv to size of theta
+        try:
+            boolean = theta.size() == dU_dtheta.size())
+            return dU_dtheta
+        except SizeError as e:
+            print("The size of the gradient and theta do not match")
+    else:
+        return potential
 
 
 def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
     '''Implements the given kinetic energy of the system. Automatically 
     calulates gradients if required. 
     
-    p       - Variable object in pytorch. \mathbb{R}^{1 \times D}
+    p       -  \mathbb{R}^{1 \times D} dtype = float32
     M_inv   - Is a positive symmetric, diagonal matrix. Each diag represents
-              M_inv_{ii} represents the component p_{i} 
+              M_inv_{ii} represents the 'mass' component p_{i} dype = float32
     gauss   - bool - if True calculates the stadard gaussian K.E.
                      K(p) = 0.5*M^{-1}* p*p  Does elementwise multiplication
     laplace - bool - if True calculates the Laplace momentum instead
@@ -261,11 +294,25 @@ def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
     
     K(p) or dk_dp
     '''
+    # checks whether object is numpy array and converts to torch Float
+    # tensor
+    if isinstance(M_inv, np.ndarray):
+        M_inv = torch.from_numpy(M_inv).float()
+    if isinstance(p, np.ndarray):
+        p     = torch.from_numpy(p).float()
+    # create torch.autograd.Variable objects that can be differentiated.  
+    
+   
+    p     = Variable(p, requires_grad = True)
+    M_inv = Variable(M_inv, requires_grad = False)
     if gauss:
-        K =  torch.mm(torch.mm(p,M_inv),torch.transpose(p,0,1))
+        K =  p.mm(M_inv).mm(torch.transpose(p,0,1))
         if grad:
             K.backward()
-            return p.grad
+            dk_dp = p.grad.data
+            # zero gradients 
+            p.grad.data.zero_()
+            return dk_dp
         else:
             return K
     else:
