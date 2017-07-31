@@ -220,7 +220,7 @@ def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_
             stepsize = stepsize_avg
     return theta
 
-def potential_fn(theta,dim, grad = False):
+def potential_fn(theta,dim, mu, con_inv, grad = False):
     '''Calulates the potential energy. Uses the pytorch back end to 
      automatically calcualte the gradients. 
      All variables that go into the potential_fn will have to be declared
@@ -248,17 +248,9 @@ def potential_fn(theta,dim, grad = False):
 #     the function. It will be much cleaner and much more useful fo0r 
 #     testing. 
 #==============================================================================
-    # randn draws from N(0,1) use .normal_(mean = <mean>, std = <std> )
-    mu   = Variable(torch.randn(dim), requires_grad = False) 
-    cov  = torch.randn(dim,dim)
-    # ensures postive definite and symmetric
-    cov  = (cov + torch.transpose(cov, dim0 = 0, dim1 = 1)) / 2
-    for i in range(dim):
-        cov[i][i]  = 1
-    cov_inv = Variable(torch.inverse(cov), requites_grad = False)
-    
+        
     # calcualte the potential 
-    potential = 0.5 * (theta - mu).mm(cov_inv).mm(torch.transpose(theta - mu),0,1))
+    potential = 0.5 * (theta - mu).mm(cov_inv).mm(torch.transpose(theta - mu),0,1)
     if grad:
         potential.backward()
         dU_dtheta = theta.grad.data
@@ -269,7 +261,7 @@ def potential_fn(theta,dim, grad = False):
         ##*#****$**$*$*$*$$**$
         # ensure size of gradient \equiv to size of theta
         try:
-            boolean = theta.size() == dU_dtheta.size())
+            boolean = theta.size() == dU_dtheta.size()
             return dU_dtheta
         except SizeError as e:
             print("The size of the gradient and theta do not match")
@@ -322,17 +314,43 @@ def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
          else:
              return K
 
+def main():
+    # main loop for running the CHMC test
+    
+#==============================================================================
+#     INTIALISATIONS
+#==============================================================================
+    # randn draws from N(0,1) use .normal_(mean = <mean>, std = <std> )
+    dim  = 2
+    mu   = Variable(torch.randn(dim), requires_grad = False) 
+    cov  = torch.randn(dim,dim)
+    # ensures postive definite and symmetric
+    cov  = (cov + torch.transpose(cov, dim0 = 0, dim1 = 1)) / 2
+    for i in range(dim):
+        cov[i][i]  = 1
+    cov_inv = Variable(torch.inverse(cov), requites_grad = False)
+    
+    theta = torch.randn(1,dim)
+#==============================================================================
+#    PARAMETERS
+#==============================================================================
+    no_samples = 1000
+    
+#==============================================================================
+#     OUTPUTS
+#==============================================================================
+# The torch.mean and torch.var functions calculate the mean and variance
+# for each row of data 
+    theta_2np  =  theta.numpy()   
+    sample_var =  numpy.cov(theta_2np.T)
+    print('****** TARGET VALUES ******')
+    print('target mean:', mu)
+    print('target cov:\n', cov)
 
-#    Needed for when running the sampler
-#  
-#    print('****** TARGET VALUES ******')
-#    print('target mean:', mu)
-#    print('target cov:\n', cov)
-#
-#    print('****** EMPIRICAL MEAN/COV USING HMC ******')
-#    print('empirical mean: ', samples.mean(axis=0))
-#    print('empirical_cov:\n', numpy.cov(samples.T))
-#
-#    print('****** HMC INTERNALS ******')
-#    print('final stepsize', sampler.stepsize.get_value())
-#    print('final acceptance_rate', sampler.avg_acceptance_rate.get_value())
+    print('****** EMPIRICAL MEAN/COV USING HMC ******')
+    print('empirical mean: ', torch.mean(theta))
+    print('empirical_cov:\n', sample_var)
+
+    print('****** HMC INTERNALS ******')
+    print('final stepsize', final_stepsize)
+    print('final acceptance_rate', sampler.avg_acceptance_rate.get_value())
