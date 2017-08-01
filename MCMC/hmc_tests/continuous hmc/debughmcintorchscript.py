@@ -252,7 +252,7 @@ def metropolis_accept_reject(theta_next,theta_current, p_next, p_current,M_inv):
     else:
         return theta_current, -p_current, accept_prob
      
-def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, no_samples, no_adapt_iter, batch = 1):
+def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples, no_adapt_iter, batch = 1):
     '''This function implements algorithm 5 of the NUTS sampler 
     Hoffman and Gelman 2014, to create the optimal value for the stepsize
     using stochastic optimization.
@@ -289,7 +289,7 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, no_samples, no
     # initial parameters
     
     stepsize            = findreasonable_epsilon(theta_init, M_inv)
-    mu                  = torch.log(10*stepsize)
+    mulog               = torch.log(10*stepsize)
     stepsize_avg        = torch.ones(1,1)
     H_avg               = torch.zeros(1,1)
     gamma               = 0.05 * torch.ones(1,1)
@@ -307,12 +307,12 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, no_samples, no
         theta_current = theta_prev.clone()
         p_tilde       = p_init
         # the max operation only returns a float
-        ratio         = torch.round(torch.div(simulationlength,stepsize_current))
+        ratio         = torch.round(torch.div(simulationlength,stepsize))
         L             = torch.max(torch.ones(1,batch), ratio)
         
         # simulate trajectories.
         for j in range(0,L):
-            theta_next, p_next = leapfrog(theta_current, p_tilde, stepsize_current, M_inv)
+            theta_next, p_next = leapfrog(theta_current, p_tilde, stepsize, M_inv)
         
                
         # perform acceptance step
@@ -329,11 +329,12 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, no_samples, no
             H_avg   = (1 - const)*H_avg + const* (delta -  accept_prob)
             
             #log_newstepsize
-            stepsize      = torch.exp(mu - torch.div(torch.sqrt(itensor), gamma)*H_avg)
+            stepsize      = torch.exp(mulog - torch.div(torch.sqrt(itensor), gamma)*H_avg)
             temp          = torch.pow(itensor, -kappa)
             stepsize_avg  = torch.exp(temp*torch.log(stepsize) + (1- temp)*torch.log(stepsize_avg))
         else:
-            stepsize = stepsize_avg
+            stepsize          = stepsize_avg
+            simulation_length = stepsize-avg * L
     return theta
 
 
@@ -372,7 +373,7 @@ def main():
 # The torch.mean and torch.var functions calculate the mean and variance
 # for each row of data 
     theta       =  chmc_with_dualavg(theta_init, M_inv, delta, simulation_length,\
-                            no_samples, no_adapt_iter, batch = 1)                                     
+                            L, no_samples, no_adapt_iter, batch = 1)                                     
     theta_2np   =  theta.numpy()   
     sample_var  =  numpy.cov(theta_2np.T)
     sample_mean =  theta_2np.mean(axis = 0) 
