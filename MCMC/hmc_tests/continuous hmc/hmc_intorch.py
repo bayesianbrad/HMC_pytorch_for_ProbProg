@@ -18,7 +18,100 @@ from torch.autograd import Variable
 class SizeError(Exception):
     pass
 
-def findreasonable_epsilon(theta,dim):
+def potential_fn(theta, grad = False):
+    '''Calulates the potential energy. Uses the pytorch back end to 
+     automatically calcualte the gradients. 
+     All variables that go into the potential_fn will have to be declared
+     as torch.autograd.Variable(<variable>, requires_grad = <bool>)
+     Where only if the gradient of the variable is required do you
+     set the bool to True, else set to False. 
+     
+     theta     - Variable object in pytorch.\mathbb{R}^{1 \times D}
+     grad      - bool - If true returns gradient w.r.t theta.
+     
+     returns  U(\theta) if grad = False
+          or  dU_dtheta if grad = True
+     
+     ************* N-dim Gaussian implemented here for testing *************
+     '''
+     # convert to torch float, if np array .
+    if isinstance(theta, np.ndarray):
+       theta = torch.from_numpy(theta).float()
+    
+    # convert theta to a variable.
+    theta    = Variable(theta, requires_grad = True)
+#==============================================================================
+#     May want to move the construction of the mean and cov outside of
+#     the function. It will be much cleaner and much more useful fo0r 
+#     testing. 
+#==============================================================================
+        
+    # calcualte the potential 
+    U = 0.5 * (theta - mu).mm(cov_inv).mm(torch.transpose((theta - mu),0,1))
+    if grad:
+        U.backward()
+        dU_dtheta = theta.grad.data
+        # zero gradients
+        theta.grad.data.zero_()
+        ##*#****$**$*$*$*$$**$
+        # try:except, only for testing
+        ##*#****$**$*$*$*$$**$
+        # ensure size of gradient \equiv to size of theta
+        try:
+            boolean = theta.size() == dU_dtheta.size()
+            return dU_dtheta
+        except SizeError as e:
+            print("The size of the gradient and theta do not match")
+    else:
+        return U
+
+
+def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
+    '''Implements the given kinetic energy of the system. Automatically 
+    calulates gradients if required. 
+    
+    p       -  \mathbb{R}^{1 \times D} dtype = float32
+    M_inv   - Is a positive symmetric, diagonal matrix. Each diag represents
+              M_inv_{ii} represents the 'mass' component p_{i} dype = float32
+    gauss   - bool - if True calculates the stadard gaussian K.E.
+                     K(p) = 0.5*M^{-1}* p*p  Does elementwise multiplication
+    laplace - bool - if True calculates the Laplace momentum instead
+                     K(p) = m^{-1} | p | 
+    grad    - bool - if True calcules gradient dk/dp
+    
+    returns
+    
+    K(p) or dk_dp
+    '''
+    # checks whether object is numpy array and converts to torch Float
+    # tensor
+    if isinstance(M_inv, np.ndarray):
+        M_inv = torch.from_numpy(M_inv).float()
+    if isinstance(p, np.ndarray):
+        p     = torch.from_numpy(p).float()
+    # create torch.autograd.Variable objects that can be differentiated.  
+    
+   
+    p     = Variable(p, requires_grad = True)
+    M_inv = Variable(M_inv, requires_grad = False)
+    if gauss:
+        K =  p.mm(M_inv).mm(torch.transpose(p,0,1))
+        if grad:
+            K.backward()
+            dk_dp = p.grad.data
+            # zero gradients 
+            p.grad.data.zero_()
+            return dk_dp
+        else:
+            return K
+    else:
+         K = torch.mm(torch.abs(p),M_inv) 
+         if grad:
+             return 0#only makes sense in the discrete case as derivative of |x| is undefined
+         else:
+             return K
+
+def findreasonable_epsilon(theta):
     '''A function that implements algorithm 4 from (Hoffman and Gelmans 2014) 
     a heuristic approach for finding the right step size \epsilon. 
     
@@ -39,7 +132,7 @@ def findreasonable_epsilon(theta,dim):
     
     # for each row vector in theta, representing a particle at a point in 
     # space. We would like to associate a good intial starting value
-    stepsize = tensor.ones(theta.size(0))
+    stepsize = torch.ones(theta.size(0))
     
     # we can switch the option volitile - True, rather than require_grad.
     # much fast for inference. See pytorch documentation. 
@@ -54,23 +147,23 @@ def findreasonable_epsilon(theta,dim):
     p_joint_next     = cal_joint(theta_next,p_next)
     p_joint_prev     = cal_joint(theta , p_init)
     
-    alpha            = p_joint_new / p_joint_prev
+    alpha            = p_joint_next / p_joint_prev
    #implement if statement in tensors
    # if we decide to processes all batches at once we can use the following 
    # line:    a_values         = 2*(alpha>0.5).float() - 1 
     a_value           = 2*(alpha>0.5).float() - 1
-    truth             = torch.gt(torch.pow(alpha,a),torch.pow(2,-a_values))
+    truth             = torch.gt(torch.pow(alpha,a_value),torch.pow(2,-a_value))
     
     # The following while loop, should return a stepsize, as a tensor, with 
     # the optimal starting value. 
     while(truth[0][0]):
-        stepsize           = torch.pow(2,a_values) * stepsize
+        stepsize           = torch.pow(2,a_value) * stepsize
         theta_next, p_next = leapfrog(theta, p_init, stepsize)
         
         p_joint_next     = cal_joint(theta_next,p_next)
         p_joint_prev     = cal_joint(theta , p_init)
-        alpha            = p_joint_new / p_joint_prev
-        truth            = torch.gt(torch.pow(alpha,a),torch.pow(2,-a_values))
+        alpha            = p_joint_next / p_joint_prev
+        truth            = torch.gt(torch.pow(alpha,a),torch.pow(2,-a_value))
 
     return stepsize 
 
@@ -99,11 +192,11 @@ def leapfrog(theta, p, stepsize):
         p     = torch.from_numpy(p).float()
         
     # first half step momentum - hopefully can replace with pytorch command.
-    p        = p + 0.5*stepsize*potential_fn(theta, gauss = True, grad = True)
+    p        = p + 0.5*stepsize*potential_fn(theta, grad = True)
     # full step theta
     theta    = theta + stepsize*kinetic_fn(p, gauss = True, grad = True)
     # completing full step of momentum
-    p        = p + 0.5*stepsize*potential_fn(theta, gauss = True, grad = True)
+    p        = p + 0.5*stepsize*potential_fn(theta, grad = True)
     
     return theta, p
         
@@ -173,7 +266,7 @@ def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_
     # initial parameters
     
     stepsize            = findreasonable_epsilon(theta_init)
-    mu                  = torch.log(10*stepsize_init)
+    mu                  = torch.log(10*stepsize)
     stepsize_avg        = torch.ones(1,1)
     H_avg               = torch.zeros(1,1)
     gamma               = 0.05 * torch.ones(1,1)
@@ -220,103 +313,12 @@ def chmc_with_dualavg(theta_init, delta, simulationlength, no_samples, no_adapt_
             stepsize = stepsize_avg
     return theta
 
-def potential_fn(theta,dim, mu, con_inv, grad = False):
-    '''Calulates the potential energy. Uses the pytorch back end to 
-     automatically calcualte the gradients. 
-     All variables that go into the potential_fn will have to be declared
-     as torch.autograd.Variable(<variable>, requires_grad = <bool>)
-     Where only if the gradient of the variable is required do you
-     set the bool to True, else set to False. 
-     
-     theta     - Variable object in pytorch.\mathbb{R}^{1 \times D}
-     grad      - bool - If true returns gradient w.r.t theta.
-     dim       - dimension of system 
-     
-     returns  U(\theta) if grad = False
-          or  dU_dtheta if grad = True
-     
-     ************* N-dim Gaussian implemented here for testing *************
-     '''
-     # convert to torch float, if np array .
-    if isinstance(theta, np.ndarray):
-       theta = torch.from_numpy(theta).float()
-    
-    # convert theta to a variable.
-    theta    = Variable(theta, requires_grad = True)
-#==============================================================================
-#     May want to move the construction of the mean and cov outside of
-#     the function. It will be much cleaner and much more useful fo0r 
-#     testing. 
-#==============================================================================
-        
-    # calcualte the potential 
-    potential = 0.5 * (theta - mu).mm(cov_inv).mm(torch.transpose(theta - mu),0,1)
-    if grad:
-        potential.backward()
-        dU_dtheta = theta.grad.data
-        # zero gradients
-        theta.grad.data.zero()
-        ##*#****$**$*$*$*$$**$
-        # try:except, only for testing
-        ##*#****$**$*$*$*$$**$
-        # ensure size of gradient \equiv to size of theta
-        try:
-            boolean = theta.size() == dU_dtheta.size()
-            return dU_dtheta
-        except SizeError as e:
-            print("The size of the gradient and theta do not match")
-    else:
-        return potential
-
-
-def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
-    '''Implements the given kinetic energy of the system. Automatically 
-    calulates gradients if required. 
-    
-    p       -  \mathbb{R}^{1 \times D} dtype = float32
-    M_inv   - Is a positive symmetric, diagonal matrix. Each diag represents
-              M_inv_{ii} represents the 'mass' component p_{i} dype = float32
-    gauss   - bool - if True calculates the stadard gaussian K.E.
-                     K(p) = 0.5*M^{-1}* p*p  Does elementwise multiplication
-    laplace - bool - if True calculates the Laplace momentum instead
-                     K(p) = m^{-1} | p | 
-    grad    - bool - if True calcules gradient dk/dp
-    
-    returns
-    
-    K(p) or dk_dp
-    '''
-    # checks whether object is numpy array and converts to torch Float
-    # tensor
-    if isinstance(M_inv, np.ndarray):
-        M_inv = torch.from_numpy(M_inv).float()
-    if isinstance(p, np.ndarray):
-        p     = torch.from_numpy(p).float()
-    # create torch.autograd.Variable objects that can be differentiated.  
-    
-   
-    p     = Variable(p, requires_grad = True)
-    M_inv = Variable(M_inv, requires_grad = False)
-    if gauss:
-        K =  p.mm(M_inv).mm(torch.transpose(p,0,1))
-        if grad:
-            K.backward()
-            dk_dp = p.grad.data
-            # zero gradients 
-            p.grad.data.zero_()
-            return dk_dp
-        else:
-            return K
-    else:
-         K = torch.mm(torch.abs(p),M_inv) 
-         if grad:
-             return 0#only makes sense in the discrete case as derivative of |x| is undefined
-         else:
-             return K
 
 def main():
     # main loop for running the CHMC test
-    
+    # saves having to edit all the function passes
+    global mu
+    global cov_inv
 #==============================================================================
 #     INTIALISATIONS
 #==============================================================================
@@ -328,29 +330,35 @@ def main():
     cov  = (cov + torch.transpose(cov, dim0 = 0, dim1 = 1)) / 2
     for i in range(dim):
         cov[i][i]  = 1
-    cov_inv = Variable(torch.inverse(cov), requites_grad = False)
+    cov_inv = Variable(torch.inverse(cov), requires_grad = False)
     
-    theta = torch.randn(1,dim)
+
 #==============================================================================
 #    PARAMETERS
 #==============================================================================
-    no_samples = 1000
-    
+    theta_init        = torch.randn(1,dim)    
+    no_samples        = 1000
+    delta             = 0.65
+    L                 = 25
+    stepsize_init     = 1
+    simulation_length = L * stepsize_init
+    no_adapt_iter     = 200
 #==============================================================================
 #     OUTPUTS
 #==============================================================================
 # The torch.mean and torch.var functions calculate the mean and variance
 # for each row of data 
-    theta_2np  =  theta.numpy()   
-    sample_var =  numpy.cov(theta_2np.T)
+    theta       =  chmc_with_dualavg(theta_init, delta, simulation_length,\
+                            no_samples, no_adapt_iter, batch = 1)                                     
+    theta_2np   =  theta.numpy()   
+    sample_var  =  numpy.cov(theta_2np.T)
+    sample_mean =  theta_2np.mean(axis = 0) 
     print('****** TARGET VALUES ******')
     print('target mean:', mu)
     print('target cov:\n', cov)
 
     print('****** EMPIRICAL MEAN/COV USING HMC ******')
-    print('empirical mean: ', torch.mean(theta))
+    print('empirical mean: ', sample_mean)
     print('empirical_cov:\n', sample_var)
 
-    print('****** HMC INTERNALS ******')
-    print('final stepsize', final_stepsize)
-    print('final acceptance_rate', sampler.avg_acceptance_rate.get_value())
+
