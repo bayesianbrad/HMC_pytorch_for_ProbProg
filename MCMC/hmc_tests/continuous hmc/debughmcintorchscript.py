@@ -47,8 +47,7 @@ def potential_fn(theta, grad = False):
        theta = torch.from_numpy(theta).float()
     
     # convert theta to a variable.
-    theta    = Variable(theta, requires_grad = True)
-    print("Theta passed to potential", theta)
+    thetacopy    = Variable(theta, requires_grad = True)
 #==============================================================================
 #     May want to move the construction of the mean and cov outside of
 #     the function. It will be much cleaner and much more useful fo0r 
@@ -56,26 +55,24 @@ def potential_fn(theta, grad = False):
 #==============================================================================
         
     # calcualte the potential 
-    U = 0.5 * (theta - mu).mm(cov_inv).mm(torch.transpose((theta - mu),0,1))
-    print("The potential: ", U)
+    U = 0.5 * (thetacopy - mu).mm(cov_inv).mm(torch.transpose((thetacopy - mu),0,1))
     if grad:
         U.backward()
-        dU_dtheta = theta.grad.data
-        print("The derivative of theta wrt  U:  ", dU_dtheta)
+        dU_dtheta = thetacopy.grad.data
         # zero gradients
-        theta.grad.data.zero_()
+#        thetacopy.grad.data.zero_()
         ##*#****$**$*$*$*$$**$
         # try:except, only for testing
         ##*#****$**$*$*$*$$**$
         # ensure size of gradient \equiv to size of theta
-        time.sleep(6)
+        #time.sleep(6)
         try:
             boolean = theta.size() == dU_dtheta.size()
             return dU_dtheta
         except SizeError as e:
             print("The size of the gradient and theta do not match")
     else:
-        return U
+        return U.data
 
 
 def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
@@ -103,25 +100,23 @@ def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
         p     = torch.from_numpy(p).float()
     # create torch.autograd.Variable objects that can be differentiated.  
     
-   
-    p     = Variable(p, requires_grad = True)
+    pcopy = Variable(p, requires_grad = True)
+#    p     = Variable(p, requires_grad = True)
     M_inv = Variable(M_inv, requires_grad = False)
     if gauss:
-        K =  p.mm(M_inv).mm(torch.transpose(p,0,1))
+        K =  0.5*pcopy.mm(M_inv).mm(torch.transpose(pcopy,0,1))
         if grad:
             K.backward()
-            dk_dp = p.grad.data
-            # zero gradients 
-            p.grad.data.zero_()
+            dk_dp = pcopy.grad.data
             return dk_dp
         else:
-            return K
+            return K.data
     else:
          K = torch.mm(torch.abs(p),M_inv) 
          if grad:
              return 0#only makes sense in the discrete case as derivative of |x| is undefined
          else:
-             return K
+             return K.data
 
 def findreasonable_epsilon(theta, M_inv):
     '''A function that implements algorithm 4 from (Hoffman and Gelmans 2014) 
@@ -152,9 +147,10 @@ def findreasonable_epsilon(theta, M_inv):
     p_init   = torch.randn(theta.size())
     # may have to intialise theta_new and p_new as variables with 
     # reqires_grad = True. If properties are not carried forward. 
-    
+    print("Before :", theta, p_init)
     theta_next, p_next = leapfrog(theta, p_init, stepsize, M_inv)
     print('the leapfrog step of findres eps has been completed')
+    print("After: ", theta_next, p_next)
     # This will return a scalar for each batch. 
     p_joint_next     = cal_joint(theta_next,p_next,M_inv)
     p_joint_prev     = cal_joint(theta , p_init,M_inv)
@@ -170,13 +166,12 @@ def findreasonable_epsilon(theta, M_inv):
     # the optimal starting value. 
     while(truth[0][0]):
         stepsize           = torch.pow(2,a_value) * stepsize
-        stepsize.Float()
-        theta_next, p_next = leapfrog(theta, p_init, stepsize)
-        
+        # stepsize[0][0] ia used as we only want an integer value
+        theta_next, p_next = leapfrog(theta, p_init, stepsize[0][0], M_inv) 
         p_joint_next     = cal_joint(theta_next,p_next,M_inv)
         p_joint_prev     = cal_joint(theta , p_init, M_inv)
         alpha            = p_joint_next / p_joint_prev
-        truth            = torch.gt(torch.pow(alpha,a),torch.pow(2,-a_value))
+        truth            = torch.gt(torch.pow(alpha,a_value),torch.pow(2,-a_value))
 
     return stepsize 
 
@@ -208,17 +203,16 @@ def leapfrog(theta, p, stepsize, M_inv):
         p     = torch.from_numpy(p).float()
         
     # first half step momentum - hopefully can replace with pytorch command.
-    print("the momentum to be passed in", p)
-    time.sleep(5)
+    #time.sleep(5)
+    
     p        = p + 0.5*stepsize*potential_fn(theta, grad = True)
-    print("halfstep momentum", p, '\n')
+
+    print(type(p))
     # full step theta
     theta    = theta + stepsize*kinetic_fn(p, M_inv, gauss = True, grad = True)
-    print("fullstep position completed")
     # completing full step of momentum
-    time.sleep(5)
+    #time.sleep(5)
     p        = p + 0.5*stepsize*potential_fn(theta, grad = True)
-    print("last half step p", p)
     return theta, p
         
 
@@ -262,6 +256,7 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
                           how p_{i} are scaled. Usually a diagonal matrix
     delta               - desired average acceptance probability
     simulation length   - stepsize * L - L is the number of trajectories run
+    L                   - Number of trajectories
     no_samples          - How many samples that we want to collect
     no_adapt_iter       - Number of iterations after which to stop the adaptation
     H                   - Statistic that describes some aspect of the behivour
@@ -271,7 +266,7 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
                           iterations of the algorithm
     gamma               - is free parameter that controls the amount of
                           shrinkage towards mu
-    mu                  - freely choosen pt that the iterates stepsize_{t} 
+    mulog               - freely choosen pt that the iterates stepsize_{t} 
                           are shrunk towards
     kappa               - free parameter between (0.5,1] - mainly to reduce 
                          the computation time to find optimal stepsize
@@ -334,7 +329,6 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
             stepsize_avg  = torch.exp(temp*torch.log(stepsize) + (1- temp)*torch.log(stepsize_avg))
         else:
             stepsize          = stepsize_avg
-            simulation_length = stepsize-avg * L
     return theta
 
 
@@ -386,3 +380,4 @@ def main():
     print('empirical_cov:\n', sample_var)
 
 
+main()
