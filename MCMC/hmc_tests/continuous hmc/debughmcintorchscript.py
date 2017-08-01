@@ -137,43 +137,49 @@ def findreasonable_epsilon(theta, M_inv):
     dim    - the number of dimensions we wish to sample from
     '''
     
-    # for each row vector in theta, representing a particle at a point in 
-    # space. We would like to associate a good intial starting value
-    stepsize = 1
-    
-    # we can switch the option volitile - True, rather than require_grad.
-    # much fast for inference. See pytorch documentation. 
-    
-    p_init   = torch.randn(theta.size())
-    # may have to intialise theta_new and p_new as variables with 
-    # reqires_grad = True. If properties are not carried forward. 
-    print("Before :", theta, p_init)
-    theta_next, p_next = leapfrog(theta, p_init, stepsize, M_inv)
-    print('the leapfrog step of findres eps has been completed')
-    print("After: ", theta_next, p_next)
-    # This will return a scalar for each batch. 
-    p_joint_next     = cal_joint(theta_next,p_next,M_inv)
-    p_joint_prev     = cal_joint(theta , p_init,M_inv)
-    
-    alpha            = p_joint_next / p_joint_prev
-   #implement if statement in tensors
-   # if we decide to processes all batches at once we can use the following 
-   # line:    a_values         = 2*(alpha>0.5).float() - 1 
-    a_value           = 2*(alpha>0.5).float() - 1
-    truth             = torch.gt(torch.pow(alpha,a_value),torch.pow(2,-a_value))
-    
-    # The following while loop, should return a stepsize, as a tensor, with 
-    # the optimal starting value. 
-    while(truth[0][0]):
-        stepsize           = torch.pow(2,a_value) * stepsize
-        # stepsize[0][0] ia used as we only want an integer value
-        theta_next, p_next = leapfrog(theta, p_init, stepsize[0][0], M_inv) 
-        p_joint_next     = cal_joint(theta_next,p_next,M_inv)
-        p_joint_prev     = cal_joint(theta , p_init, M_inv)
-        alpha            = p_joint_next / p_joint_prev
-        truth            = torch.gt(torch.pow(alpha,a_value),torch.pow(2,-a_value))
-
-    return stepsize 
+#    # for each row vector in theta, representing a particle at a point in 
+#    # space. We would like to associate a good intial starting value
+#    stepsize = 1
+#    
+#    # we can switch the option volitile - True, rather than require_grad.
+#    # much fast for inference. See pytorch documentation. 
+#    
+#    p_init   = torch.randn(theta.size())
+#    # may have to intialise theta_new and p_new as variables with 
+#    # reqires_grad = True. If properties are not carried forward. 
+#    print("Before :", theta, p_init)
+#    theta_next, p_next = leapfrog(theta, p_init, stepsize, M_inv)
+#    print('the leapfrog step of findres eps has been completed')
+#    print("After: ", theta_next, p_next)
+#    # This will return a scalar for each batch. 
+#    p_joint_next     = cal_joint(theta_next,p_next,M_inv)
+#    p_joint_prev     = cal_joint(theta , p_init,M_inv)
+#    
+#    alpha            = p_joint_next / p_joint_prev
+#   #implement if statement in tensors
+#   # if we decide to processes all batches at once we can use the following 
+#   # line:    a_values         = 2*(alpha>0.5).float() - 1 
+#    a_value           = 2*(alpha>0.5).float() - 1
+#    truth             = torch.gt(torch.pow(alpha,a_value),torch.pow(2,-a_value))
+#    
+#    # The following while loop, should return a stepsize, as a tensor, with 
+#    # the optimal starting value. 
+#    while(truth[0][0]):
+#        stepsize           = torch.pow(2,a_value) * stepsize
+#        # stepsize[0][0] ia used as we only want an integer value
+#        theta_next, p_next = leapfrog(theta, p_init, stepsize[0][0], M_inv) 
+#        p_joint_next       = cal_joint(theta_next,p_next,M_inv)
+#        p_joint_prev       = cal_joint(theta , p_init, M_inv)
+#        alpha              = p_joint_next / p_joint_prev
+#        truth              = torch.gt(torch.pow(alpha,a_value),torch.pow(2,-a_value))
+#        if (a_value[0][0] == 1):
+#            stepsize = stepsize /2
+#            print("if statmeent triggered")
+#            break
+#
+#    print("Stepsize: ", stepsize)
+#    return stepsize 
+    return np.random.uniform(0.01, 0.20)
 
 def cal_joint(theta_row, p_row, M_inv):
     '''Takes the one of column of theta and the corresponding column 
@@ -198,16 +204,14 @@ def leapfrog(theta, p, stepsize, M_inv):
         M_inv     -  \mathbb{R}^{D x D} mass matrix
         
     '''
-    print("Stepsize: ", stepsize)
     if isinstance(p, np.ndarray):
         p     = torch.from_numpy(p).float()
         
     # first half step momentum - hopefully can replace with pytorch command.
     #time.sleep(5)
     
-    p        = p + 0.5*stepsize*potential_fn(theta, grad = True)
+    p     = p + 0.5*stepsize*potential_fn(theta, grad = True)
 
-    print(type(p))
     # full step theta
     theta    = theta + stepsize*kinetic_fn(p, M_inv, gauss = True, grad = True)
     # completing full step of momentum
@@ -241,7 +245,7 @@ def metropolis_accept_reject(theta_next,theta_current, p_next, p_current,M_inv):
     accept       = (accept_prob - u >=0)
     
     # the minus is to preserve symmetry
-    if (accept[0]):
+    if (accept[0][0]):
         return theta_next, -p_next,accept_prob
     else:
         return theta_current, -p_current, accept_prob
@@ -255,7 +259,7 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
     M_inv               - Mass matrix of the kinetic energy, represents 
                           how p_{i} are scaled. Usually a diagonal matrix
     delta               - desired average acceptance probability
-    simulation length   - stepsize * L - L is the number of trajectories run
+    simulationlength    - stepsize * L - L is the number of trajectories run
     L                   - Number of trajectories
     no_samples          - How many samples that we want to collect
     no_adapt_iter       - Number of iterations after which to stop the adaptation
@@ -283,14 +287,17 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
     '''
     # initial parameters
     
-    stepsize            = findreasonable_epsilon(theta_init, M_inv)
+    stepsize            = findreasonable_epsilon(theta_init, M_inv)*torch.ones(1,1)
     mulog               = torch.log(10*stepsize)
     stepsize_avg        = torch.ones(1,1)
     H_avg               = torch.zeros(1,1)
+    simulationlength    = simulationlength*torch.ones(1,1)
     gamma               = 0.05 * torch.ones(1,1)
     t_0                 = 10 * torch.ones(1,1)
     kappa               = 0.75 * torch.ones(1,1)
     theta_prev          = theta_init
+    
+    
     # To store all trajectories
     theta               = torch.Tensor(no_samples, theta_init.size(1))
     theta[0][:]         = theta_init
@@ -299,15 +306,15 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
         p_init        = torch.randn(theta_init.size())
         # Everything starts with intial values and will be modified 
         # accordingly
-        theta_current = theta_prev.clone()
+        theta_current = theta_prev
         p_tilde       = p_init
         # the max operation only returns a float
         ratio         = torch.round(torch.div(simulationlength,stepsize))
         L             = torch.max(torch.ones(1,batch), ratio)
         
         # simulate trajectories.
-        for j in range(0,L):
-            theta_next, p_next = leapfrog(theta_current, p_tilde, stepsize, M_inv)
+        for j in range(0,L.int()[0][0]):
+            theta_next, p_next = leapfrog(theta_current, p_tilde, stepsize[0][0], M_inv)
         
                
         # perform acceptance step
@@ -318,17 +325,19 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
         
         # Adapt parameters 
         
-        if i <= no_adapt_iter:
-            itensor = i * torch.ones(1,1)
-            const   = 1 / (itensor + t_0)
-            H_avg   = (1 - const)*H_avg + const* (delta -  accept_prob)
-            
-            #log_newstepsize
-            stepsize      = torch.exp(mulog - torch.div(torch.sqrt(itensor), gamma)*H_avg)
-            temp          = torch.pow(itensor, -kappa)
-            stepsize_avg  = torch.exp(temp*torch.log(stepsize) + (1- temp)*torch.log(stepsize_avg))
-        else:
-            stepsize          = stepsize_avg
+#        if i <= no_adapt_iter:
+#            itensor = i * torch.ones(1,1)
+#            const   = 1 / (itensor + t_0)
+#            H_avg   = (1 - const)*H_avg + const* (delta -  accept_prob)
+#            
+#            #log_newstepsize
+#            stepsize      = torch.exp(mulog - torch.div(torch.sqrt(itensor), gamma)*H_avg)
+#            temp          = torch.pow(itensor, -kappa)
+#            stepsize_avg  = torch.exp(temp*torch.log(stepsize) + (1- temp)*torch.log(stepsize_avg))
+#            print("In loop:  ", stepsize_avg)
+#        else:
+#            stepsize          = stepsize_avg
+#            print("Else condition ", stepsize_avg)
     return theta
 
 
@@ -355,12 +364,12 @@ def main():
 #==============================================================================
     theta_init        = torch.randn(1,dim)    
     M_inv             = torch.eye(theta_init.size(1))
-    no_samples        = 5
+    no_samples        = 500
     delta             = 0.65
     L                 = 5
     stepsize_init     = 1
     simulation_length = L * stepsize_init
-    no_adapt_iter     = 2
+    no_adapt_iter     = 150
 #==============================================================================
 #     OUTPUTS
 #==============================================================================
@@ -369,8 +378,9 @@ def main():
     theta       =  chmc_with_dualavg(theta_init, M_inv, delta, simulation_length,\
                             L, no_samples, no_adapt_iter, batch = 1)                                     
     theta_2np   =  theta.numpy()   
-    sample_var  =  numpy.cov(theta_2np.T)
+    sample_var  =  np.cov(theta_2np.T)
     sample_mean =  theta_2np.mean(axis = 0) 
+    print(theta)
     print('****** TARGET VALUES ******')
     print('target mean:', mu)
     print('target cov:\n', cov)
