@@ -215,13 +215,13 @@ def leapfrog(theta, p, stepsize, M_inv):
     # first half step momentum - hopefully can replace with pytorch command.
     #time.sleep(5)
     
-    p     = p + 0.5*stepsize*potential_fn(theta, grad = True)
+    p      = p + 0.5*stepsize*potential_fn(theta, grad = True)
 
     # full step theta
-    theta    = theta + stepsize*kinetic_fn(p, M_inv, gauss = True, grad = True)
+    theta  = theta + stepsize*kinetic_fn(p, M_inv, gauss = True, grad = True)
     # completing full step of momentum
     #time.sleep(5)
-    p        = p + 0.5*stepsize*potential_fn(theta, grad = True)
+    p       = p + 0.5*stepsize*potential_fn(theta, grad = True)
     return theta, p
         
 
