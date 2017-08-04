@@ -69,7 +69,8 @@ while t < nSamples
         q(:,t) = q(:,t-1);
     end
 end
- 
+mean1  = mean(q(:,1))
+mean2  = mean(q(:,2))
 % DISPLAY
 figure
 scatter(q(1,:),q(2,:),'k.'); hold on;
