@@ -62,7 +62,7 @@ while t < nSamples
     % ACCEPTANCE/REJECTION CRITERION
     alpha = min(1,exp((Ucurrent + Kcurrent) - (Uprop + Kprop)));
  
-    u = rand;
+    u = rand;  
     if u < alpha
         q(:,t) = qprop;
     else
