@@ -493,6 +493,7 @@ def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=3):
     _samples = numpy.asarray([sampler.draw() for r in range(n_samples)])
     # Flatten to [n_samples * batchsize, dim]
     samples = _samples.T.reshape(dim, -1).T
+    print(samples,samples.shape)
 
     print('****** TARGET VALUES ******')
     print('target mean:', mu)
@@ -508,7 +509,7 @@ def sampler_on_nd_gaussian(sampler_cls, burnin, n_samples, dim=3):
 
     return sampler
 sampler = sampler_on_nd_gaussian(HMC_sampler.new_from_shared_positions,
-                                 burnin=1000, n_samples=1000, dim=3)
+                                 burnin=1000, n_samples=1000, dim=2)
 assert abs(sampler.avg_acceptance_rate.get_value() -
            sampler.target_acceptance_rate) < .1
 assert sampler.stepsize.get_value() >= sampler.stepsize_min

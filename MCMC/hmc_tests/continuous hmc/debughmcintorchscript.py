@@ -22,6 +22,7 @@ import time
 import numpy as np
 import torch
 from torch.autograd import Variable
+from matplotlib import pyplot as plt 
 
 class SizeError(Exception):
     pass
@@ -59,6 +60,8 @@ def potential_fn(theta, grad = False):
     if grad:
         U.backward()
         dU_dtheta = thetacopy.grad.data
+#        print('true grad', (theta-mu.data).mm(cov_inv.data))
+#        print('Calcualted grad: ', dU_dtheta)
         # zero gradients
 #        thetacopy.grad.data.zero_()
         ##*#****$**$*$*$*$$**$
@@ -108,6 +111,8 @@ def kinetic_fn(p, M_inv, gauss  = True, laplace = False,  grad = False):
         if grad:
             K.backward()
             dk_dp = pcopy.grad.data
+#            print('Autograd: ', dk_dp)
+#            print('True grad: ', p.mm(M_inv.data))
             return dk_dp
         else:
             return K.data
@@ -179,7 +184,7 @@ def findreasonable_epsilon(theta, M_inv):
 #
 #    print("Stepsize: ", stepsize)
 #    return stepsize 
-    return np.random.uniform(0.01, 0.20)
+    return np.random.uniform(0.08, 0.19)
 
 def cal_joint(theta_row, p_row, M_inv):
     '''Takes the one of column of theta and the corresponding column 
@@ -287,10 +292,10 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
     '''
     # initial parameters
     
-    stepsize            = findreasonable_epsilon(theta_init, M_inv)*torch.ones(1,1)
-    mulog               = torch.log(10*stepsize)
-    stepsize_avg        = torch.ones(1,1)
-    H_avg               = torch.zeros(1,1)
+#    stepsize            = findreasonable_epsilon(theta_init, M_inv)*torch.ones(1,1)
+#    mulog               = torch.log(10*stepsize)
+#    stepsize_avg        = torch.ones(1,1)
+#    H_avg               = torch.zeros(1,1)
     simulationlength    = simulationlength*torch.ones(1,1)
     gamma               = 0.05 * torch.ones(1,1)
     t_0                 = 10 * torch.ones(1,1)
@@ -303,6 +308,8 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
     theta[0][:]         = theta_init
     
     for i in range(1,no_samples):
+        stepsize      = findreasonable_epsilon(theta_init, M_inv)*torch.ones(1,1)
+#        print(stepsize)
         p_init        = torch.randn(theta_init.size())
         # Everything starts with intial values and will be modified 
         # accordingly
@@ -311,7 +318,7 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
         # the max operation only returns a float
         ratio         = torch.round(torch.div(simulationlength,stepsize))
         L             = torch.max(torch.ones(1,batch), ratio)
-        
+#        print(L)
         # simulate trajectories.
         for j in range(0,L.int()[0][0]):
             theta_next, p_next = leapfrog(theta_current, p_tilde, stepsize[0][0], M_inv)
@@ -322,7 +329,7 @@ def chmc_with_dualavg(theta_init, M_inv, delta, simulationlength, L, no_samples,
                                                  p_next, p_tilde,M_inv)
         # update the trajectory tensor (our drawn samples)
         theta[i][:]   = theta_next
-        
+#        print(theta)
         # Adapt parameters 
         
 #        if i <= no_adapt_iter:
@@ -364,9 +371,9 @@ def main():
 #==============================================================================
     theta_init        = torch.randn(1,dim)    
     M_inv             = torch.eye(theta_init.size(1))
-    no_samples        = 500
+    no_samples        = 10000
     delta             = 0.65
-    L                 = 5
+    L                 = 7
     stepsize_init     = 1
     simulation_length = L * stepsize_init
     no_adapt_iter     = 150
@@ -388,6 +395,10 @@ def main():
     print('****** EMPIRICAL MEAN/COV USING HMC ******')
     print('empirical mean: ', sample_mean)
     print('empirical_cov:\n', sample_var)
+    plt.figure(1)
+    for i in theta_2np:
+        plt.plot(i[0],i[1],'r.')
+    
 
 
 main()
