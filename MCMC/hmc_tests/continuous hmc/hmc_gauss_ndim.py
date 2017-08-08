@@ -148,13 +148,13 @@ def hamiltonian(position, momentum, energy_function,ndim):
     U is the potential energy and is = -log_posterior(x)
     Parameters
     ----------
-    position : torch.autograd.Variable, we requires its gradient. 
-        Position or state vector x (sample from the target distribution)
-    momentum : tf.Variable
-        Auxiliary momentum variable
-    energy_function
-        Function from state to position to 'energy'
-         = -log_posterior
+    position        :torch.autograd.Variable, we requires its gradient. 
+                     Position or state vector x (sample from the target 
+                     distribution)
+    momentum        :torch.Tensor \mathbb{R}^{1 x D}. Auxiliary momentum 
+                     variable
+    energy_function :Function from state to position to 'energy'= -log_posterior
+    
     Returns
     -------
     hamitonian : float
