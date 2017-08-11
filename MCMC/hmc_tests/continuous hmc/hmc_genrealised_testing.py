@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Fri Aug 11 12:48:26 2017
+
+@author: bradley
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Aug  7 12:11:33 2017
 
 @author: bradley
@@ -17,7 +25,8 @@ Created on Wed Aug  2 11:00:58 2017
 import torch
 from torch.autograd import Variable
 import numpy as np
-from matplotlib import pyplot as plt 
+from matplotlib import pyplot as plt
+import scipy.stats as ss
 
 def main():
     global count
@@ -73,27 +82,26 @@ def main():
 #    plt.figure(1)
 #    for i in sampl1np:
 #        plt.plot(i[0],i[1],'r.')
-def gaussian_log_posterior(x, cov, grad = False):
-    """Evaluate the unormalized log posterior from a zero-mean
-    Gaussian distribution, with the specifed covariance matrix
-    
-    Parameters
-    ----------
-    x : torch.autograd.Variable
-    Sample ~ target distribution
-    covariance : torch.autograg.Variable N x N 
 
 
-    Returns
-    -------
-    logp : float, log(exp(-x.T * A * x)) "Log of Normal"
-        Unormalized log p(x)
-    dlogp_dx : float: Gradient of the log. 
+def log_gaussian_pdf(x, mu, cov):
+    mu = Variable(mu, requires_grad = False)
+    covariance_inverse = Variable(torch.inverse(cov).float(), requires_grad = False)
+    return -0.5*(x - mu).mm(covariance_inverse).mm(torch.transpose((x- mu),0,1))
+
+def log_posterior(x, grad = False):
+    """
+    x - 3-vector (a, b, c)
     """
     if isinstance(x, Variable) == False:
         X = Variable(x, requires_grad = True)
     else:
         X = x
+        
+    a, b, c = pytorch.split(X, 3)
+    
+    
+    
     covariance_inverse = Variable(torch.inverse(cov).float(), requires_grad = False)
     xAx = -0.5*X.mm(covariance_inverse).mm(torch.transpose(X,0,1))
     if grad:
@@ -103,7 +111,24 @@ def gaussian_log_posterior(x, cov, grad = False):
     else:
         return xAx.data
 
-
+def gaussian_log_posterior(cov):
+    def gaussian_log_posterior2(x, grad = False):
+        if isinstance(x, Variable) == False:
+            X = Variable(x, requires_grad = True)
+        else:
+            X = x
+        C = Variable(c, requires_grad = True)
+        a  = torch.randn(1)
+        b  = 
+        covariance_inverse = Variable(torch.inverse(cov).float(), requires_grad = False)
+        xAx = -0.5*X.mm(covariance_inverse).mm(torch.transpose(X,0,1))
+        if grad:
+            xAx.backward()
+            dlogp_dx = X.grad.data
+            return dlogp_dx 
+        else:
+            return xAx.data
+    return gaussian_log_posterior2
 
 def gaussian_log_posterior_correlated(x, ndim, correlation=0.8, grad = False):
     '''     

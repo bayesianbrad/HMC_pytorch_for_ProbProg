@@ -71,7 +71,7 @@ class DHMCSampler(object):
         self.n_disc         = n_disc
         self.potential      = potential
         self.potential_disc = potential_disc
-    
+        self.kinetic        = kinetic
     def gauss_laplace_momentum(self, potential,potential_disc, kinetic,\
                                stpsze, x0, p0, logp, grad, aux, n_disc = 0,\
                                M  = None):
@@ -227,9 +227,9 @@ class DHMCSampler(object):
         0 and var 1. )
         '''
         p_cont = torch.sqrt(self.M[:-self.n_disc]) \
-        * torch.randn(self.n_param - self.n_disc)
+        * torch.randn(self.n_param - self.n_disc,1)
         p_disc = self.M[-self.n_disc:] * torch.from_numpy(np.random.laplace(size=self.n_disc))
-        return np.concatenate((p_cont, p_disc))
+        return torch.cat((p_cont, p_disc),)
     
     def hamiltonian(self, x, p, potential, kinetic):
         '''
@@ -239,9 +239,8 @@ class DHMCSampler(object):
         
         Parameters
         ----------
-        x    - torch.autograd.Variable. we requires its gradient. 
-                   Position or state vector x (sample from the target distribution)
-        p    - tf.Variable
+        x    - torch.Tensor.
+        p    - torch.Tensor. 
             Auxiliary momentum variable
         energy_function
             Function from state to position to 'energy'
@@ -251,9 +250,11 @@ class DHMCSampler(object):
         -------
         hamitonian - float
         '''
-        U = potential(x, grad = False) 
-        T = kinetic(p, grad = False)
-        return U + T
+        U     = potential(x, grad = False) 
+        Tcont = kinetic(p[:-self.n_disc,1], self.M, mom = 'Gauss',  grad = False)
+        Tdisc = torch.abs(torch.transpose(p[-self.n_disc:,1],0,1).mm(torch.div(torch.ones(1,1),\
+                                          self.M[-self.n_disc:,1])).mm(p[-self.n_disc:,1]))
+        return U + Tcont + Tdisc
     # Integrator and kinetic energy functions for the proposal scheme. The
     # class allows any reversible dynamics based samplers by changing the
     # 'integrator', 'random_momentum', and 'compute_hamiltonian' functions.
@@ -298,4 +299,4 @@ class DHMCSampler(object):
         print(('The average path length of each DHMC iteration was '
                '{:.2f}.'.format(pathlen_ave)))
 
-        return samples, logp_samples, accept_prob, pathlen_ave, time_elapsed
+        return samples, logp_samples, accept_prob, pathlen_ave
