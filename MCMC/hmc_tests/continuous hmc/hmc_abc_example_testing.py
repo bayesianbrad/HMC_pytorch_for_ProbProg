@@ -10,10 +10,13 @@ def main():
     global count
     count       = 0
     num_samples = 10000
-
-    ndim       = 3
-
-    sample1 = torch.Tensor(num_samples, ndim)
+    nvars       = 3 
+    ndim        = 3
+    
+    sample1    = torch.Tensor(num_samples, ndim)
+    variables  = torch.Tensor(1)
+    variables  = 
+    
 
     print("Starting to draw samples")
     # TODO should requires_grad=True below?

@@ -23,12 +23,9 @@ def main():
     global count
     count       = 0
     num_samples = 10000
-    
-    
-
     # Number of dimensions for samples
     ndim       = 100
-    sigma      = 0.4837842
+    sigma      = 0.34782378
     sample1 = torch.Tensor(num_samples, ndim)
 #    Creates a positve definite and symmetric covaraince matrix.
 #    For any square matrix the following hold: 
@@ -36,7 +33,7 @@ def main():
 #    M_{s} = 0.5*(A  + A.T)
 #    M_{a} = 0.5*(A - A.T)
     # Really should put this into a class
-    correlation = 0.3874378
+    correlation = 0.2998388373
     cov = correlation* np.ones((ndim,ndim))
     np.fill_diagonal(cov, sigma)
     global cov_pos
@@ -49,8 +46,8 @@ def main():
     for i in range(num_samples-1):
         sample,count = hmc(initial_x, 
                 log_posterior=gaussian_log_posterior_correlated, 
-                step_size = torch.min(torch.Tensor(1).uniform_(0.05,0.18)), 
-                num_steps = torch.Tensor(1).uniform_(15,24).int()[0],
+                step_size = torch.min(torch.Tensor(1).uniform_(0.03,0.18)), 
+                num_steps = torch.Tensor(1).uniform_(5,15).int()[0],
                 ndim      = ndim,
                 count     = count)
         sample1[i+1] = sample.data
@@ -81,7 +78,7 @@ def gaussian_log_posterior(x, cov, grad = False):
     ----------
     x : torch.autograd.Variable
     Sample ~ target distribution
-    covariance : torch.autograg.Variable N x N 
+    cov : torch.autograg.Variable N x N 
 
 
     Returns
@@ -90,7 +87,7 @@ def gaussian_log_posterior(x, cov, grad = False):
         Unormalized log p(x)
     dlogp_dx : float: Gradient of the log. 
     """
-    if isinstance(x, Variable) == False:
+    if not isinstance(x, Variable):
         X = Variable(x, requires_grad = True)
     else:
         X = x
