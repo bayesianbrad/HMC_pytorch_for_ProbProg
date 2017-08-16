@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Wed Aug 16 14:18:59 2017
+
+@author: bradley
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Aug 14 15:31:26 2017
 
 @author: bradley
@@ -10,8 +18,8 @@ import torch
 import numpy as np
 from torch.autograd import Variable
 import scipy.stats as ss
-import math
-
+np.random.seed(1234)
+torch.manual_seed(1234)
 def kinetic_fn(p, mom  ='Gauss', grad = False):
     """Kinetic energy of the current momentum (assuming a standard Gaussian)
         (x dot x) / 2 and Mass matrix M = \mathbb{I}_{dim,dim}
@@ -35,7 +43,7 @@ def kinetic_fn(p, mom  ='Gauss', grad = False):
     else:
         return K.data
     
-def log_potential_fn(x, cov_inverse,cov, grad = False):
+def log_potential_fn_gauss(x, cov_inverse, grad = False):
     """Evaluate the unormalized log posterior from a zero-mean
     Gaussian distribution, with the specifed covariance matrix
     
@@ -57,17 +65,14 @@ def log_potential_fn(x, cov_inverse,cov, grad = False):
         X = Variable(x, requires_grad = True)
     else:
         X = x
-    det = np.abs(np.linalg.det(cov.numpy()))
-    constant = np.sqrt((2*np.pi*np.log(det))**x.size()[1]/2)
-    print(constant)
-    xAx = -0.5*X.mm(cov_inverse).mm(torch.transpose(X,0,1)) - constant
+#    mvn = ss.multivariate_normal(x)
+    xAx = -0.5*X.mm(cov_inverse).mm(torch.transpose(X,0,1))
     if grad:
         xAx.backward()
         dlogp_dx = X.grad.data
         return dlogp_dx 
     else:
-        return xAx.data
-    
+        return xAx.data 
 class Borg:
     ''' Borg class making class attributes global'''
     _shared_state = {} # Attribute dictionary
@@ -111,10 +116,9 @@ class HMCsampler(Borg):
         kinetic       = self.kinetic
         n_steps       = self.nsteps
         cov_inv       = self.cov_inv
-        cov           = self.cov
 
         # Start by updating the momentum a half-step
-        p = p0 + 0.5 * step_size * log_potential(x0, cov_inv,cov, grad = True)
+        p = p0 + 0.5 * step_size * log_potential(x0, cov_inv, grad = True)
         # Initalize x to be the first step
         x0.data = x0.data + step_size * kinetic(p, grad = True)
         # If the gradients are not zeroed then they will blow up. This leads
@@ -124,7 +128,7 @@ class HMCsampler(Borg):
         for i in range(n_steps-1):
             # Compute gradient of the log-posterior with respect to x
             # Update momentum
-            p = p + step_size * log_potential(x0, cov_inv,cov, grad = True)
+            p = p + step_size * log_potential(x0, cov_inv, grad = True)
     
             # Update x
             x0.data = x0.data + step_size *  kinetic(p, grad = True)
@@ -132,7 +136,7 @@ class HMCsampler(Borg):
     
         # Do a final update of the momentum for a half step
         
-        p = p + 0.5 * step_size * log_potential(x0, cov_inv , cov, grad = True)
+        p = p + 0.5 * step_size * log_potential(x0, cov_inv , grad = True)
         xproposed = x0
         pproposed = p
         # return new proposal state
@@ -155,7 +159,7 @@ class HMCsampler(Borg):
         -------
         hamitonian : float
         """
-        U = self.log_potential(x,self.cov_inv,self.cov) 
+        U = self.log_potential(x,self.cov_inv) 
         T = self.kinetic(p)
         return U + T
     
@@ -256,12 +260,12 @@ class HMCsampler(Borg):
     
           
 def main():
-    n_dim       = 5
-    n_samples   = 100
+    n_dim       = 3
+    n_samples   = 1000
     burnin      = 0
     n_vars      = 1
     minstep     = 0.03
-    maxstep     = 0.18
+    maxstep     = 0.20
     mintraj     = 5
     maxtraj     = 15
     # Intialise both trajectory length and step size
@@ -276,21 +280,21 @@ def main():
     xinit       = Variable(torch.randn(n_vars, n_dim), requires_grad = True)
     pinit       = torch.randn(n_vars, n_dim)
     hmc_sampler = HMCsampler(x0 = xinit,
-                     p0   = pinit,
-                     ndim = n_dim,
-                     nsamples = n_samples,
-                     burn_in  = burnin,
-                     nvars    = n_vars,
-                     nsteps   = n_steps,
-                     stepsize = step_size,
-                     min_step = minstep,
-                     max_step = maxstep,
-                     min_traj = mintraj,
-                     max_traj = maxtraj,
-                     cov      = cov,
-                     cov_inv  = cov_inv,
-                     count    = 0,
-                     log_potential = log_potential_fn,
-                     kinetic       = kinetic_fn)
+                         p0   = pinit,
+                         ndim = n_dim,
+                         nsamples = n_samples,
+                         burn_in  = burnin,
+                         nvars    = n_vars,
+                         nsteps   = n_steps,
+                         stepsize = step_size,
+                         min_step = minstep,
+                         max_step = maxstep,
+                         min_traj = mintraj,
+                         max_traj = maxtraj,
+                         cov      = cov,
+                         cov_inv  = cov_inv,
+                         count    = 0,
+                         log_potential = log_potential_fn_gauss,
+                         kinetic       = kinetic_fn)
     hmc_sampler.run_sampler()
 main()

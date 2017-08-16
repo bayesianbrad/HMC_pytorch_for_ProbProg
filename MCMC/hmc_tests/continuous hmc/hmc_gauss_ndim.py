@@ -18,13 +18,14 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 from matplotlib import pyplot as plt 
-
+np.random.seed(1234)
+torch.manual_seed(1234)
 def main():
     global count
     count       = 0
     num_samples = 10000
     # Number of dimensions for samples
-    ndim       = 100
+    ndim       = 5
     sigma      = 0.34782378
     sample1 = torch.Tensor(num_samples, ndim)
 #    Creates a positve definite and symmetric covaraince matrix.
