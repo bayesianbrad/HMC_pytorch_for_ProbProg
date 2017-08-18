@@ -28,8 +28,81 @@ import torch
 import numpy as np
 import math
 from torch.autograd import Variable
+torch.utils.backcompat.broadcast_warning.enabled=True
 
-
+class Potential(object):
+    ''' Is told what type of potential we are calulating, discrete or 
+    continous and ouputs the potential and required gradients if needed. 
+    Parameters
+    ----------
+    x             - A list containing our parameters of interest
+    
+    jnt_density   - Will be a  function object that contains the entire 
+                    joint and allows us to evaluate it 
+    grad          - Bool, will be true or false depending on whether 
+                    the gradient is needed
+    continuous    - Bool, default True. States whether we require the 
+                    continous potential
+    discrete      - Bool, default False. States whether we require the 
+                    discrete potential.
+    Output
+    --------
+    
+    potential object. 
+    '''
+    def __init__(self, x, jnt_density, grad, continuous = True, discrete = False ):
+        self.x              = x
+        self.jnt_density    = jnt_density
+        self.grad           = grad
+        self.continuous     = continuous
+        self.discrete       = discrete
+    
+    def _determine_parameters(self, x):
+        ''' Extracts the parameters of interest from x, so that 
+        we can operate on them accordingly. Assume params are stored
+        row wise.
+        
+        Parameters
+        ----------
+        x  - N x D tensor. N - Number of params, D dimension of data
+        
+        Output
+        --------
+        params - A 1 x N list of params of type variable
+        
+        '''
+        no_params = x.size()[0]
+                
+        
+    def disc_potential(self):
+        '''To do'''
+    def cont_potential(self, **kwargs):
+        '''To do'''
+    def log_potential_fn(self, x, jnt_density ):
+        '''Evaluate the unormalized log posterior, the joint distribution.
+        
+        Parameters
+        ----------
+        x : contains a
+    
+       Output
+        -------
+        logp : float, unormalized log p(x)
+        dlogp_dx : float: Gradient of the log. 
+        
+        '''
+        if not isinstance(x, Variable):
+            X = Variable(x, requires_grad = True)
+        else:
+            X = x
+        xAx = -0.5*X.mm(cov_inverse).mm(torch.transpose(X,0,1))
+        if grad:
+            xAx.backward()
+            dlogp_dx = X.grad.data
+            return dlogp_dx 
+        else:
+            return xAx.data
+        
 class DHMCSampler(object):
     '''Discountinous HMC sampler. Takes as input an object, and outputs
     the samples. 

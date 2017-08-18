@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Aug 15 17:21:32 2017
+
+@author: bradley
+"""
+
+import scipy.stats as ss
+import torch
+import numpy as np
+from torch.autograd import Variable
+
+d = 3
+a  = Variable(2*torch.ones(1,d), requires_grad = True)
+b = Variable(torch.rand(1,d), requires_grad  = True)
+c = Variable(torch.rand(1,d), requires_grad  = True)
+x = Variable(torch.FloatTensor(1,d).zero_(), requires_grad = False)
+params_dic = {}
+params  = [a,b,c]
+for i in range(d):
+    params_dic["var{0}".format(i)] = params[i]
+#print(params_dic)
+# as the first element needs to be assigned to x
+x = params[0]
+# then concatenate the rest of params
+for i in range(len(params) -1):
+    x = torch.cat((x,params[i+1]), dim = 0)
+#print(x)
+mvn = ss.multivariate_normal.logpdf(a.data.numpy(), mean  = np.zeros(d), cov =  np.eye(d))
+mvn.backward()
+print(a.grad.data)
+# unpack x
+def unpack(x):
+    no_params = x.size()[0]
+    params    = []
+    for i in range(no_params):
+        params.append(x[i,:])
+    
+def auto_grad_test(a,b,c,params):  
+    y = 0
+    for i in range(len(params)):
+        y += torch.log(params[i]) 
+    #y = torch.log(x)
+    print(y)
+    print(torch.sum(y))
+    torch.sum(y).backward()
+    print(a.grad)
+    print(b.grad)
+    print(c.grad)
