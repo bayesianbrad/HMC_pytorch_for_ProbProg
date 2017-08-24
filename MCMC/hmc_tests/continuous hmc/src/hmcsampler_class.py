@@ -12,6 +12,8 @@ from torch.autograd import Variable
 import scipy.stats as ss
 import math
 
+np.random.seed(1234)
+torch.manual_seed(1234)
 def kinetic_fn(p, mom  ='Gauss', grad = False):
     """Kinetic energy of the current momentum (assuming a standard Gaussian)
         (x dot x) / 2 and Mass matrix M = \mathbb{I}_{dim,dim}

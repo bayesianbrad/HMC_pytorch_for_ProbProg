@@ -94,15 +94,15 @@ def opt4():
     # one of the log pdfs of all random variables
     # and the value of the random variable
     # true grad
-    true1 = -0.5*(2*(x1.data + x2.data) - 2*(x1.data + x2.data))*y1.data
-    true2 =-0.5*(2*(x1.data + x2.data) - 2*(x1.data + x2.data))*y1.data
+    true1 = (x1.data + x1.data*x2.data)*y1.data
+#    true2 =-0.5*(2*(x1.data + x2.data) - 2*(x1.data + x2.data))*y1.data
     y1.backward()
     dy1_dx1 = x1.grad.data.clone()
     dy1_dx2 = x2.grad.data.clone()
     print('grad dy1_dx1', dy1_dx1)
     print('grad dy1_dx2', dy1_dx2)
     print()
-    print('True grad', true1, true2)
+    print('True grad', true1)
     x1.grad.data.zero_()
     x2.grad.data.zero_()
     y2.backward()
@@ -112,11 +112,15 @@ def opt4():
     print('grad dy2_dx1', dy2_dx1)
     print('grad dy2_dx2', dy2_dx2)
     print()
-    print('True grads',true1, true2)
+#    print('True grads',true1, true2)
 
 def normal_pdf(observed, mean, std):
     pi        = np.pi
     constant  = torch.sqrt(2*torch.abs(std)**2 * pi)
+    print('Constant' , constant)
     return constant*torch.exp(-0.5*(observed - mean)*(std**-1)*(observed-mean))
-
+def normal_pdf_data(observed, mean, std):
+    pi        = np.pi
+    constant  = torch.sqrt(2*torch.abs(std.data)**2 * pi)
+    return constant*torch.exp(-0.5*(observed.data - mean.data)*(1/std.data)*(observed.data-mean.data))
 opt4()

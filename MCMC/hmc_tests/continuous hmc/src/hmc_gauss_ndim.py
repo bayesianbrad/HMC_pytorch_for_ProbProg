@@ -1,15 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  7 12:11:33 2017
 
-@author: bradley
-"""
 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Aug  2 11:00:58 2017
+Created on Wed Aug  21 11:00:58 2017
 
 @author: bradley
 """
