@@ -3,15 +3,19 @@ import numpy as np
 from torch.autograd import Variable
 
 class ContinuousRandomVariable():
+    '''A very basic representation of what should be contained in a
+       continuous random variable class'''
     def pdf(self):
         raise NotImplementedError("pdf is not implemented")
     def logpdf(self, x):
-        raise NotImplementedError("log_pdf is not implemented")
+        raise NotImplementedError("logpdf is not implemented")
 
     def sample(self):
         raise NotImplementedError("sample is not implemented")
 
 class DiscreteRandomVariable():
+    '''A very basic representation of what should be contained in a
+       discrete random variable class'''
     def pmf(self):
         raise NotImplementedError("pdf is not implemented")
     def logpmf(self, x):

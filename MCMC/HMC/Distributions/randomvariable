@@ -436,3 +436,57 @@ class Pseudobernoulli(RandomVariable):
         return self._multivariate_independent_pseudobernoulli.logpdf(
             value.unsqueeze(-1), batch_size, num_particles, epsilon=epsilon
         )
+class MultivariateIndependentPseudobernoulli(RandomVariable):
+    """MultivariateIndependentPseudobernoulli random variable"""
+    def __init__(self, probability):
+        """Initialize this distribution with probability.
+
+        input:
+            probability: Tensor/Variable
+                [batch_size, num_particles, dim_1, ..., dim_N]
+        """
+        assert(len(probability.size()) > 2)
+        self._probability = probability
+
+    def sample(self, batch_size, num_particles):
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+        if isinstance(self._probability, Variable):
+            return self._probability.detach()
+        else:
+            return self._probability
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return self._probability
+
+    def pdf(self, value, batch_size, num_particles):
+        assert(value.size() == self._probability.size())
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return torch.prod(
+            (
+                self._probability**value * (1 - self._probability)**(1 - value)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+    def logpdf(self, value, batch_size, num_particles, epsilon=1e-10):
+        assert(value.size() == self._probability.size())
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return torch.sum(
+            (
+                value * torch.log(self._probability + epsilon) +
+                (1 - value) * torch.log(1 - self._probability + epsilon)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
