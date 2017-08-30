@@ -1,0 +1,492 @@
+import collections
+import numpy as np
+import torch
+from HMC.Distributions import state as st
+from torch.autograd import Variable
+
+
+class RandomVariable():
+    """Base class for random variables. Supported methods:
+        - sample(batch_size, num_particles)
+        - sample_reparameterized(batch_size, num_particles)
+        - logpdf(value, batch_size, num_particles)
+    """
+
+    def sample(self, batch_size, num_particles):
+        """Returns a sample of this random variable."""
+
+        raise NotImplementedError
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        """Returns a reparameterized sample of this random variable."""
+
+        raise NotImplementedError
+
+    def pdf(self, value, batch_size, num_particles):
+        """Evaluate the density of this random variable at a value. Returns
+        Tensor/Variable [batch_size, num_particles].
+        """
+
+        raise NotImplementedError
+
+    def logpdf(self, value, batch_size, num_particles):
+        """Evuate the log density of this random variable at a value. Returns
+        Tensor/Variable [batch_size, num_particles].
+        """
+
+        raise NotImplementedError
+
+
+class StateRandomVariable(RandomVariable):
+    """Collection of RandomVariable objects. Implements sample,
+    sample_reparameterized, logpdf methods.
+
+    E.g.
+
+        state_random_variable = StateRandomVariable(random_variables={
+            'a': Normal(
+                mean=torfch.zeros(3, 2),
+                variance=torch.ones(3, 2)
+            )
+        })
+        state_random_variable.b = MultivariateIndependentNormal(
+            mean=torch.zeros(3, 2, 4, 5),
+            variance=torch.ones(3, 2, 4, 5)
+        )
+        state = state_random_variable.sample(
+            batch_size=3,
+            num_particles=2
+        )
+        state_logpdf = state_random_variable.logpdf(
+            value=state,
+            batch_size=3,
+            num_particles=2
+        )
+    """
+    def __init__(self, random_variables={}):
+        self._random_variables = collections.OrderedDict()
+
+        for name, random_variable in random_variables.items():
+            self.set_random_variable_(name, random_variable)
+
+    def __getattr__(self, name):
+        if '_random_variables' in self.__dict__:
+            _random_variables = self.__dict__['_random_variables']
+            if name in _random_variables:
+                return _random_variables[name]
+        raise AttributeError("'{}' object has no attribute '{}'".format(
+            type(self).__name__, name))
+
+    def __setattr__(self, name, value):
+        if isinstance(value, RandomVariable):
+            self.set_random_variable_(name, value)
+        elif (
+            ('_random_variables' in self.__dict__) and
+            (name in self__dict__['_random_variables'])
+        ):
+            raise AttributeError(
+                'cannot override assigned random variable {0} with a value '
+                'that is not a RandomVariable: {1}'.format(name, value)
+            )
+        else:
+            object.__setattr__(self, name, value)
+
+    def random_variables(self):
+        """Return a lazy iterator over random_variables"""
+        for name, random_variable in self._random_variables.items():
+            yield random_variable
+
+    def named_random_variables(self):
+        """Return a lazy iterator over random_variables"""
+        for name, random_variable in self._random_variables.items():
+            yield name, random_variable
+
+    def sample(self, batch_size, num_particles):
+        state = st.State(batch_size=batch_size, num_particles=num_particles)
+        for name, random_variable in self.named_random_variables():
+            state.set_value_(name, random_variable.sample(
+                batch_size=batch_size,
+                num_particles=num_particles
+            ))
+
+        return state
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        state = st.State(batch_size=batch_size, num_particles=num_particles)
+        for name, random_variable in self.named_random_variables():
+            state.set_value_(name, random_variable.sample_reparameterized(
+                batch_size=batch_size,
+                num_particles=num_particles
+            ))
+
+        return state
+
+    def set_random_variable_(self, name, random_variable):
+        if not isinstance(random_variable, RandomVariable):
+            raise TypeError(
+                'random_variable {} is not a RandomVariable'.
+                format(random_variable)
+            )
+        _random_variables = self.__dict__['_random_variables']
+        _random_variables[name] = random_variable
+
+        return self
+
+    def logpdf(self, value, batch_size, num_particles):
+        assert(
+            set([x[0] for x in self.named_random_variables()]) ==
+            set([x[0] for x in value.named_values()])
+        )
+
+        result = 0
+        for name, random_variable in self.named_random_variables():
+            result += random_variable.logpdf(
+                value=value.get_value(name),
+                batch_size=batch_size,
+                num_particles=num_particles
+            )
+
+        return result
+
+
+class MultivariateIndependentLaplace(RandomVariable):
+    """MultivariateIndependentLaplace random variable"""
+    def __init__(self, location, scale):
+        """Initialize this distribution with location, scale.
+
+        input:
+            location: Tensor/Variable
+                [batch_size, num_particles, dim_1, ..., dim_N]
+            scale: Tensor/Variable
+                [batch_size, num_particles, dim_1, ..., dim_N]
+        """
+        assert(location.size() == scale.size())
+        assert(len(location.size()) > 2)
+        self._location = location
+        self._scale = scale
+
+    def sample(self, batch_size, num_particles):
+        assert(list(self._location.size()[:2]) == [batch_size, num_particles])
+        uniforms = torch.Tensor(self._location.size()).uniform_() - 0.5
+        if isinstance(self._location, Variable):
+            uniforms = Variable(uniforms)
+            return self._location.detach() - self._scale.detach() * \
+                torch.sign(uniforms) * torch.log(1 - 2 * torch.abs(uniforms))
+        else:
+            return self._location - self._scale * torch.sign(uniforms) * \
+                torch.log(1 - 2 * torch.abs(uniforms))
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        assert(list(self._location.size()[:2]) == [batch_size, num_particles])
+
+        standard_laplace = MultivariateIndependentLaplace(
+            location=Variable(torch.zeros(self._location.size())),
+            scale=Variable(torch.ones(self._scale.size()))
+        )
+
+        return self._location + self._scale * standard_laplace.sample(
+            batch_size, num_particles
+        )
+
+    def pdf(self, value, batch_size, num_particles):
+        assert(value.size() == self._location.size())
+        assert(list(self._location.size()[:2]) == [batch_size, num_particles])
+
+        return torch.prod(
+            (
+                torch.exp(-torch.abs(value - self._location) / self._scale) /
+                (2 * self._scale)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+    def logpdf(self, value, batch_size, num_particles):
+        assert(value.size() == self._location.size())
+        assert(list(self._location.size()[:2]) == [batch_size, num_particles])
+
+        return torch.sum(
+            (
+                -torch.abs(value - self._location) /
+                self._scale - torch.log(2 * self._scale)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+
+class MultivariateIndependentNormal(RandomVariable):
+    """MultivariateIndependentNormal random variable"""
+    def __init__(self, mean, variance):
+        """Initialize this distribution with mean, variance.
+
+        input:
+            mean: Tensor/Variable
+                [batch_size, num_particles, dim_1, ..., dim_N]
+            variance: Tensor/Variable
+                [batch_size, num_particles, dim_1, ..., dim_N]
+        """
+        assert(mean.size() == variance.size())
+        assert(len(mean.size()) > 2)
+        self._mean = mean
+        self._variance = variance
+
+    def sample(self, batch_size, num_particles):
+        assert(list(self._mean.size()[:2]) == [batch_size, num_particles])
+
+        uniform_normals = torch.Tensor(self._mean.size()).normal_()
+        if isinstance(self._mean, Variable):
+            return self._mean.detach() + \
+                Variable(uniform_normals) * torch.sqrt(self._variance.detach())
+        else:
+            return uniform_normals * torch.sqrt(self._variance) + self._mean
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        assert(list(self._mean.size()[:2]) == [batch_size, num_particles])
+
+        standard_normal = MultivariateIndependentNormal(
+            mean=Variable(torch.zeros(self._mean.size())),
+            variance=Variable(torch.ones(self._variance.size()))
+        )
+
+        return self._mean + torch.sqrt(self._variance) * \
+            standard_normal.sample(batch_size, num_particles)
+
+    def pdf(self, value, batch_size, num_particles):
+        assert(value.size() == self._mean.size())
+        assert(list(self._mean.size()[:2]) == [batch_size, num_particles])
+
+        return torch.prod(
+            (
+                1 / torch.sqrt(2 * self._variance * np.pi) * torch.exp(
+                    -0.5 * (value - self._mean)**2 / self._variance
+                )
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+    def logpdf(self, value, batch_size, num_particles):
+        assert(value.size() == self._mean.size())
+        assert(list(self._mean.size()[:2]) == [batch_size, num_particles])
+
+        return torch.sum(
+            (
+                -0.5 * (value - self._mean)**2 / self._variance -
+                0.5 * torch.log(2 * self._variance * np.pi)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+
+class MultivariateIndependentPseudobernoulli(RandomVariable):
+    """MultivariateIndependentPseudobernoulli random variable"""
+    def __init__(self, probability):
+        """Initialize this distribution with probability.
+
+        input:
+            probability: Tensor/Variable
+                [batch_size, num_particles, dim_1, ..., dim_N]
+        """
+        assert(len(probability.size()) > 2)
+        self._probability = probability
+
+    def sample(self, batch_size, num_particles):
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+        if isinstance(probability, Variable):
+            return self._probability.detach()
+        else:
+            return self._probability
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return self._probability
+
+    def pdf(self, value, batch_size, num_particles):
+        assert(value.size() == self._probability.size())
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return torch.prod(
+            (
+                self._probability**value * (1 - self._probability)**(1 - value)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+    def logpdf(self, value, batch_size, num_particles, epsilon=1e-10):
+        assert(value.size() == self._probability.size())
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return torch.sum(
+            (
+                value * torch.log(self._probability + epsilon) +
+                (1 - value) * torch.log(1 - self._probability + epsilon)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+
+class Laplace(RandomVariable):
+    """Laplace random variable"""
+    def __init__(self, location, scale):
+        """Initialize this distribution with location, scale.
+
+        input:
+            location: Tensor/Variable [batch_size, num_particles]
+            scale: Tensor/Variable [batch_size, num_particles]
+        """
+        assert(len(location.size()) == 2)
+        self._multivariate_independent_laplace = MultivariateIndependentLaplace(
+            location=location.unsqueeze(-1),
+            scale=scale.unsqueeze(-1)
+        )
+
+    def sample(self, batch_size, num_particles):
+        return self._multivariate_independent_laplace.sample(
+            batch_size, num_particles
+        )
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        return self._multivariate_independent_laplace.sample_reparameterized(
+            batch_size, num_particles
+        )
+
+    def pdf(self, value, batch_size, num_particles):
+        return self._multivariate_independent_laplace.pdf(
+            value.unsqueeze(-1), batch_size, num_particles
+        )
+
+    def logpdf(self, value, batch_size, num_particles):
+        return self._multivariate_independent_laplace.logpdf(
+            value.unsqueeze(-1), batch_size, num_particles
+        )
+
+
+class Normal(RandomVariable):
+    """Normal random variable"""
+    def __init__(self, mean, variance):
+        """Initialize this distribution with mean, variance.
+
+        input:
+            mean: Tensor/Variable [batch_size, num_particles]
+            variance: Tensor/Variable [batch_size, num_particles]
+        """
+        assert(len(mean.size()) == 2)
+        self._multivariate_independent_normal = MultivariateIndependentNormal(
+            mean=mean.unsqueeze(-1),
+            variance=variance.unsqueeze(-1)
+        )
+
+    def sample(self, batch_size, num_particles):
+        return self._multivariate_independent_normal.sample(
+            batch_size, num_particles
+        ).squeeze(-1)
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        return self._multivariate_independent_normal.sample_reparameterized(
+            batch_size, num_particles
+        ).squeeze(-1)
+
+    def pdf(self, value, batch_size, num_particles):
+        return self._multivariate_independent_normal.pdf(
+            value.unsqueeze(-1), batch_size, num_particles
+        )
+
+    def logpdf(self, value, batch_size, num_particles):
+        return self._multivariate_independent_normal.logpdf(
+            value.unsqueeze(-1), batch_size, num_particles
+        )
+
+
+class Pseudobernoulli(RandomVariable):
+    """Pseudobernoulli random variable"""
+    def __init__(self, probability):
+        """Initialize this distribution with probability.
+
+        input:
+            probability: Tensor/Variable [batch_size, num_particles]
+        """
+        assert(len(probability.size()) == 2)
+        self._multivariate_independent_pseudobernoulli = \
+            MultivariateIndependentPseudobernoulli(
+                probability=probability.unsqueeze(-1)
+            )
+
+    def sample(self, batch_size, num_particles):
+        return self._multivariate_independent_pseudobernoulli.sample(
+            batch_size, num_particles
+        ).squeeze(-1)
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        return self._multivariate_independent_pseudobernoulli.\
+            sample_reparameterized(batch_size, num_particles).squeeze(-1)
+
+    def pdf(self, value, batch_size, num_particles):
+        return self._multivariate_independent_pseudobernoulli.pdf(
+            value.unsqueeze(-1), batch_size, num_particles
+        )
+
+    def logpdf(self, value, batch_size, num_particles, epsilon=1e-10):
+        return self._multivariate_independent_pseudobernoulli.logpdf(
+            value.unsqueeze(-1), batch_size, num_particles, epsilon=epsilon
+        )
+class MultivariateIndependentPseudobernoulli(RandomVariable):
+    """MultivariateIndependentPseudobernoulli random variable"""
+    def __init__(self, probability):
+        """Initialize this distribution with probability.
+
+        input:
+            probability: Tensor/Variable
+                [batch_size, num_particles, dim_1, ..., dim_N]
+        """
+        assert(len(probability.size()) > 2)
+        self._probability = probability
+
+    def sample(self, batch_size, num_particles):
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+        if isinstance(self._probability, Variable):
+            return self._probability.detach()
+        else:
+            return self._probability
+
+    def sample_reparameterized(self, batch_size, num_particles):
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return self._probability
+
+    def pdf(self, value, batch_size, num_particles):
+        assert(value.size() == self._probability.size())
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return torch.prod(
+            (
+                self._probability**value * (1 - self._probability)**(1 - value)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)
+
+    def logpdf(self, value, batch_size, num_particles, epsilon=1e-10):
+        assert(value.size() == self._probability.size())
+        assert(
+            list(self._probability.size()[:2]) == [batch_size, num_particles]
+        )
+
+        return torch.sum(
+            (
+                value * torch.log(self._probability + epsilon) +
+                (1 - value) * torch.log(1 - self._probability + epsilon)
+            ).view(batch_size, num_particles, -1),
+            dim=2
+        ).squeeze(2)

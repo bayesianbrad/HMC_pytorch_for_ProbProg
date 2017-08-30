@@ -25,7 +25,7 @@ n_disc = n_param - n_cont
 sigma_B = 500
 
 def pack_param(p, phi, U):
-    # THE CONTINOUS EMBEDDING 
+    # THE CONTINOUS EMBEDDING - well part of it. Only for the discrete parameter
     # Returns a properly transformed and concatenated parameter vector.
     theta = np.zeros(n_param)
     theta[index["phi"]] = np.log(phi / (1 - phi))
