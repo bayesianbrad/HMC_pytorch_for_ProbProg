@@ -69,8 +69,7 @@ class Normal(ContinuousRandomVariable):
     def sample(self, num_samples = 1):
         # x ~ N(0,1)
         self.unifomNorm = Variable(torch.randn(1,num_samples))
-        sample          = self.unifomNorm * (self.std) + self.mean
-        return VariableCast(sample)
+        return self.unifomNorm * (self.std) + self.mean
 
     def sample_grad(self):
         x                 = Variable(self.unifomNorm.data, requires_grad = True)
@@ -121,11 +120,11 @@ class MultivariateNormal(ContinuousRandomVariable):
         samples           = self.mean  + Variable(self.L.t().mm(self.uniformNorm))
         return samples
 
-    def sample_grad(self):
-        x          = Variable(self.uniformNorm.data, requires_grad = True)
-        logSample  = self.uniformNorm * (self.L)
-        sampleGrad = torch.autograd.grad([logSample],[x], grad_outputs= torch.ones(x.size()))[0]
-        return sampleGrad
+    # def sample_grad(self):
+    #     x          = Variable(self.uniformNorm.data, requires_grad = True)
+    #     logSample  = self.uniformNorm * (self.L)
+    #     sampleGrad = torch.autograd.grad([logSample],[x], grad_outputs= torch.ones(x.size()))[0]
+    #     return sampleGrad
     # def pdf(self, value):
     #     assert (value.size() == self._mean.size())
     #     # CAUTION: If the covariance is 'Unknown' then we will
