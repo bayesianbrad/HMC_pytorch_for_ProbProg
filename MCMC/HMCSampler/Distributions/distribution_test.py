@@ -21,23 +21,26 @@ def testing_normal(mean, std):
     sample       = normal_obj.sample(num_samples = mean.size()[1])
     samplex      = Variable(sample.data, requires_grad = True)
     normal_logpdf = normal_obj.logpdf(samplex)
-
-    diff_logpdf  = torch.autograd.grad([normal_logpdf], [samplex], grad_outputs=torch.ones(samplex.size()), retain_graph=True)[0]
+    test_list    = [samplex, mean]
+    diff_logpdf  = torch.autograd.grad([normal_logpdf], test_list, grad_outputs=torch.ones(mean.size()), retain_graph=True)
     diff_logpdf2 = torch.autograd.grad([normal_logpdf], [mean], grad_outputs=torch.ones(mean.size()), retain_graph=True)[0]
     diff_logpdf3 = torch.autograd.grad([normal_logpdf], [std], grad_outputs=torch.ones(std.size()), retain_graph=True)[0]
-    diff_logpdf4 = normal_obj.sample_grad()
+    # diff_logpdf4 = normal_obj.sample_grad()
     # Pytorch gradients
     print('Printing autograd gradients: ')
-    print(diff_logpdf)
-    print(diff_logpdf2)
-    print(diff_logpdf3)
-    print('Sample Gradient' , diff_logpdf4)
-    # True gradients
-    print()
-    print('Printing true gradients ')
-    print('grad_sample',true_grad_normal(sample,mean,std,diff = 'sample').data)
-    print('grad_mean',true_grad_normal(sample,mean,std,diff = 'mean').data)
-    print('grad_std', true_grad_normal(sample, mean, std, diff = 'std').data)
+    print(diff_logpdf[0][0].data.unsqueeze(0), diff_logpdf[1][0].data.unsqueeze(0))
+    # print(dir(diff_logpdf[0][:]))
+    # print(type(diff_logpdf))
+    # print(len(diff_logpdf))
+    # print(diff_logpdf2)
+    # print(diff_logpdf3)
+    # # print('Sample Gradient' , diff_logpdf4)
+    # # True gradients
+    # print()
+    # print('Printing true gradients ')
+    # print('grad_sample',true_grad_normal(sample,mean,std,diff = 'sample').data)
+    # print('grad_mean',true_grad_normal(sample,mean,std,diff = 'mean').data)
+    # print('grad_std', true_grad_normal(sample, mean, std, diff = 'std').data)
 
 
 def true_grad_laplace(sample, loc, scale, diff):

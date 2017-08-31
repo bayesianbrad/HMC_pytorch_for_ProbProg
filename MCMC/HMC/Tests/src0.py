@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from torch.autograd import Variable
-from Distributions import *
+from z import *
 
 a= VariableCast(1.0)
 b= VariableCast(1.41)
@@ -26,6 +26,7 @@ logp_y_g_x = p_y_g_x.logpdf(obs2)
 #
 # print(logp_y_g_x.grad_fn)
 logp_x_y = Variable.add(logp_x,logp_y_g_x)
+print(logp_x_y)
 # print(logp_x_y.grad_fn)
 grad_x = torch.autograd.grad(outputs = [logp_x_y], inputs= [x])
 print(grad_x)
