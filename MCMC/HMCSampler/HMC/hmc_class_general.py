@@ -46,28 +46,25 @@ class KEnergy():
             self.M  = VariableCast(torch.eye(p.size()[1])) # inverse of identity is identity
 
 
-    def gauss_ke(self,p):
+    def gauss_ke(self,p, grad = False):
         '''' (p dot p) / 2 and Mass matrix M = \mathbb{I}_{dim,dim}'''
         self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
         K = 0.5 * P.mm(self.M).mm(torch.transpose(P, 0, 1))
-        return K.data
-    def gauss_ke_grad(self,p):
-        self.p = VariableCast(p)
-        P = Variable(self.p.data, requires_grad=True)
-        K = 0.5 * P.mm(self.M).mm(torch.transpose(P, 0, 1))
-        return torch.autograd.grad([K], [P], grad_outputs= torch.ones(P.size()))[0]
-
-    def laplace_ke(self,p):
+        if grad:
+            return self.ke_gradients(P, K)
+        else:
+            return K
+    def laplace_ke(self, p, grad = False):
         self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
         K = torch.sign(P).mm(self.M)
-        return K.data
-    def laplace_ke_grad(self):
-        self.p = VariableCast(p)
-        P = Variable(self.p.data, requires_grad=True)
-        K = torch.sign(P).mm(self.M)
-        return torch.autograd.grad([K], [P], grad_outputs= torch.ones(P.size()))[0]
+        if grad:
+            return self.ke_gradients(P, K)
+        else:
+            return K
+    def ke_gradients(self, P, K):
+        return torch.autograd.grad([K], [P], grad_outputs=torch.ones(P.size()))[0]
 
 class Foppl_reformat(object):
     '''
@@ -101,52 +98,52 @@ class Foppl_reformat(object):
             v = VariableCast(v, requires_grad=True)
 
 
-class LogPotentialCts():
-    """ Takes a joint density and creates an object that
+# class LogPotentialCts():
+#     """ Takes a joint density and creates an object that
+#
+#
+#     Methods
+#     -------
+#
+#     calc_grad  - calculates the gradients of the joint
+#     calc_pot   - calculates the potential evaluated at the proposed parameter of interested points, generated
+#                           via the leapfrog integrator
+#     Attributes
+#     ----------
+#     joint P(x,y) - Type       : torch.Variable
+#                    Size       :
+#                    Description: Is the joint distribution, where the joint has been constructed from the FOPPL
+#                                 output, via the distribution class module
+#
+#     params       - Type       : python list of Variables. The data attributes must all be the same size.
+#                    Size       :
+#                    Description: A python list of the variables of interest. The latent parameters etc. The object, will
+#                                 have its gradients evaluated with respect to that.
+#
+#
+#     """
+#     def __init__(self, joint, params):
+#         self.joint  = torch.log(joint)
+#         self.params = params
+#
+#     def calc_grad(self):
+#         ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
+#             data from the Variable of the gradients '''
+#         grad      = torch.autograd.grad([self.joint], self.params, grad_outputs= torch.ones(self.params[0].data))
+#         gradients = torch.Tensor(len(self.params), self.params[0].data.size())
+#         for i in range(len(self.params)):
+#            gradients[i][:] = grad[i][0].data.unsqueeze(0) # ensures that each row of the grads represents a params grad
+#         return gradients
+#
+#     def  calc_pot(self):
+#         ''' Calculates the ' log potential function' needed to calculate the Hamiltonian '''
+#         return self.joint.data
 
 
-    Methods
-    -------
 
-    calc_grad  - calculates the gradients of the joint
-    calc_pot   - calculates the potential evaluated at the proposed parameter of interested points, generated
-                          via the leapfrog integrator
-    Attributes
-    ----------
-    joint P(x,y) - Type       : torch.Variable
-                   Size       :
-                   Description: Is the joint distribution, where the joint has been constructed from the FOPPL
-                                output, via the distribution class module
-
-    params       - Type       : python list of Variables. The data attributes must all be the same size.
-                   Size       :
-                   Description: A python list of the variables of interest. The latent parameters etc. The object, will
-                                have its gradients evaluated with respect to that.
-
-
-    """
-    def __init__(self, joint, params):
-        self.joint  = torch.log(joint)
-        self.params = params
-
-    def calc_grad(self):
-        ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
-            data from the Variable of the gradients '''
-        grad      = torch.autograd.grad([self.joint], self.params, grad_outputs= torch.ones(self.params[0].data))
-        gradients = torch.Tensor(len(self.params), self.params[0].data.size())
-        for i in range(len(self.params)):
-           gradients[i][:] = grad[i][0].data.unsqueeze(0) # ensures that each row of the grads represents a params grad
-        return gradients
-
-    def  calc_pot(self):
-        ''' Calculates the ' log potential function' needed to calculate the Hamiltonian '''
-        return self.joint.data
-
-
-
-
-class LogPotentialDisc():
-    ''' TO DO'''
+#
+# class LogPotentialDisc():
+#     ''' TO DO'''
 
 class HMCsampler(object):
     '''
@@ -165,6 +162,8 @@ class HMCsampler(object):
     '''
     def __init__(self, joint, params, p, burn_in= 100, num_steps= 1000, M= None,  min_step= None, max_step= None,\
                  min_traj= None, max_traj= None):
+        # TO DO: May have to pass through the FOPPL-Potential interactor class, rather than 'joint' and params
+        # Maybe better to have a joint class?
         self.params    = params
         self.p         = p
         self.burn_in   = burn_in
@@ -180,7 +179,7 @@ class HMCsampler(object):
         self.step_size = torch.Tensor(1).uniform_(min_step, max_step)
         self.traj_size = torch.Tensor(1).uniform_(min_traj, max_traj)
         self.kinetic   = KEnergy(M)
-        self.potential = LogPotentialCts(joint, params)
+        self.potential = Program(joint, params)
         # TO DO : Implement a adaptive step size tuning from HMC
         # TO DO : Have a desired target acceptance ratio
 
