@@ -1,0 +1,16 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Duvenaud et~al.(2013)Duvenaud, Lloyd, Grosse, Tenenbaum, and
+  Ghahramani]{duvenaud2013}
+David Duvenaud, James~Robert Lloyd, Roger Grosse, Joshua~B Tenenbaum, and
+  Zoubin Ghahramani.
+\newblock Structure discovery in nonparametric regression through compositional
+  kernel search.
+\newblock \emph{arXiv preprint arXiv:1302.4922}, 2013.
+
+\end{thebibliography}
