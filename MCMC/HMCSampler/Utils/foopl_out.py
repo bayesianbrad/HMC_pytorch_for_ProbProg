@@ -14,11 +14,12 @@ class program:
          def eval
 
          Needs to be a class '''
-    def __init__(self):
-        '''Generating code, returns  a map of variable names / symbols
-         store all variables of interest / latent parameters in here.
-          Strings -  A list of all the unique numbers of the para'''
-        # self.params = [{'x' + Strings[i] : None} for i in range(len(Strings))]
+    # def __init__(self):
+    #     '''Generating code, returns  a map of variable names / symbols
+    #      store all variables of interest / latent parameters in here.
+    #       Strings -  A list of all the unique numbers of the para'''
+    #     # self.params = [{'x' + Strings[i] : None} for i in range(len(Strings))]
+    #     self.params  = {'x':None}
 
     def generate(self):
         ''' Generates the initial state and returns the samples and logjoint evaluated at initial samples  '''
