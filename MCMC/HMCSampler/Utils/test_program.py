@@ -13,11 +13,11 @@ from torch.autograd import Variable
 from core import VariableCast
 from program import program
 from test_KE import KEnergy
-
+# TO DO: Check how to call a class method within  a class 
 def test():
-    prog_obj = program
+    prog_obj = program()
     logjointOrig, values_init  = prog_obj.generate()
-    initial_grad               = program.calc_grad(logjointOrig, values_init)
+    initial_grad               = program.calc_grad(logjoint= logjointOrig, values = values_init)
     kinetic_obj                = KEnergy()
     ham_orig                   = fake_ham(logjointOrig)
 
@@ -42,3 +42,4 @@ def test():
 def fake_ham(logjoint):
     return torch.exp(logjoint + 2.0)
 
+test()
