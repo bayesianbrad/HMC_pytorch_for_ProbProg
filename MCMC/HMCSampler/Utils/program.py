@@ -3,7 +3,7 @@ import numpy as np
 from torch.autograd import Variable
 import Distributions.distributions as dis
 from core import VariableCast
-class program:
+class program():
     ''''This needs to be a function of all free variables.
          If I provide a map of all values and computes the log density
          and assigns values rather than samples.
@@ -14,12 +14,12 @@ class program:
          def eval
 
          Needs to be a class '''
-    # def __init__(self):
+    def __init__(self):
     #     '''Generating code, returns  a map of variable names / symbols
     #      store all variables of interest / latent parameters in here.
     #       Strings -  A list of all the unique numbers of the para'''
     #     # self.params = [{'x' + Strings[i] : None} for i in range(len(Strings))]
-    #     self.params  = {'x':None}
+         self.params  = {'x':None}
 
     def generate(self):
         ''' Generates the initial state and returns the samples and logjoint evaluated at initial samples  '''
@@ -45,7 +45,7 @@ class program:
         ################# End FOPPL output ############
 
         # sum up all logs
-        logp_x_y   = torch.zeros(1,1)
+        logp_x_y   = VariableCast(torch.zeros(1,1))
         for logprob in logp:
             logp_x_y = logp_x_y + logprob
         return logp_x_y, x
@@ -83,7 +83,7 @@ class program:
             logpjoint = logpjoint + logprob
 
         if grad:
-            gradients = self.calc_grad(logjoint, values)
+            gradients = self.calc_grad(self, logjoint, values)
             return gradients, values
         else:
             return logjoint, values
@@ -96,6 +96,8 @@ class program:
         # Assuming values is a dictionary we could extract the values into a list as follows
         if isinstance(dict, values):
             self.params = list(values.values())
+        else:
+            self.params = values
         grad      = torch.autograd.grad([logjoint], self.params, grad_outputs= torch.ones(self.params[0].data))
         # note: Having grad_outputs set to the dimensions of the first element in the list, implies that we believe all
         # other values are the same size.
