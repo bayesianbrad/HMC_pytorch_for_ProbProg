@@ -12,6 +12,8 @@ class ContinuousRandomVariable():
 
     def sample(self):
         raise NotImplementedError("sample is not implemented")
+    def iscontinous(self):
+        return True
 
 class DiscreteRandomVariable():
     '''A very basic representation of what should be contained in a
@@ -23,6 +25,8 @@ class DiscreteRandomVariable():
 
     def sample(self):
         raise NotImplementedError("sample is not implemented")
+    def isdiscrete(self):
+        return True
 
 def VariableCast(value, grad = False):
     '''casts an input to torch Variable object
