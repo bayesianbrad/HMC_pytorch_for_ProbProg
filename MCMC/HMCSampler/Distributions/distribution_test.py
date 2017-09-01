@@ -26,6 +26,7 @@ def testing_normal(mean, std):
     diff_logpdf2 = torch.autograd.grad([normal_logpdf], [mean], grad_outputs=torch.ones(mean.size()), retain_graph=True)[0]
     diff_logpdf3 = torch.autograd.grad([normal_logpdf], [std], grad_outputs=torch.ones(std.size()), retain_graph=True)[0]
     # diff_logpdf4 = normal_obj.sample_grad()
+    print(normal_obj.iscontinous())
     # Pytorch gradients
     print('Printing autograd gradients: ')
     print(diff_logpdf[0][0].data.unsqueeze(0), diff_logpdf[1][0].data.unsqueeze(0))
