@@ -35,9 +35,8 @@ class KEnergy():
            Description: The mass matrix, defaults to identity.
 
     '''
-    def __init__(self, p, M = None):
+    def __init__(self, M = None):
 
-        self.p      = VariableCast(p)
         if M is not None:
             if isinstance(M, Variable):
                 self.M  = VariableCast(torch.inverse(M.data))
@@ -47,21 +46,25 @@ class KEnergy():
             self.M  = VariableCast(torch.eye(p.size()[1])) # inverse of identity is identity
 
 
-    def gauss_ke(self):
-        '''' (x dot x) / 2 and Mass matrix M = \mathbb{I}_{dim,dim}'''
+    def gauss_ke(self,p):
+        '''' (p dot p) / 2 and Mass matrix M = \mathbb{I}_{dim,dim}'''
+        self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
         K = 0.5 * P.mm(self.M).mm(torch.transpose(P, 0, 1))
         return K.data
-    def gauss_ke_grad(self):
+    def gauss_ke_grad(self,p):
+        self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
         K = 0.5 * P.mm(self.M).mm(torch.transpose(P, 0, 1))
         return torch.autograd.grad([K], [P], grad_outputs= torch.ones(P.size()))[0]
 
-    def laplace_ke(self, grad):
+    def laplace_ke(self,p):
+        self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
         K = torch.sign(P).mm(self.M)
         return K.data
     def laplace_ke_grad(self):
+        self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
         K = torch.sign(P).mm(self.M)
         return torch.autograd.grad([K], [P], grad_outputs= torch.ones(P.size()))[0]
@@ -176,7 +179,7 @@ class HMCsampler(object):
             min_traj = torch.Tensor(1).uniform_(5, 12)
         self.step_size = torch.Tensor(1).uniform_(min_step, max_step)
         self.traj_size = torch.Tensor(1).uniform_(min_traj, max_traj)
-        self.kinetic   = KEnergy(p, M)
+        self.kinetic   = KEnergy(M)
         self.potential = LogPotentialCts(joint, params)
         # TO DO : Implement a adaptive step size tuning from HMC
         # TO DO : Have a desired target acceptance ratio
@@ -206,11 +209,10 @@ class HMCsampler(object):
         # Start by updating the momentum a half-step
         p = p0 + 0.5 * step_size * self.potential.calc_grad()
         # Initalize x to be the first step
-        x0.data = x0.data + step_size * kinetic(p,grad=True)
+        x0 = x0 + step_size * self.kinetic.gauss_ke_grad(p)
         # If the gradients are not zeroed then they will blow up. This leads
         # to an exponential increase in kinetic and potential energy.
         # As the position and momentum increase unbounded.
-        x0.grad.data.zero_()
         for i in range(n_steps - 1):
             # Compute gradient of the log-posterior with respect to x
             # Update momentum
