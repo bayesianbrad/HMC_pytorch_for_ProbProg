@@ -29,7 +29,7 @@ def testing_normal(mean, std):
     print(normal_obj.iscontinous())
     # Pytorch gradients
     print('Printing autograd gradients: ')
-    print(diff_logpdf[0][0].data.unsqueeze(0), diff_logpdf[1][0].data.unsqueeze(0))
+    # print(diff_logpdf[0][0].data.unsqueeze(0), diff_logpdf[1][0].data.unsqueeze(0))
     # print(dir(diff_logpdf[0][:]))
     # print(type(diff_logpdf))
     # print(len(diff_logpdf))
