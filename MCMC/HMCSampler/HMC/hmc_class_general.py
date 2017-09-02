@@ -11,6 +11,7 @@ import numpy as np
 from torch.autograd import Variable
 import scipy.stats as ss
 from Utils.core import VariableCast
+from Utils.program import program
 import math
 
 np.random.seed(1234)
@@ -65,37 +66,6 @@ class KEnergy():
             return K
     def ke_gradients(self, P, K):
         return torch.autograd.grad([K], [P], grad_outputs=torch.ones(P.size()))[0]
-
-class Foppl_reformat(object):
-    '''
-    Takes an object that is the output of FOPPL and creates an object of the given joint.
-
-    Methods
-    ----------
-    Need sometihng to extract the keys and values
-    turn parameters of interest into Variables with requires grad
-    calc the whole logjoint
-    calc the derivative, w.r.t to the inputs and outputs
-
-
-
-
-    Attributes
-    -------
-    FOPPL_out   - Type        : python dictionary keys  : type str < Name of distribution >,
-                                                 values : type torch.Tensor, Variable, ndarray <parameter of interest>
-                  Size        :
-                  Description : Contains the FOPPL output and provides all the information to construct the log_joint.
-                                Such as: the probability distribution, a str, and the required parameters of interest
-                                for each distribution
-    '''
-
-    def __init__(self, FOPPL_out):
-        self.Fout = FOPPL_out
-
-    def Variable_updater(self):
-        for k, v in self.Fout:
-            v = VariableCast(v, requires_grad=True)
 
 
 # class LogPotentialCts():
@@ -162,8 +132,6 @@ class HMCsampler(object):
     '''
     def __init__(self, joint, params, p, burn_in= 100, num_steps= 1000, M= None,  min_step= None, max_step= None,\
                  min_traj= None, max_traj= None):
-        # TO DO: May have to pass through the FOPPL-Potential interactor class, rather than 'joint' and params
-        # Maybe better to have a joint class?
         self.params    = params
         self.p         = p
         self.burn_in   = burn_in
@@ -179,9 +147,10 @@ class HMCsampler(object):
         self.step_size = torch.Tensor(1).uniform_(min_step, max_step)
         self.traj_size = torch.Tensor(1).uniform_(min_traj, max_traj)
         self.kinetic   = KEnergy(M)
-        self.potential = Program(joint, params)
+        self.potential = program()
         # TO DO : Implement a adaptive step size tuning from HMC
         # TO DO : Have a desired target acceptance ratio
+        # TO DO : Implement a adaptive trajectory size from HMC
 
     def leapfrog_steps(self):
         '''Performs the leapfrog steps of the HMC for the specified trajectory
