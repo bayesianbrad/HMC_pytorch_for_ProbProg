@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 from Utils.core import ContinuousRandomVariable, DiscreteRandomVariable, VariableCast
-
+# TO DO : comment seeds when running program for real.
 torch.manual_seed(1234) # For testing only
 np.random.seed(1234)
 
