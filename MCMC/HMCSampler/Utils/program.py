@@ -21,6 +21,22 @@ class program():
     #     # self.params = [{'x' + Strings[i] : None} for i in range(len(Strings))]
          self.params  = {'x':None}
 
+    def calc_grad(self, logjoint, values):
+        ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
+            data from the Variable of the gradients '''
+        # Assuming values is a dictionary we could extract the values into a list as follows
+        # if isinstance(dict, values):
+        #     self.params = list(values.values())
+        # else:
+        #     self.params = values
+        grad = torch.autograd.grad([logjoint], [values], grad_outputs=torch.ones(values.data.size()))
+        # note: Having grad_outputs set to the dimensions of the first element in the list, implies that we believe all
+        # other values are the same size.
+        gradients = torch.Tensor(len(values), values.data.size()[1])
+        for i in range(len(values)):
+            gradients[i][:] = grad[i][0].data.unsqueeze(
+                0)  # ensures that each row of the grads represents a params grad
+        return gradients
     def generate(self):
         ''' Generates the initial state and returns the samples and logjoint evaluated at initial samples  '''
 
@@ -29,7 +45,7 @@ class program():
         a = VariableCast(1.0)
         b = VariableCast(1.41)
         normal_object = dis.Normal(a, b)
-        x = normal_object.sample()
+        x = Variable(normal_object.sample().data, requires_grad = True)
 
         std  = VariableCast(1.73)
         obs2 = VariableCast(7.0)
@@ -48,7 +64,7 @@ class program():
         logp_x_y   = VariableCast(torch.zeros(1,1))
         for logprob in logp:
             logp_x_y = logp_x_y + logprob
-        return logp_x_y, x
+        return logp_x_y, x, VariableCast(self.calc_grad(logp_x_y,x))
     def eval(self, values, grad = False):
         ''' Takes a map of variable names, to variable values . This will be continually called
             within the leapfrog step
@@ -63,6 +79,7 @@ class program():
 
         ################## Start FOPPL input ##########
         logp = [] # empty list to store logps of each variable
+        values = Variable(values.data, requires_grad = True)
         a = VariableCast(1.0)
         b = VariableCast(1.41)
         normal_object = dis.Normal(a, b)
@@ -77,34 +94,18 @@ class program():
         logp.append(p_y_g_x.logpdf(obs2))
 
         ################# End FOPPL output ############
-        logjoint = torch.zeros(1, 1)
+        logjoint = VariableCast(torch.zeros(1, 1))
 
         for logprob in logp:
-            logpjoint = logpjoint + logprob
+            logjoint = logjoint + logprob
 
         if grad:
-            gradients = self.calc_grad(self, logjoint, values)
-            return gradients, values
+            gradients = self.calc_grad(logjoint, values)
+            return VariableCast(gradients)
         else:
             return logjoint, values
     def free_vars(self):
         return self.params
-
-    def calc_grad(self, logjoint, values):
-        ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
-            data from the Variable of the gradients '''
-        # Assuming values is a dictionary we could extract the values into a list as follows
-        if isinstance(dict, values):
-            self.params = list(values.values())
-        else:
-            self.params = values
-        grad      = torch.autograd.grad([logjoint], self.params, grad_outputs= torch.ones(self.params[0].data))
-        # note: Having grad_outputs set to the dimensions of the first element in the list, implies that we believe all
-        # other values are the same size.
-        gradients = torch.Tensor(len(self.params), self.params[0].data.size())
-        for i in range(len(self.params)):
-           gradients[i][:] = grad[i][0].data.unsqueeze(0) # ensures that each row of the grads represents a params grad
-        return gradients
 
 
 class programif():
