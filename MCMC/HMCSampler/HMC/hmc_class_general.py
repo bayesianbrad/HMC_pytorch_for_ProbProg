@@ -12,60 +12,12 @@ from torch.autograd import Variable
 import scipy.stats as ss
 from Utils.core import VariableCast
 from Utils.program import program
+from Utils.kinetic import Kinetic
 import math
 
 np.random.seed(1234)
 torch.manual_seed(1234)
 
-
-class KEnergy():
-    ''' A basic class that implements kinetic energies and computes gradients
-    Methods
-    -------
-    gauss_ke          : Returns KE gauss
-    laplace_ke        : Returns KE laplace
-
-    Attributes
-    ----------
-    p    - Type       : torch.Tensor, torch.autograd.Variable,nparray
-           Size       : [1, ... , N]
-           Description: Vector of current momentum
-
-    M    - Type       : torch.Tensor, torch.autograd.Variable, nparray
-           Size       : \mathbb{R}^{N \times N}
-           Description: The mass matrix, defaults to identity.
-
-    '''
-    def __init__(self, M = None):
-
-        if M is not None:
-            if isinstance(M, Variable):
-                self.M  = VariableCast(torch.inverse(M.data))
-            else:
-                self.M  = VariableCast(torch.inverse(M))
-        else:
-            self.M  = VariableCast(torch.eye(p.size()[1])) # inverse of identity is identity
-
-
-    def gauss_ke(self,p, grad = False):
-        '''' (p dot p) / 2 and Mass matrix M = \mathbb{I}_{dim,dim}'''
-        self.p = VariableCast(p)
-        P = Variable(self.p.data, requires_grad=True)
-        K = 0.5 * P.mm(self.M).mm(torch.transpose(P, 0, 1))
-        if grad:
-            return self.ke_gradients(P, K)
-        else:
-            return K
-    def laplace_ke(self, p, grad = False):
-        self.p = VariableCast(p)
-        P = Variable(self.p.data, requires_grad=True)
-        K = torch.sign(P).mm(self.M)
-        if grad:
-            return self.ke_gradients(P, K)
-        else:
-            return K
-    def ke_gradients(self, P, K):
-        return torch.autograd.grad([K], [P], grad_outputs=torch.ones(P.size()))[0]
 
 
 # class LogPotentialCts():
@@ -115,9 +67,8 @@ class KEnergy():
 # class LogPotentialDisc():
 #     ''' TO DO'''
 
-class HMCsampler(object):
+class HMCsampler():
     '''
-    Object - The potential energy function, that contains information regarding the joint.
     Notes:  the params from FOPPL graph will have to all be passed to - maybe
     Methods
     -------
@@ -130,10 +81,8 @@ class HMCsampler(object):
     ----------
 
     '''
-    def __init__(self, joint, params, p, burn_in= 100, num_steps= 1000, M= None,  min_step= None, max_step= None,\
+    def __init__(self, burn_in= 100, num_steps= 1000, M= None,  min_step= None, max_step= None,\
                  min_traj= None, max_traj= None):
-        self.params    = params
-        self.p         = p
         self.burn_in   = burn_in
         self.n_steps   = num_steps
         if min_step is None:
@@ -146,78 +95,76 @@ class HMCsampler(object):
             min_traj = torch.Tensor(1).uniform_(5, 12)
         self.step_size = torch.Tensor(1).uniform_(min_step, max_step)
         self.traj_size = torch.Tensor(1).uniform_(min_traj, max_traj)
-        self.kinetic   = KEnergy(M)
+        self.kinetic   = Kinetic(self.p,M)
         self.potential = program()
+        # to calculate acceptance probability
+        self.count     = 0
+
         # TO DO : Implement a adaptive step size tuning from HMC
         # TO DO : Have a desired target acceptance ratio
         # TO DO : Implement a adaptive trajectory size from HMC
+    def sample_momentum(self,values):
+        if isinstance(dict, values):
+            print('deal with dict and calculate momentum of potentially different sizes depending on momentum')
+            for k in values.keys():
+                print(' add function to deal with extracting stuff from dictionary. May want to use collections')
+        elif isinstance(Variable, values):
+            return  VariableCast(torch.randn(values.data.size()))
+        else:
+            return VariableCast(torch.randn(VariableCast(values).data.size()))
 
-    def leapfrog_steps(self):
+    def leapfrog_steps(self, p_init, values_init, logjoint_init,  grad_init):
         '''Performs the leapfrog steps of the HMC for the specified trajectory
         length, given by num_steps
         Parameters
         ----------
-            x0
-            p0
-            log_potential
-            step_size
-            n_steps
+            values_init
+            p_init
+            logjoint_init
+            grad_init     - Description: contains the initial gradients of the joint w.r.t parameters.
 
         Outputs
         -------
-            xproposed
-            pproposed
+            values -    Description: proposed new values
+            p      -    Description: proposed new auxillary momentum
         '''
 
-        log_potential = self.log_potential
         step_size = self.step_size
-        kinetic = self.kinetic
-        n_steps = self.nstepsv
+        n_steps   = self.nsteps
 
-        # Start by updating the momentum a half-step
-        p = p0 + 0.5 * step_size * self.potential.calc_grad()
-        # Initalize x to be the first step
-        x0 = x0 + step_size * self.kinetic.gauss_ke_grad(p)
-        # If the gradients are not zeroed then they will blow up. This leads
-        # to an exponential increase in kinetic and potential energy.
-        # As the position and momentum increase unbounded.
+        # Start by updating the momentum a half-step and values by a full step
+        p = p_init + 0.5 * step_size * grad_init
+        values = values_init + step_size * self.kinetic.gauss_ke_grad(p)
         for i in range(n_steps - 1):
-            # Compute gradient of the log-posterior with respect to x
-            # Update momentum
-            p = p + step_size * log_potential(x0,grad=True)
+            # range equiv to [2:nsteps] as we have already performed the first step
+            # update momentum
+            p = p + step_size * self.potential.eval(values, grad=True)
+            # update values
+            values = values_init + step_size * self.kinetic.gauss_ke_grad(p)
 
-            # Update x
-            x0.data = x0.data + step_size * kinetic(p,grad=True)
-            x0.grad.data.zero_()
 
         # Do a final update of the momentum for a half step
-
-        p = p + 0.5 * step_size * log_potential(x0,grad=True)
-        xproposed = x0
-        pproposed = p
+        p = p + 0.5 * step_size * self.potential.eval(values, grad= True)
         # return new proposal state
-        return xproposed, pproposed
+        return values, p
 
-    def hamiltonian(self, x, p):
+    def hamiltonian(self, logjoint, p):
         """Computes the Hamiltonian  given the current postion and momentum
         H = U(x) + K(p)
         U is the potential energy and is = -log_posterior(x)
         Parameters
         ----------
-        x             :torch.autograd.Variable, we requires its gradient.
-                         Position or state vector x (sample from the target
-                         distribution)
-        p             :torch.Tensor \mathbb{R}^{1 x D}. Auxiliary momentum
-                         variable
+        logjoint    - Type:torch.autograd.Variable \mathbb{R}^{1 \times 1}
+        p           - Type:torch.Tensor \mathbb{R}^{1 \times D}.
+                    Description: Auxiliary momentum
         log_potential :Function from state to position to 'energy'= -log_posterior
 
         Returns
         -------
         hamitonian : float
         """
-        U = self.log_potential(x)
-        T = self.kinetic(p)
-        return U + T
+        T = self.kinetic.gauss_ke(p, grad = False)
+        return logjoint + T
 
     def acceptance(self):
         '''Returns the new accepted state
@@ -231,21 +178,25 @@ class HMCsampler(object):
 
         Output
         ------
-        returns sample
+        returns accepted or rejected proposal
         '''
-        # get proposed x and p
-        x, p = self.leapfrog_steps()
-        orig = self.hamiltonian(self.x0, self.p0)
-        current = self.hamiltonian(x, p)
+
+        logjoint_init, values_init, grad_init  = self.potential.generate()
+        # generate initial momentum
+        p_init = self.sample_momentum(values_init)
+        orig   = self.hamiltonian(logjoint_init, p_init)
+        # generate proposals
+        values, p = self.leapfrog_steps(p_init, values_init, logjoint_init, grad_init)
+        current = self.hamiltonian(self.potential.eval(values, grad= False), p)
         alpha = torch.min(torch.exp(orig - current))
         # calculate acceptance probability
         p_accept = min(1, alpha)
         if p_accept > np.random.uniform():
             # Updates count globally for target acceptance rate
             self.count = self.count + 1
-            return x
+            return values
         else:
-            return self.x0
+            return values_init
 
     def run_sampler(self):
         ''' Runs the hmc internally for a number of samples and updates
@@ -262,18 +213,8 @@ class HMCsampler(object):
 
 
         '''
-        print("Drawing from a correlated Gaussian...")
-        n_samples = self.nsamples
-        n_dim = self.ndim
-        n_vars = self.nvars
-        min_step = self.min_step
-        max_step = self.max_step
-        min_traj = self.min_traj
-        max_traj = self.max_traj
-        burn_in = self.burn_in
-        samples = torch.Tensor(n_samples, n_dim)
-        samples[0] = self.x0.data
-        for i in range(n_samples - 1):
+        for i in range(self.n_samples):
+            # TO DO: Get this bit sorted 
             temp = self.acceptance()
             # update the intial value of self.x0 globally
             self.x0 = temp
@@ -302,22 +243,6 @@ class Statistics(object):
     statistics given an MCMC chain. '''
 # return samples[burn_in:, :], target_acceptance
 
-# class Distribution_creator(object):
-#    '''Pass in a string for the desired distrbution required
-#    and returns a subset of the scipy.stats object for the given distrubution.
-#    Each object will have a log_pdf , as required for the potential.
-#
-#    Parameters
-#    ----------
-#    distribution - str
-#
-#    Output
-#    ------
-#    distribution object
-#    '''
-#    def __init__(self, distribution):
-#        self.distribution = distribution
-
 
 def main():
     n_dim = 5
@@ -329,25 +254,17 @@ def main():
     mintraj = 5
     maxtraj = 15
     # Intialise both trajectory length and step size
-    step_size = np.random.uniform(minstep, maxstep)
-    n_steps = int(np.random.uniform(mintraj, maxtraj))
-    xinit = Variable(torch.randn(n_vars, n_dim), requires_grad=True)
-    pinit = torch.randn(n_vars, n_dim)
     hmc_sampler = HMCsampler(x0=xinit,
                              p0=pinit,
                              ndim=n_dim,
                              nsamples=n_samples,
                              burn_in=burnin,
                              nvars=n_vars,
-                             nsteps=n_steps,
-                             stepsize=step_size,
                              min_step=minstep,
                              max_step=maxstep,
                              min_traj=mintraj,
                              max_traj=maxtraj,
-                             count=0,
-                             log_potential=log_potential_fn,
-                             kinetic=kinetic_fn)
+                             count=0)
     hmc_sampler.run_sampler()
 
 
