@@ -78,7 +78,7 @@ class program():
         '''
 
         ################## Start FOPPL input ##########
-        logp = [] # empty list to store logps of each variable
+        logp = [] # empty list to store logps of each variable # In addition to foopl input
         values = Variable(values.data, requires_grad = True)
         a = VariableCast(1.0)
         b = VariableCast(1.41)
