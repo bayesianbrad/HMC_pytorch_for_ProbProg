@@ -81,21 +81,29 @@ class HMCsampler():
     ----------
 
     '''
-    def __init__(self, burn_in= 100, num_steps= 1000, M= None,  min_step= None, max_step= None,\
+    def __init__(self, burn_in= 100, n_samples= 1000, M= None,  min_step= None, max_step= None,\
                  min_traj= None, max_traj= None):
-        self.burn_in   = burn_in
-        self.n_steps   = num_steps
+        self.burn_in    = burn_in
+        self.n_samples  = n_samples
         if min_step is None:
-            min_step = torch.Tensor(1).uniform_(0.01, 0.07)
+            self.min_step = torch.Tensor(1).uniform_(0.01, 0.07)
+        else:
+            self.min_step = min_step
         if max_step is None:
-            max_step = torch.Tensor(1).uniform_(0.14, 0.20)
+            self.max_step = torch.Tensor(1).uniform_(0.14, 0.20)
+        else:
+            self.max_step = max_step
         if max_traj is None:
-            max_traj = torch.Tensor(1).uniform_(18, 25)
+            self.max_traj = torch.Tensor(1).uniform_(18, 25)
+        else:
+            self.max_traj = max_traj
         if min_traj is None:
-            min_traj = torch.Tensor(1).uniform_(5, 12)
+            self.min_traj = torch.Tensor(1).uniform_(5, 12)
+        else:
+            self.min_traj = min_traj
+        self.M         = M
         self.step_size = torch.Tensor(1).uniform_(min_step, max_step)
-        self.traj_size = torch.Tensor(1).uniform_(min_traj, max_traj)
-        self.kinetic   = Kinetic(self.p,M)
+        self.traj_size = int(torch.Tensor(1).uniform_(min_traj, max_traj))
         self.potential = program()
         # to calculate acceptance probability
         self.count     = 0
@@ -163,10 +171,10 @@ class HMCsampler():
         -------
         hamitonian : float
         """
-        T = self.kinetic.gauss_ke(p, grad = False)
+        T = self.kinetic.gauss_ke(p, grad=False)
         return logjoint + T
 
-    def acceptance(self):
+    def acceptance(self, values_init):
         '''Returns the new accepted state
 
         Parameters
@@ -184,6 +192,8 @@ class HMCsampler():
         logjoint_init, values_init, grad_init  = self.potential.generate()
         # generate initial momentum
         p_init = self.sample_momentum(values_init)
+        # generate kinetic energy object.
+        self.kinetic = Kinetic(p_init,self.M)
         orig   = self.hamiltonian(logjoint_init, p_init)
         # generate proposals
         values, p = self.leapfrog_steps(p_init, values_init, logjoint_init, grad_init)
@@ -213,35 +223,34 @@ class HMCsampler():
 
 
         '''
+        logjoint_init, values_init, grad_init = self.potential.generate()
+        if isinstance(dict, values_init):
+            print('do something else')
+        else:
+            n_dim = values_init.size()[1]
+        samples = Variable(torch.zeros(self.n_samples,n_dim))
         for i in range(self.n_samples):
             # TO DO: Get this bit sorted
-            temp = self.acceptance()
+            temp = self.acceptance(values_init)
             # update the intial value of self.x0 globally
-            self.x0 = temp
-            samples[i] = temp.data
-            # update parameters and draw new momentum
-            self.step_size = np.random.uniform(min_step, max_step)
-            self.n_steps = int(np.random.uniform(min_traj, max_traj))
-            self.p0 = torch.randn(n_vars, n_dim)
 
-        target_acceptance = self.count / (n_samples - 1)
-        sampl1np = samples[burn_in:, :].numpy()
-        #    print(sampl1np)
-        sam1mean = sampl1np.mean(axis=0)
-        samp1_var = np.cov(sampl1np.T)
-        print('****** TRUE MEAN/ COV ******')
-        print('True mean: ', np.zeros((1, n_dim)))
-        print('True cov: ', self.cov)
+            samples[i,:] = temp.data
+            # update parameters and draw new momentum
+            self.step_size = np.random.uniform(self.min_step, self.max_step)
+            self.n_steps = int(np.random.uniform(self.min_traj, self.max_traj))
+
+        target_acceptance = self.count / (self.n_samples - 1)
+        samples_reduced   = samples[self.burn_in:, :]
+        mean = torch.mean(samples_reduced,dim=0, keep_dim= True)
         print()
         print('****** EMPIRICAL MEAN/COV USING HMC ******')
-        print('empirical mean : ', sam1mean)
-        print('empirical_cov  :\n', samp1_var)
+        print('empirical mean : ', mean)
         print('Average acceptance rate is: ', target_acceptance)
 
-class Statistics(object):
-    '''A class that contains .mean() and .var() methods and returns the sampled
-    statistics given an MCMC chain. '''
-# return samples[burn_in:, :], target_acceptance
+# class Statistics(object):
+#     '''A class that contains .mean() and .var() methods and returns the sampled
+#     statistics given an MCMC chain. '''
+# # return samples[burn_in:, :], target_acceptance
 
 
 def main():
@@ -254,18 +263,18 @@ def main():
     mintraj = 5
     maxtraj = 15
     # Intialise both trajectory length and step size
-    hmc_sampler = HMCsampler(x0=xinit,
-                             p0=pinit,
-                             ndim=n_dim,
-                             nsamples=n_samples,
-                             burn_in=burnin,
-                             nvars=n_vars,
-                             min_step=minstep,
-                             max_step=maxstep,
-                             min_traj=mintraj,
-                             max_traj=maxtraj,
-                             count=0)
-    hmc_sampler.run_sampler()
+    # hmc_sampler = HMCsampler(x0=xinit,
+    #                          p0=pinit,
+    #                          ndim=n_dim,
+    #                          nsamples=n_samples,
+    #                          burn_in=burnin,
+    #                          nvars=n_vars,
+    #                          min_step=minstep,
+    #                          max_step=maxstep,
+    #                          min_traj=mintraj,
+    #                          max_traj=maxtraj,
+    #                          count=0)
+    # hmc_sampler.run_sampler()
 
 
 main()
