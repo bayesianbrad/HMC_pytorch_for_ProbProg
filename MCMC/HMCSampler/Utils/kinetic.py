@@ -10,7 +10,7 @@ License: MIT
 from core import VariableCast
 import torch
 from torch.autograd import Variable
-class KEnergy():
+class Kinetic():
     ''' A basic class that implements kinetic energies and computes gradients
     Methods
     -------
@@ -28,7 +28,7 @@ class KEnergy():
            Description: The mass matrix, defaults to identity.
 
     '''
-    def __init__(self, M = None):
+    def __init__(self, p, M = None):
 
         if M is not None:
             if isinstance(M, Variable):
