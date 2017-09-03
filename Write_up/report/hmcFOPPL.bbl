@@ -1,16 +1,55 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{8}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Duvenaud et~al.(2013)Duvenaud, Lloyd, Grosse, Tenenbaum, and
-  Ghahramani]{duvenaud2013}
-David Duvenaud, James~Robert Lloyd, Roger Grosse, Joshua~B Tenenbaum, and
-  Zoubin Ghahramani.
-\newblock Structure discovery in nonparametric regression through compositional
-  kernel search.
-\newblock \emph{arXiv preprint arXiv:1302.4922}, 2013.
+\bibitem[Andrieu et~al.(2003)Andrieu, De~Freitas, Doucet, and
+  Jordan]{andrieu2003introduction}
+Christophe Andrieu, Nando De~Freitas, Arnaud Doucet, and Michael~I Jordan.
+\newblock An introduction to mcmc for machine learning.
+\newblock \emph{Machine learning}, 50\penalty0 (1-2):\penalty0 5--43, 2003.
+
+\bibitem[Berg and Billoire(2008)]{berg2008markov}
+Bernd~A Berg and Alain Billoire.
+\newblock \emph{Markov chain monte carlo simulations}.
+\newblock Wiley Online Library, 2008.
+
+\bibitem[Duane et~al.(1987)Duane, Kennedy, Pendleton, and
+  Roweth]{duane1987hybrid}
+Simon Duane, Anthony~D Kennedy, Brian~J Pendleton, and Duncan Roweth.
+\newblock Hybrid monte carlo.
+\newblock \emph{Physics letters B}, 195\penalty0 (2):\penalty0 216--222, 1987.
+
+\bibitem[Hastings(1970)]{hastings1970monte}
+W~Keith Hastings.
+\newblock Monte carlo sampling methods using markov chains and their
+  applications.
+\newblock \emph{Biometrika}, 57\penalty0 (1):\penalty0 97--109, 1970.
+
+\bibitem[Neal et~al.(2011)]{neal2011mcmc}
+Radford~M Neal et~al.
+\newblock Mcmc using hamiltonian dynamics.
+\newblock \emph{Handbook of Markov Chain Monte Carlo}, 2\penalty0 (11), 2011.
+
+\bibitem[Sorensen and Gianola(2007)]{sorensen2007likelihood}
+Daniel Sorensen and Daniel Gianola.
+\newblock \emph{Likelihood, Bayesian, and MCMC methods in quantitative
+  genetics}.
+\newblock Springer Science \& Business Media, 2007.
+
+\bibitem[Tolpin et~al.(2015)Tolpin, van~de Meent, and
+  Wood]{tolpin2015probabilistic}
+David Tolpin, Jan-Willem van~de Meent, and Frank Wood.
+\newblock Probabilistic programming in anglican.
+\newblock In \emph{Joint European Conference on Machine Learning and Knowledge
+  Discovery in Databases}, pages 308--311. Springer, 2015.
+
+\bibitem[Wood et~al.(2014)Wood, Meent, and Mansinghka]{wood2014new}
+Frank Wood, Jan~Willem Meent, and Vikash Mansinghka.
+\newblock A new approach to probabilistic programming inference.
+\newblock In \emph{Artificial Intelligence and Statistics}, pages 1024--1032,
+  2014.
 
 \end{thebibliography}

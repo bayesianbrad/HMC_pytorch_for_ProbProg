@@ -214,7 +214,7 @@ class HMCsampler():
 
         '''
         for i in range(self.n_samples):
-            # TO DO: Get this bit sorted 
+            # TO DO: Get this bit sorted
             temp = self.acceptance()
             # update the intial value of self.x0 globally
             self.x0 = temp

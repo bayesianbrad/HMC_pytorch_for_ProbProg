@@ -12,24 +12,8 @@ import torch
 from torch.autograd import Variable
 from core import VariableCast
 from program import program
-from test_KE import KEnergy
+from kinetic import Kinetic
 # TO DO: Check how to call a class method within  a class
-def calc_grad(logjoint, values):
-    ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
-        data from the Variable of the gradients '''
-    # Assuming values is a dictionary we could extract the values into a list as follows
-    # if isinstance(dict, values):
-    #     self.params = list(values.values())
-    # else:
-    #     self.params = values
-    grad = torch.autograd.grad([logjoint], [values], grad_outputs=torch.ones(values.data.size()))
-    # note: Having grad_outputs set to the dimensions of the first element in the list, implies that we believe all
-    # other values are the same size.
-    gradients = torch.Tensor(len(values), values.data.size())
-    for i in range(len(values)):
-        gradients[i][:] = grad[i][0].data.unsqueeze(
-            0)  # ensures that each row of the grads represents a params grad
-    return gradients
 def test():
     prog_obj = program()
     logjointOrig, values_init, init_gradient  = prog_obj.generate()
@@ -41,7 +25,7 @@ def test():
     # # if values is a dictionary then, we can generate a
     # # momentum with the right
     p0         = VariableCast(torch.randn(values_init.size()))
-    kinetic_obj = KEnergy(p0)
+    kinetic_obj = Kinetic(p0)
     values     = values_init
     print('******** Before ********')
     print(p0)
