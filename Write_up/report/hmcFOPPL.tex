@@ -7,6 +7,7 @@
 \usepackage{algpseudocode}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{dsfont}
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
@@ -92,7 +93,8 @@
 
 Monte Carlo Markov Chain (MCMC) methods are a set of powerful inference algorithms \citep{berg2008markov} that enable us to evaluate, model and analyze complicated probabilistic models such as those found in machine learning and Bayesian inference \citep{andrieu2003introduction} and in natural systems, such as those found in Biology \citep{sorensen2007likelihood} and Physics \citep{duane1987hybrid}. 
 However, as the dimensionality of the problem grows many MCMC methods, such as Metropolis-Hastings \citep{hastings1970monte},  become ineffective at being able to generate samples effectively. This can be overcome in some instances by tuning particular parameters or rephrasing the problem in a different manner, but this cannot always be done. One MCMC this is able to circumvent this problem is Hamiltonian Monte Carlo (HMC) \citep{neal2011mcmc}\citep{duane1987hybrid}, which takes inspiration from the physical world and uses a dynamical model to generate new proposals. This in turn enables us to explore larger spaces more effectively globally, rather than getting trapped in local regions. See section \ref{sec:supmat} for more information on HMC. \\
-Choosing the right inference algorithm is critical for probabilistic programming languages \citep{tolpin2015probabilistic} such as Anglican \citep{wood2014new} and others, where we rely upon accurate inference and sampling procedures to evaluate our program.   
+Choosing the right inference algorithm is critical for probabilistic programming languages \citep{tolpin2015probabilistic} such as Anglican \citep{wood2014new} and others, where we rely upon accurate inference and sampling procedures to evaluate our programs. Although, in practice there is no-one inference or sampling algorithm to rule them all. Thus we rely on a combination of techniques, to deal with both finite parameter and infinite parameter spaces (non-parametric models). To analyze more effectively a subset of the problems that Anglican can, such as finite graphs, FOPPL, a first order probabilistic programming language was developed so that we could take advantage of fast inference algorithms, such as HMC.\\
+
 
 \section{Background}
 
@@ -212,7 +214,9 @@ where $K(p)$ represents our kinetic energy and $U(q)$ is the potential energy.
 
 Within the HMC MCMC framework the ''positions", $q$, are the variables of interest and for each position variable we have to create a fictitious ''momentum", $p$. For compactness let $z = (q,p)$. The potential energy $U(q)$ will be the minus of the log of the probabilty density for the distribution of the position variables we wish to sample, plus \textbf{any} constant that is convenient.  The kinetic energy will represents the dynamics of our variables, for which a popular form of $K(p) = \frac{p^{T} M^{-1} p}{2}$, where $M$ is symmetric, positive definite and typically diagonal. This form of $K(p)$ corresponds to a minus the log probability of the zero mean Gaussian distribution with covariance matrix $M$. For this choice we can write the Hamiltonian equations, for any dimension $d$, as follows:
 \begin{align}
+\label{eq:ham1neal}
 \dot{q}_{i} &= \frac{dq_{i}}{dt} = [M^{-1}p]_{i}\\
+\label{eq:ham2neal}
 \dot{p}_{i} &= \frac{dp_{i}}{dt} = -\frac{\partial U}{\partial q_{i}}
 \end{align}
 
@@ -234,7 +238,7 @@ where $\pi(q)$ is the prior distribution, and $L(q|D)$ is the likelihood, not th
 \subsection{The Integrator}
 
 \subsubsection{The leapfrog method}
-The leapfrog method enables reduced error and allows us to dicretize Hamiltons equations, so that we can implement them numerically. 
+The leapfrog method enables us to discretise Hamiltons equations and as it is a valid integrator, it allows us to numerically solve Hamiltons equations \ref{eq:ham1neal} and \ref{eq:ham2neal}. In doing so, we generate new proposals given some initial state 
 We start with a state at $t = 0$ and then evaluate at a subsequent time $t + \epsilon , \hdots, t + n\epsilon$, where $\epsilon$ is the step in which we increase and $n$ is the number of time steps. 
 
 \begin{align}
@@ -264,41 +268,41 @@ Both steps leave the canonical distribution of (q,p) invariant, hence the distri
 
 In \textbf{Step 1} we first draw the $p_{i}$ randomly from their Gaussian distribution independently of the current values of the position values. 
 In \textbf{Step 2} a Metropolis update is performed, using the Hamiltonian dynamics to propose a new state. Starting with the current state $(q,p)$, Hamiltonian dynamics is simulated for $L$ steps using the leapfrog method, with a stepsize of $\epsilon$. $L$ and $\epsilon$ are parameters of the mnodel that need to be tuned.\\
-The momentum vairables at the end of this $L$-step trajectory are then negated, giving s proposed state $(q^{*}. p^{*})$. This proposed state is accepted as the next state in the Markov Chain with probability: \begin{equation}
+The momentum vairables at the end of this $L$-step trajectory are then negated, giving s proposed state $(q^{*}. p^{*})$. This proposed state is accepted as the next state in the Markov Chain with probability: \begin{multline}
 \min[1, \exp(-H(q^{*}, p^{*}) + H(p,q)] =\\
  \min[1, \exp(-U(q^{*}) + U(q) - K(p^{*}) + K(p))]
-\end{equation} 
+\end{multline} 
 \begin{algorithm}
 	\label{alg:simpHMC}
 	\caption{\textbf{Continuous Hamiltonian Monte Carlo MCMC}}
 	\begin{algorithmic}[1]
-		\Procedure{HMC}{$\theta_{0}$, $\epsilon$, $L$,$U$, $M$}
+		\Procedure{HMC}{$x_{0}$, $\epsilon$, $L$,$U$, $M$}
 		\For{$m = 1 \text{ to } M$}
-		\State $ p^{0} \sim \mathcal{N}(0,\mathbb{I})$
-		\State $ \theta^{m} \gets \theta^{m-1}$
-		\State $\theta^{'} \gets \theta^{m-1}$
+		\State $ p^{0} \sim \mathcal{N}(0,\mathds{1})$
+		\State $ x^{m} \gets x^{m-1}$
+		\State $x^{'} \gets x^{m-1}$
 		\State $ p^{'} \gets p^{0}$
 		\For {$i = 1 \text{ to } L$}
-		\State $\theta^{'}$ , $p \gets$ Leapfrog($\theta^{'}, p^{'}, \epsilon$)
+		\State $x^{'}$ , $p \gets$ Leapfrog($x^{'}, p^{'}, \epsilon$)
 		\EndFor
-		\State $\alpha = \min\left\{1, \frac{\exp \left\{-U(\theta^{'}) - K(p^{'})\right\}}{\exp \left\{U(\theta^{m-1}) - K(p^{0})\right\}}\right\}$ \Comment{Acceptance probability}
+		\State $\alpha = \min\left\{1, \frac{\exp \left\{-U(x^{'}) - K(p^{'})\right\}}{\exp \left\{U(x^{m-1}) - K(p^{0})\right\}}\right\}$
 		\State $u \sim Uniform(0,1)$
 		\If{ $u < \alpha $}
-		\State \Return $ \theta^{m} \gets \theta^{'}$, $p^{m} \gets -p $  \Comment{Accept}
+		\State \Return $ x^{m} \gets x^{'}$, $p^{m} \gets -p $  \Comment{Accept}
 		\Else
-		\State \Return $\theta^{m}  \gets \theta^{m-1}$ , $p^{m} \gets p^{0}$ \Comment{Reject}
+		\State \Return $x^{m}  \gets x^{m-1}$ , $p^{m} \gets p^{0}$ \Comment{Reject}
 		\EndIf
 		\EndFor
-		\State {Leapfrog($\theta$, $p$, $\epsilon$)} 
-		\State $p^{'} \gets p - \frac{\epsilon}{2}\nabla_{\theta} U(\theta)$ \Comment{Half step for momentum}
-		\State $\theta^{'} \gets \theta + \epsilon \nabla_{p} K(p^{'})$ \Comment{Full step for the the position} 
-		\State $p^{'} \gets \frac{\epsilon}{2}\nabla_{\theta}U(\theta^{'})$ \Comment{Final half step for momentum}
-		\State \Return $\theta^{'}$ , $p^{'}$
+		\State {Leapfrog($x$, $p$, $\epsilon$)} 
+		\State $p^{'} \gets p - \frac{\epsilon}{2}\nabla_{x} U(x)$ \Comment{Half step for momentum}
+		\State $x^{'} \gets x + \epsilon \nabla_{p} K(p^{'})$ \Comment{Full step for position} 
+		\State $p^{'} \gets p - \frac{\epsilon}{2}\nabla_{x}U(x^{'})$ \Comment{Half step for momentum}
+		\State \Return $x^{'}$ , $p^{'}$
 	\end{algorithmic} 
 \end{algorithm}
 If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
 The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.
-Where $U = -\log(\pi(\theta))$,  $M$ is the number of samples we wish to take , $(\theta^{'}, p^{'})$ is the generated proposal and we propose setting $\theta^{m} = \theta^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
+Where $U = -\log(\pi(x))$,  $M$ is the number of samples we wish to take , $(x^{'}, p^{'})$ is the generated proposal and we propose setting $x^{m} = x^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
 A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $q$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $q$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $q_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
 
 
