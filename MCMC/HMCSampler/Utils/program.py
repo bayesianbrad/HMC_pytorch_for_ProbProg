@@ -32,10 +32,10 @@ class program():
         grad = torch.autograd.grad([logjoint], [values], grad_outputs=torch.ones(values.data.size()))
         # note: Having grad_outputs set to the dimensions of the first element in the list, implies that we believe all
         # other values are the same size.
-        gradients = torch.Tensor(len(values), values.data.size()[1])
+        # print(grad)
+        gradients = torch.Tensor(1,values.size()[0])
         for i in range(len(values)):
-            gradients[i][:] = grad[i][0].data.unsqueeze(
-                0)  # ensures that each row of the grads represents a params grad
+            gradients[i,:] = grad[i][0].data.unsqueeze(0)  # ensures that each row of the grads represents a params grad
         return gradients
     def generate(self):
         ''' Generates the initial state and returns the samples and logjoint evaluated at initial samples  '''
@@ -65,7 +65,7 @@ class program():
         for logprob in logp:
             logp_x_y = logp_x_y + logprob
         return logp_x_y, x, VariableCast(self.calc_grad(logp_x_y,x))
-    def eval(self, values, grad = False):
+    def eval(self, values, grad= False, grad2= False):
         ''' Takes a map of variable names, to variable values . This will be continually called
             within the leapfrog step
 
@@ -76,9 +76,8 @@ class program():
                             Size: -
                             Description: Flag to denote whether the gradients are needed or not
         '''
-
+        logp = []  # empty list to store logps of each variable # In addition to foopl input
         ################## Start FOPPL input ##########
-        logp = [] # empty list to store logps of each variable # In addition to foopl input
         values = Variable(values.data, requires_grad = True)
         a = VariableCast(1.0)
         b = VariableCast(1.41)
@@ -102,6 +101,9 @@ class program():
         if grad:
             gradients = self.calc_grad(logjoint, values)
             return VariableCast(gradients)
+        elif grad2:
+            gradients = self.calc_grad(logjoint, values)
+            return logjoint, VariableCast(gradients)
         else:
             return logjoint, values
     def free_vars(self):
