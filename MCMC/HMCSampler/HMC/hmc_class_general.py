@@ -8,15 +8,16 @@ Created on Mon Aug 14 15:31:26 2017
 
 import torch
 import numpy as np
-from torch.autograd import Variable
 import time
-from Utils.core import VariableCast
-from Utils.program import program
-from Utils.kinetic import Kinetic
+import matplotlib.pyplot as plt
 import math
+from torch.autograd import Variable
+from Utils.core import VariableCast
+from Utils.program import program_simple as program
+from Utils.kinetic import Kinetic
 
-np.random.seed(1234)
-torch.manual_seed(1234)
+# np.random.seed(1234)
+# torch.manual_seed(1234)
 
 
 
@@ -44,28 +45,7 @@ torch.manual_seed(1234)
 #
 #
 #     """
-#     def __init__(self, joint, params):
-#         self.joint  = torch.log(joint)
-#         self.params = params
-#
-#     def calc_grad(self):
-#         ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
-#             data from the Variable of the gradients '''
-#         grad      = torch.autograd.grad([self.joint], self.params, grad_outputs= torch.ones(self.params[0].data))
-#         gradients = torch.Tensor(len(self.params), self.params[0].data.size())
-#         for i in range(len(self.params)):
-#            gradients[i][:] = grad[i][0].data.unsqueeze(0) # ensures that each row of the grads represents a params grad
-#         return gradients
-#
-#     def  calc_pot(self):
-#         ''' Calculates the ' log potential function' needed to calculate the Hamiltonian '''
-#         return self.joint.data
 
-
-
-#
-# class LogPotentialDisc():
-#     ''' TO DO'''
 
 class HMCsampler():
     '''
@@ -86,24 +66,24 @@ class HMCsampler():
         self.burn_in    = burn_in
         self.n_samples  = n_samples
         if min_step is None:
-            self.min_step = torch.Tensor(1).uniform_(0.01, 0.07)
+            self.min_step = np.random.uniform(0.01, 0.07)
         else:
             self.min_step = min_step
         if max_step is None:
-            self.max_step = torch.Tensor(1).uniform_(0.14, 0.20)
+            self.max_step = np.random.uniform(0.07, 0.18)
         else:
             self.max_step = max_step
         if max_traj is None:
-            self.max_traj = torch.Tensor(1).uniform_(18, 25)
+            self.max_traj = np.random.uniform(18, 25)
         else:
             self.max_traj = max_traj
         if min_traj is None:
-            self.min_traj = torch.Tensor(1).uniform_(5, 12)
+            self.min_traj = np.random.uniform(0, 18)
         else:
             self.min_traj = min_traj
         self.M         = M
-        self.step_size = torch.Tensor(1).uniform_(self.min_step[0], self.max_step[0])[0]
-        self.traj_size = int(torch.Tensor(1).uniform_(self.min_traj[0], self.max_traj[0])[0])
+        self.step_size = np.random.uniform(self.min_step, self.max_step)
+        self.traj_size = int(np.random.uniform(self.min_traj, self.max_traj))
         self.potential = program()
         # to calculate acceptance probability
         self.count     = 0
@@ -134,10 +114,8 @@ class HMCsampler():
         n_steps   = self.traj_size
 
         # Start by updating the momentum a half-step and values by a full step
-        p = p_init + 0.5 * step_size * grad_init
-        print(p)
+        p      = p_init + 0.5 * step_size * grad_init
         values = values_init + step_size * self.kinetic.gauss_ke(p, grad= True)
-        print(values)
         for i in range(n_steps - 1):
             # range equiv to [2:nsteps] as we have already performed the first step
             # update momentum
@@ -167,11 +145,7 @@ class HMCsampler():
         hamitonian : float
         """
         T = self.kinetic.gauss_ke(p, grad=False)
-        # print('Debug HAM *******')
-        # print(T)
-        # print(logjoint)
-        # print(type(logjoint), type(p))
-        return logjoint + T
+        return -logjoint + T
 
     def acceptance(self, logjoint_init, values_init, grad_init):
         '''Returns the new accepted state
@@ -194,26 +168,15 @@ class HMCsampler():
         self.kinetic = Kinetic(p_init,self.M)
         # calc hamiltonian  on initial state
         orig         = self.hamiltonian(logjoint_init, p_init)
-        # print(' Init values ******')
-        # print('momentum', p_init)
-        # print('values', values_init)
-        # print('logjoint', logjoint_init)
-        # print('grad_init', grad_init)
 
         # generate proposals
         values, p    = self.leapfrog_steps(p_init, values_init, grad_init)
-        # print(' Proposed values ********')
-        # print(' momentum ', p)
-        # print(' values ', values)
 
         # calculate new hamiltonian given current
         logjoint_prop, _ = self.potential.eval(values, grad= False)
-        # print('logjoint prposed')
-        # print(logjoint_prop)
 
         current      = self.hamiltonian(logjoint_prop, p)
-        alpha = torch.min(torch.exp(orig - current))
-        # print('alpha :', alpha)
+        alpha        = torch.min(torch.exp(orig - current))
         # calculate acceptance probability
         if isinstance(alpha, Variable):
             p_accept = torch.min(torch.ones(1,1), alpha.data)
@@ -227,6 +190,32 @@ class HMCsampler():
         else:
             return values_init
 
+    def plot_trace(self, samples):
+        '''
+
+        :param samples:  an nparray
+        :param parameters:  Is a list of which parameters to take the traces of
+        :return:
+        '''
+        print('This plotting traces.....')
+        fig, ax = plt.subplots()
+        iter = np.arange(0, np.shape(samples)[0])
+        ax.plot(iter, samples, label= ' values ')
+        ax.set_title('Trace plot for the parameters')
+        fname = '../../report_figures/trace_uniform.png'
+        plt.savefig(fname, dpi=400)
+
+    def histogram(self, samples, mean):
+        weights = np.ones_like(samples) / float(len(samples))
+        plt.clf()
+        plt.hist(samples,  bins = 'auto', normed=1)
+        plt.xlabel(' Samples ')
+        plt.ylabel('Density')
+        plt.title('Histogram of samples \n' + r'$\mu_{\mathrm{emperical}}$' + r'$={}$'.format(mean[0]))
+        # plt.axis([40, 160, 0, 0.03])
+        plt.grid(True)
+        fname = '../../report_figures/histogram_uniform.png'
+        plt.savefig(fname, dpi = 400)
     def run_sampler(self):
         ''' Runs the hmc internally for a number of samples and updates
         our parameters of interest internally
@@ -243,40 +232,45 @@ class HMCsampler():
 
         '''
         logjoint_init, values_init, grad_init = self.potential.generate()
-        if isinstance(dict, values_init):
-            print('do something else')
-        else:
-            logjoint_init, values_init, grad_init = self.potential.generate()
+        # if isinstance(dict, values_init):
+        #     print('do something else')
+        # else:
+        #     logjoint_init, values_init, grad_init = self.potential.generate()
         temp = self.acceptance(logjoint_init, values_init, grad_init)
         n_dim = values_init.size()[1]
         samples      = Variable(torch.zeros(self.n_samples,n_dim))
-        samples[i, :] = temp.data
+        samples[0, :] = temp.data
         self.step_size = np.random.uniform(self.min_step, self.max_step)
         self.n_steps = int(np.random.uniform(self.min_traj, self.max_traj))
         # Then run for loop from 2:n_samples
-        samples      = Variable(torch.zeros(self.n_samples+1,1))
+        samples      = Variable(torch.zeros(self.n_samples,1))
 
         for i in range(self.n_samples-1):
             # TO DO: Get this bit sorted
-            print(' Iteration ', i)
-            print(' Samples ' , temp.data)
-            print(' Samples type ', type(temp))
+            # print(' Iteration ', i)
+            # print(' Samples ' , temp.data)
+            # print(' Samples type ', type(temp))
             logjoint_init, grad_init = self.potential.eval(temp, grad2= True)
             temp = self.acceptance(logjoint_init,temp, grad_init)
             # store accepted sample
-            print(' Temp data {0} interation {1} '.format(temp.data, i))
+            # print(' Temp data {0} interation {1} '.format(temp.data, i))
+            # print(temp)
             samples[i+1,:] = temp.data
             # update parameters and draw new momentum
-            self.step_size = torch.Tensor(1).uniform_(self.min_step[0], self.max_step[0])[0]
-            self.traj_size = int(torch.Tensor(1).uniform_(self.min_traj[0], self.max_traj[0])[0])
+            self.step_size = np.random.uniform(self.min_step, self.max_step)
+            self.traj_size = int(np.random.uniform(self.min_traj, self.max_traj))
 
         target_acceptance = self.count / (self.n_samples)
-        # samples_reduced   = samples[self.burn_in:, :]
-        # mean = torch.mean(samples,dim=0, keepdim= True)
-        # print()
-        # print('****** EMPIRICAL MEAN/COV USING HMC ******')
-        # print('empirical mean : ', mean)
-        # print('Average acceptance rate is: ', target_acceptance)
+        samples_reduced   = samples[self.burn_in:, :]
+        mean = torch.mean(samples_reduced,dim=0, keepdim= True)
+        print(samples_reduced)
+
+        print()
+        print('****** EMPIRICAL MEAN/COV USING HMC ******')
+        print('empirical mean : ', mean)
+        print('Average acceptance rate is: ', target_acceptance)
+        self.plot_trace(samples.data.numpy())
+        self.histogram(samples_reduced.data.numpy(), mean.data.numpy())
 
 # class Statistics(object):
 #     '''A class that contains .mean() and .var() methods and returns the sampled
@@ -284,30 +278,52 @@ class HMCsampler():
 # # return samples[burn_in:, :], target_acceptance
 
 
+class Plotting():
+
+    def __init__(self, samples, mean, cov= None):
+        if isinstance(Variable, samples):
+            self.samples = samples.data.numpy()
+        else:
+            self.samples = samples.numpy()
+        self.mean    = mean
+        if cov is not None:
+            self.cov = cov
+
+    def plot_trace(self, samples, parameters):
+        '''
+
+        :param samples:  an nparray
+        :param parameters:  Is a list of which parameters to take the traces of
+        :return:
+        '''
+        print('This plotting traces.....')
+        fig, ax = plt.subplots()
+        iter = np.arange(0, np.shape(samples)[0])
+        ax.plot(iter, samples, label= ' values ')
+        ax.set_title('Trace plot for the parameters')
+        plt.show()
+
+    def histogram(self, samples, mean):
+        n, bins, patches = plt.hist(samples, normed=1, facecolor='green', alpha=0.75)
+
+        plt.xlabel(' Samples ')
+        plt.ylabel('Probability')
+        plt.title('Histogram of samples' + 'r $\mu={}$'.format([0]))
+        # plt.axis([40, 160, 0, 0.03])
+        plt.grid(True)
+
+        plt.show()
 def main():
-    n_dim = 5
-    n_samples = 100
-    burnin = 0
-    n_vars = 1
-    minstep = 0.03
-    maxstep = 0.18
-    mintraj = 5
-    maxtraj = 15
-    hmcsampler  = HMCsampler(burn_in=0, n_samples= 100)
+    # n_dim = 5
+    # n_samples = 10000
+    # burnin = 0
+    # n_vars = 1
+    # minstep = 0.03
+    # maxstep = 0.18
+    # mintraj = 5
+    # maxtraj = 15
+    hmcsampler  = HMCsampler(burn_in=1000, n_samples= 10000)
     hmcsampler.run_sampler()
-    # Intialise both trajectory length and step size
-    # hmc_sampler = HMCsampler(x0=xinit,
-    #                          p0=pinit,
-    #                          ndim=n_dim,
-    #                          nsamples=n_samples,
-    #                          burn_in=burnin,
-    #                          nvars=n_vars,
-    #                          min_step=minstep,
-    #                          max_step=maxstep,
-    #                          min_traj=mintraj,
-    #                          max_traj=maxtraj,
-    #                          count=0)
-    # hmc_sampler.run_sampler()
 
 
 main()
