@@ -37,17 +37,23 @@ class program():
         for i in range(len(values)):
             gradients[i,:] = grad[i][0].data.unsqueeze(0)  # ensures that each row of the grads represents a params grad
         return gradients
+
+class program_simple(program):
+    def __init__(self,dim):
+        super().__init__()
+        self.dim = dim
+
     def generate(self):
         ''' Generates the initial state and returns the samples and logjoint evaluated at initial samples  '''
 
         ################## Start FOPPL input ##########
         logp = [] # empty list to store logps of each variable
-        a = VariableCast(1.0)
-        b = VariableCast(1.41)
+        a = VariableCast(0.0)
+        b = VariableCast(2.236)
         normal_object = dis.Normal(a, b)
         x = Variable(normal_object.sample().data, requires_grad = True)
 
-        std  = VariableCast(1.73)
+        std  = VariableCast(1.4142)
         obs2 = VariableCast(7.0)
         p_y_g_x    = dis.Normal(x, std)
 
@@ -79,11 +85,11 @@ class program():
         logp = []  # empty list to store logps of each variable # In addition to foopl input
         ################## Start FOPPL input ##########
         values = Variable(values.data, requires_grad = True)
-        a = VariableCast(1.0)
-        b = VariableCast(1.41)
+        a = VariableCast(0.0)
+        b = VariableCast(2.236)
         normal_object = dis.Normal(a, b)
 
-        std  = VariableCast(1.73)
+        std  = VariableCast(1.4142)
         obs2 = VariableCast(7.0)
         # Need a better way of dealing with values. As ideally we have a dictionary (hash map)
         # then we say if values['x']
@@ -97,7 +103,7 @@ class program():
 
         for logprob in logp:
             logjoint = logjoint + logprob
-
+        # grad2 is a hack so that we can call this at the start
         if grad:
             gradients = self.calc_grad(logjoint, values)
             return VariableCast(gradients)
