@@ -70,9 +70,9 @@
 \aistatstitle{Hamiltonian Monte Carlo Inference for a First Order Probabilistic Programming Language }
 
 %\aistatsauthor{ Bradley Gram-Hansen \And Frank Wood \And  Author 3 }
-\aistatsauthor{ Bradley Gram-Hansen \And Frank Wood}
+\aistatsauthor{ Bradley Gram-Hansen \And Yuan Zhou \And Frank Wood }
 %\aistatsaddress{ Institution 1 \And  Institution 2 \And Institution 3 } ]
-\aistatsaddress{ University of Oxford \And  University of Oxford } ]
+\aistatsaddress{ Department of Engineering,  University of Oxford } ]
 \begin{abstract}
   The Abstract paragraph should be indented 0.25 inch (1.5 picas) on
   both left and right-hand margins. Use 10~point type, with a vertical
@@ -93,7 +93,8 @@
 
 Monte Carlo Markov Chain (MCMC) methods are a set of powerful inference algorithms \citep{berg2008markov} that enable us to evaluate, model and analyze complicated probabilistic models such as those found in machine learning and Bayesian inference \citep{andrieu2003introduction} and in natural systems, such as those found in Biology \citep{sorensen2007likelihood} and Physics \citep{duane1987hybrid}. 
 However, as the dimensionality of the problem grows many MCMC methods, such as Metropolis-Hastings \citep{hastings1970monte},  become ineffective at being able to generate samples effectively. This can be overcome in some instances by tuning particular parameters or rephrasing the problem in a different manner, but this cannot always be done. One MCMC this is able to circumvent this problem is Hamiltonian Monte Carlo (HMC) \citep{neal2011mcmc}\citep{duane1987hybrid}, which takes inspiration from the physical world and uses a dynamical model to generate new proposals. This in turn enables us to explore larger spaces more effectively globally, rather than getting trapped in local regions. See section \ref{sec:supmat} for more information on HMC. \\
-Choosing the right inference algorithm is critical for probabilistic programming languages \citep{tolpin2015probabilistic} such as Anglican \citep{wood2014new} and others, where we rely upon accurate inference and sampling procedures to evaluate our programs. Although, in practice there is no-one inference or sampling algorithm to rule them all. Thus we rely on a combination of techniques, to deal with both finite parameter and infinite parameter spaces (non-parametric models). To analyze more effectively a subset of the problems that Anglican can, such as finite graphs, FOPPL, a first order probabilistic programming language was developed so that we could take advantage of fast inference algorithms, such as HMC.\\
+Choosing the right inference algorithm is critical for probabilistic programming languages \citep{tolpin2015probabilistic} such as Anglican \citep{wood2014new} and others, where we rely upon accurate inference and sampling procedures to evaluate our programs. Although, in practice there is no-one inference or sampling algorithm to rule them all. Thus we rely on a combination of techniques, to deal with both finite parameter and infinite parameter spaces (non-parametric models). To analyze more effectively a subset of the problems that Anglican can, such as finite graphs, FOPPL, a first order probabilistic programming language was constructed so that we could take advantage of fast inference algorithms, such as HMC.\\
+In this work we make two contributions, we introduce a FOPPL compiler that transform a program output, a finite graph, into python code that takes advantage of the Automatic differentiation package within Pytorch \citep{pytorch} and an HMC that correctly deals with conditional statements and can deal with both finite continuous and discrete parameters us
 
 
 \section{Background}
@@ -108,12 +109,9 @@ Second level headings are initial caps, flush left, bold, and in point
 size 10. Use one line space before the second level heading and one-half line
 space after the second level heading.
 
-\subsubsection{Third Level Heading}
+\subsubsection{Models and Results}
 
-Third level headings are flush left, initial caps, bold, and in point
-size 10. Use one line space before the third level heading and one-half line
-space after the third level heading.
-
+Here we introduce a section of simple models and show how the transformed FOPPL code is compiled and how inference is performed. 
 \paragraph{Fourth Level Heading}
 
 Fourth level headings must be flush left, initial caps, bold, and
@@ -189,7 +187,7 @@ Soma             &Cell body (contains cell nucleus) \\
 \section{SUPPLEMENTARY MATERIAL}
 \label{sec:supmat}
 
-In a top level view Hamilton Monte Carlo for Monte Carlo Markov Chain (HMC MCMC) is a two step process. In step one we define a Hamiltonian function in terms of the probability distribution from which we wish to sample from. We introduce a position variable, $q$ and momentum variable $p$, where $p$ is an auxiliary variable that typically has a Gaussian distribution.  All $p$'s are assumed independent. 
+In a top level view Hamilton Monte Carlo for Monte Carlo Markov Chain (HMC MCMC) is a two step process. In step one we define a Hamiltonian function in terms of the probability distribution from which we wish to sample from. We introduce a position variable, $q$ (our latent parameters) and momentum variable $p$, where $p$ is an auxiliary variable that typically has a Gaussian distribution.  All $p$'s are assumed independent. 
 In step two, the HMC alternates simple updates for the momentum variables with Metropolis updates. This enables us to propose a new state by computing a trajectory according to Hamiltonian dynamics, implemented with the leapfrog method. 
 \subsubsection{Prerequisites}
 The Hamiltonian of a physical system is defined completely with respect to the position $q$ and $p$ momentum variables, which span the phase space of the system. The Hamiltonian is the Legendre transform of the Lagrangian and gives us the total energy in the system, that is \begin{equation}
@@ -244,7 +242,7 @@ We start with a state at $t = 0$ and then evaluate at a subsequent time $t + \ep
 \begin{align}
 p_{i}(t + \frac{\epsilon}{2}) &= p_{i}(t) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(q(t))}{\partial q_{i}} \\
 q_{i}(t + \epsilon) &= q_{i}(t) + \epsilon\frac{\partial K(p(t + \frac{\epsilon}{2}))}{dp_{i}}\\
-p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U}{\partial q_{i}}\\
+p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U}{\partial q_{i}}
 \end{align}
 \footnote{For the usual choice of kinetic energy, we have $\frac{\partial K(p + \frac{\epsilon}{2})}{dp_{i}} = \frac{p_{i}(t + \frac{\epsilon}{2})}{m_{i}}$}
 
@@ -370,8 +368,8 @@ Use unnumbered third level headings for the acknowledgements.  All
 acknowledgements go at the end of the paper.
 
 \subsubsection*{References}
+\bibliographystyle{apalike}
 \bibliography{mini_proj}
-\bibliographystyle{plainnat}
 
 
 \end{document}
