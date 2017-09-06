@@ -3,8 +3,8 @@ import torch
 from torch.autograd import Variable
 from Utils.core import ContinuousRandomVariable, DiscreteRandomVariable, VariableCast
 # TO DO : comment seeds when running program for real.
-torch.manual_seed(1234) # For testing only
-np.random.seed(1234)
+# torch.manual_seed(1234) # For testing only
+# np.random.seed(1234)
 
 # Note to user: Only the Laplace pdf is implemented as that is that is needed for this
 # current project. The code is written for the pdfs but not
@@ -110,14 +110,14 @@ class MultivariateNormal(ContinuousRandomVariable):
         self.mean      = VariableCast(mean)
         self.covariance = VariableCast(covariance)
         # cholesky decomposition returns upper triangular matrix. Will not accept Variables
-        self.L = torch.potrf(self._covariance.data)
+        self.L = VariableCast(torch.potrf(self.covariance.data))
 
     def sample(self):
         # Returns a sample of a multivariate normal X ~ N(mean, cov)
         # A column vecotor of X ~ N(0,I)  - IS THIS ACTUALLY TRUE ?? NOT SURE, ALL POINTS HAVE
         # THE RIGHT MEAN AND VARIANCE N(0,1)
-        self.uniformNorm  = Variable(torch.Tensor(self.mean.size()).normal_().t())
-        samples           = self.mean  + Variable(self.L.t().mm(self.uniformNorm))
+        self.uniformNorm  = torch.Tensor(self.mean.size()).normal_()
+        samples           = self.mean.data  + Variable(self.L.t().data.mm(self.uniformNorm))
         return samples
 
     # def sample_grad(self):
@@ -145,9 +145,10 @@ class MultivariateNormal(ContinuousRandomVariable):
         WILL NOT RECORD THE GRAPH STRUCTURE OF THE FULL PASS, ONLY THE CALCUALTION OF THE LOGPDF')
         assert (value.size() == self.mean.size())
         value = VariableCast(value)
-        return torch.log(-0.5 * (value - self.mean).mm(self.L.inverse().mm(self.L.inverse().t())).mm(
-            (value - self.mean).t())) \
-               + self.constant
+        self._constant = ((2 * np.pi) ** value.size()[1]) * self.L.t().diag().prod()
+        return torch.log(-0.5 * (value - self.mean).t().mm(self.L.inverse().mm(self.L.inverse().t())).mm(
+            (value - self.mean))) \
+               + self._constant
 
 
 # ---------------------------------------------------------------------
