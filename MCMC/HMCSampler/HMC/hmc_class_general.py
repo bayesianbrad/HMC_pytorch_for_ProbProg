@@ -322,7 +322,7 @@ def main():
     # maxstep = 0.18
     # mintraj = 5
     # maxtraj = 15
-    hmcsampler  = HMCsampler(burn_in=1000, n_samples= 10000)
+    hmcsampler  = HMCsampler(burn_in=100, n_samples= 1000)
     hmcsampler.run_sampler()
 
 
