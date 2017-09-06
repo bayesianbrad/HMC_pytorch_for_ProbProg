@@ -71,11 +71,6 @@ class Normal(ContinuousRandomVariable):
         self.unifomNorm = Variable(torch.randn(1,num_samples))
         return self.unifomNorm * (self.std) + self.mean
 
-    def sample_grad(self):
-        x                 = Variable(self.unifomNorm.data, requires_grad = True)
-        logSample         = torch.log(x*self.std + self.mean)
-        return torch.autograd.grad([logSample], [x], grad_outputs= torch.ones(x.size()))[0]
-
     def logpdf(self, value):
         value = VariableCast(value)
         # pdf: 1 / torch.sqrt(2 * var * np.pi) * torch.exp(-0.5 * torch.pow(value - mean, 2) / var)
