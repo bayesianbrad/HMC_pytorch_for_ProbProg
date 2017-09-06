@@ -16,35 +16,8 @@ from Utils.core import VariableCast
 from Utils.program import program_simple as program
 from Utils.kinetic import Kinetic
 
-# np.random.seed(1234)
-# torch.manual_seed(1234)
-
-
-
-# class LogPotentialCts():
-#     """ Takes a joint density and creates an object that
-#
-#
-#     Methods
-#     -------
-#
-#     calc_grad  - calculates the gradients of the joint
-#     calc_pot   - calculates the potential evaluated at the proposed parameter of interested points, generated
-#                           via the leapfrog integrator
-#     Attributes
-#     ----------
-#     joint P(x,y) - Type       : torch.Variable
-#                    Size       :
-#                    Description: Is the joint distribution, where the joint has been constructed from the FOPPL
-#                                 output, via the distribution class module
-#
-#     params       - Type       : python list of Variables. The data attributes must all be the same size.
-#                    Size       :
-#                    Description: A python list of the variables of interest. The latent parameters etc. The object, will
-#                                 have its gradients evaluated with respect to that.
-#
-#
-#     """
+np.random.seed(1234)
+torch.manual_seed(1234)
 
 
 class HMCsampler():
@@ -152,10 +125,6 @@ class HMCsampler():
 
         Parameters
         ----------
-        x = xproposed
-        x0
-        p = pproposed
-        p0
 
         Output
         ------
@@ -190,32 +159,6 @@ class HMCsampler():
         else:
             return values_init
 
-    def plot_trace(self, samples):
-        '''
-
-        :param samples:  an nparray
-        :param parameters:  Is a list of which parameters to take the traces of
-        :return:
-        '''
-        print('This plotting traces.....')
-        fig, ax = plt.subplots()
-        iter = np.arange(0, np.shape(samples)[0])
-        ax.plot(iter, samples, label= ' values ')
-        ax.set_title('Trace plot for the parameters')
-        fname = '../../report_figures/trace_uniform.png'
-        plt.savefig(fname, dpi=400)
-
-    def histogram(self, samples, mean):
-        weights = np.ones_like(samples) / float(len(samples))
-        plt.clf()
-        plt.hist(samples,  bins = 'auto', normed=1)
-        plt.xlabel(' Samples ')
-        plt.ylabel('Density')
-        plt.title('Histogram of samples \n' + r'$\mu_{\mathrm{emperical}}$' + r'$={}$'.format(mean[0]))
-        # plt.axis([40, 160, 0, 0.03])
-        plt.grid(True)
-        fname = '../../report_figures/histogram_uniform.png'
-        plt.savefig(fname, dpi = 400)
     def run_sampler(self):
         ''' Runs the hmc internally for a number of samples and updates
         our parameters of interest internally
@@ -231,11 +174,8 @@ class HMCsampler():
 
 
         '''
+        print(' The sampler is now running')
         logjoint_init, values_init, grad_init = self.potential.generate()
-        # if isinstance(dict, values_init):
-        #     print('do something else')
-        # else:
-        #     logjoint_init, values_init, grad_init = self.potential.generate()
         temp = self.acceptance(logjoint_init, values_init, grad_init)
         n_dim = values_init.size()[1]
         samples      = Variable(torch.zeros(self.n_samples,n_dim))
@@ -246,15 +186,8 @@ class HMCsampler():
         samples      = Variable(torch.zeros(self.n_samples,1))
 
         for i in range(self.n_samples-1):
-            # TO DO: Get this bit sorted
-            # print(' Iteration ', i)
-            # print(' Samples ' , temp.data)
-            # print(' Samples type ', type(temp))
             logjoint_init, grad_init = self.potential.eval(temp, grad2= True)
             temp = self.acceptance(logjoint_init,temp, grad_init)
-            # store accepted sample
-            # print(' Temp data {0} interation {1} '.format(temp.data, i))
-            # print(temp)
             samples[i+1,:] = temp.data
             # update parameters and draw new momentum
             self.step_size = np.random.uniform(self.min_step, self.max_step)
@@ -263,67 +196,9 @@ class HMCsampler():
         target_acceptance = self.count / (self.n_samples)
         samples_reduced   = samples[self.burn_in:, :]
         mean = torch.mean(samples_reduced,dim=0, keepdim= True)
-        print(samples_reduced)
-
         print()
         print('****** EMPIRICAL MEAN/COV USING HMC ******')
         print('empirical mean : ', mean)
         print('Average acceptance rate is: ', target_acceptance)
-        self.plot_trace(samples.data.numpy())
-        self.histogram(samples_reduced.data.numpy(), mean.data.numpy())
 
-# class Statistics(object):
-#     '''A class that contains .mean() and .var() methods and returns the sampled
-#     statistics given an MCMC chain. '''
-# # return samples[burn_in:, :], target_acceptance
-
-
-class Plotting():
-
-    def __init__(self, samples, mean, cov= None):
-        if isinstance(Variable, samples):
-            self.samples = samples.data.numpy()
-        else:
-            self.samples = samples.numpy()
-        self.mean    = mean
-        if cov is not None:
-            self.cov = cov
-
-    def plot_trace(self, samples, parameters):
-        '''
-
-        :param samples:  an nparray
-        :param parameters:  Is a list of which parameters to take the traces of
-        :return:
-        '''
-        print('This plotting traces.....')
-        fig, ax = plt.subplots()
-        iter = np.arange(0, np.shape(samples)[0])
-        ax.plot(iter, samples, label= ' values ')
-        ax.set_title('Trace plot for the parameters')
-        plt.show()
-
-    def histogram(self, samples, mean):
-        n, bins, patches = plt.hist(samples, normed=1, facecolor='green', alpha=0.75)
-
-        plt.xlabel(' Samples ')
-        plt.ylabel('Probability')
-        plt.title('Histogram of samples' + 'r $\mu={}$'.format([0]))
-        # plt.axis([40, 160, 0, 0.03])
-        plt.grid(True)
-
-        plt.show()
-def main():
-    # n_dim = 5
-    # n_samples = 10000
-    # burnin = 0
-    # n_vars = 1
-    # minstep = 0.03
-    # maxstep = 0.18
-    # mintraj = 5
-    # maxtraj = 15
-    hmcsampler  = HMCsampler(burn_in=100, n_samples= 1000)
-    hmcsampler.run_sampler()
-
-
-main()
+        return samples_reduced, samples, mean
