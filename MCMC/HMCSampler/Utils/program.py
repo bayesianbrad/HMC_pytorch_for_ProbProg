@@ -29,7 +29,10 @@ class program():
         #     self.params = list(values.values())
         # else:
         #     self.params = values
-        grad = torch.autograd.grad([logjoint], [values], grad_outputs=torch.ones(values.data.size()))
+        if isinstance(values, list):
+            grad = torch.autograd.grad([logjoint], values, grad_outputs=torch.ones(values.data.size()))
+        else:
+            grad = torch.autograd.grad([logjoint], values, grad_outputs=torch.ones(values.data.size()))
         # note: Having grad_outputs set to the dimensions of the first element in the list, implies that we believe all
         # other values are the same size.
         # print(grad)
@@ -115,15 +118,15 @@ class program_simple(program):
             return logjoint, VariableCast(gradients)
         else:
             return logjoint, values
-    def free_vars(self):
-        return self.params
+    # def free_vars(self):
+    #     return self.params
 
 
 class program_linear_reg(program):
     def __init__(self):
         super().__init__()
 
-    def eval(self, values, grad = False, grad2 = False):
+    def generate(self):
         logp   = []
         parms  = []
         c23582 = VariableCast(torch.Tensor([0.0]))
@@ -190,17 +193,25 @@ class program_linear_reg(program):
     def eval(self, values, grad=False, grad2=False):
         logp = []
         parms = []
+        for value in values:
+            if isinstance(value, Variable):
+                temp = Variable(value.data, requires_grad = True)
+                parms.append(temp)
+            else:
+                temp = VariableCast(value)
+                temp = Variable(value.data, requires_grad = True)
+                parms.append(value)
         c23582 = VariableCast(torch.Tensor([0.0]))
         c23583 = VariableCast(torch.Tensor([10.0]))
         normal_obj1 = dis.Normal(c23582, c23583)
-        x23474 = Variable(normal_obj1.sample().data, requires_grad=True)  # sample
+        x23474 = parms[0] # sample
         parms.append(x23474)
         p23585 = normal_obj1.logpdf(x23474)  # prior
         logp.append(p23585)
         c23586 = VariableCast(torch.Tensor([0.0]))
         c23587 = VariableCast(torch.Tensor([10.0]))
         normal_obj2 = dis.Normal(c23586, c23587)
-        x23471 = Variable(normal_obj2.sample().data, requires_grad=True)  # sample
+        x23471 = parms[1]  # sample
         parms.append(x23471)
         p23589 = normal_obj2.logpdf(x23471)  # prior
         logp.append(p23589)
@@ -250,7 +261,7 @@ class program_linear_reg(program):
             return p23611, VariableCast(gradients)
         else:
             return p23611, values
-class programif():
+class programif(program):
     ''''This needs to be a function of all free variables.
          If I provide a map of all vlues and computes the log density
          and assigns values rather than samples.
@@ -265,25 +276,59 @@ class programif():
         '''Generating code, returns  a map of variable names / symbols '''
         self.params = {'x': None}
 
-    def eval(self, values):
+    def generate(self):
+        logp = []  # empty list to store logps of each variable
+        a = VariableCast(0.0)
+        b = VariableCast(1)
+        c1 = VariableCast(-1)
+        normal_obj1 = dis.Normal(a, b)
+        x = Variable(normal_obj1.sample().data, requires_grad=True)
+        logp_x = normal_obj1.logpdf(x)
+
+        if torch.gt(x.data,torch.zeros(x.size()))[0][0]:
+            y           = VariableCast(1)
+            normal_obj2 = dis.Normal(b,b)
+            logp_y_x = normal_obj2.logpdf(y)
+        else:
+            y = VariableCast(1)
+            normal_obj3 = dis.Normal(c1,b)
+            logp_y_x    = normal_obj3.logpdf(y)
+
+        logp_x_y = logp_x + logp_y_x
+
+        return logp_x_y, x, VariableCast(self.calc_grad(logp_x_y, x))
+
+        # sum up all logs
+        logp_x_y = VariableCast(torch.zeros(1, 1))
+        for logprob in logp:
+            logp_x_y = logp_x_y + logprob
+        return logp_x_y, x, VariableCast(self.calc_grad(logp_x_y, x))
+    def eval(self, values, grad= False, grad2= False):
         ''' Takes a map of variable names, to variable values '''
         a = VariableCast(0.0)
         b = VariableCast(1)
-        normal_object = Normal(a, b)
-        if values['x'] is not None:
-            x = Variable(values['x'], requires_grad=True)
+        c1 = VariableCast(-1)
+        normal_obj1 =dis.Normal(a, b)
+        values = Variable(values.data, requires_grad = True)
+        logp_x = normal_obj1.logpdf(values)
         # else:
         #     x = normal_object.sample()
         #     x = Variable(x.data, requires_grad = True)
-        if torch.gt(x,torch.zeros(x.size()))[0][0]:
-            yttyu
+        if torch.gt(values.data,torch.zeros(values.size()))[0][0]:
+            y           = VariableCast(1)
+            normal_obj2 = dis.Normal(b,b)
+            logp_y_x = normal_obj2.logpdf(y)
+        else:
+            y = VariableCast(1)
+            normal_obj3 = dis.Normal(c1,b)
+            logp_y_x    = normal_obj3.logpdf(y)
 
-        logp_x = normal_object.logpdf(x)
-        std = VariableCast(1.73)
-        p_y_g_x = Normal(x, std)
-        obs2 = VariableCast(7.0)
-        logp_y_g_x = p_y_g_x.logpdf(obs2)
-        logp_x_y = Variable.add(logp_x, logp_y_g_x)
-        return logp_x_y, {'x':x.data}
-    def free_vars(self):
-        return self.params
+        logjoint = Variable.add(logp_x, logp_y_x)
+        if grad:
+            gradients = self.calc_grad(logjoint, values)
+            return VariableCast(gradients)
+        elif grad2:
+            gradients = self.calc_grad(logjoint, values)
+            return logjoint, VariableCast(gradients)
+        else:
+            return logjoint, values
