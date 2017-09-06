@@ -1,55 +1,51 @@
-\begin{thebibliography}{8}
-\providecommand{\natexlab}[1]{#1}
-\providecommand{\url}[1]{\texttt{#1}}
-\expandafter\ifx\csname urlstyle\endcsname\relax
-  \providecommand{\doi}[1]{doi: #1}\else
-  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+\begin{thebibliography}{}
 
-\bibitem[Andrieu et~al.(2003)Andrieu, De~Freitas, Doucet, and
-  Jordan]{andrieu2003introduction}
-Christophe Andrieu, Nando De~Freitas, Arnaud Doucet, and Michael~I Jordan.
+\bibitem[Andrieu et~al., 2003]{andrieu2003introduction}
+Andrieu, C., De~Freitas, N., Doucet, A., and Jordan, M.~I. (2003).
 \newblock An introduction to mcmc for machine learning.
-\newblock \emph{Machine learning}, 50\penalty0 (1-2):\penalty0 5--43, 2003.
+\newblock {\em Machine learning}.
 
-\bibitem[Berg and Billoire(2008)]{berg2008markov}
-Bernd~A Berg and Alain Billoire.
-\newblock \emph{Markov chain monte carlo simulations}.
-\newblock Wiley Online Library, 2008.
+\bibitem[Berg and Billoire, 2008]{berg2008markov}
+Berg, B.~A. and Billoire, A. (2008).
+\newblock {\em Markov chain monte carlo simulations}.
+\newblock Wiley Online Library.
 
-\bibitem[Duane et~al.(1987)Duane, Kennedy, Pendleton, and
-  Roweth]{duane1987hybrid}
-Simon Duane, Anthony~D Kennedy, Brian~J Pendleton, and Duncan Roweth.
+\bibitem[Duane et~al., 1987]{duane1987hybrid}
+Duane, S., Kennedy, A.~D., Pendleton, B.~J., and Roweth, D. (1987).
 \newblock Hybrid monte carlo.
-\newblock \emph{Physics letters B}, 195\penalty0 (2):\penalty0 216--222, 1987.
+\newblock {\em Physics letters B}.
 
-\bibitem[Hastings(1970)]{hastings1970monte}
-W~Keith Hastings.
+\bibitem[Hastings, 1970]{hastings1970monte}
+Hastings, W.~K. (1970).
 \newblock Monte carlo sampling methods using markov chains and their
   applications.
-\newblock \emph{Biometrika}, 57\penalty0 (1):\penalty0 97--109, 1970.
+\newblock {\em Biometrika}.
 
-\bibitem[Neal et~al.(2011)]{neal2011mcmc}
-Radford~M Neal et~al.
+\bibitem[Neal et~al., 2011]{neal2011mcmc}
+Neal, R.~M. et~al. (2011).
 \newblock Mcmc using hamiltonian dynamics.
-\newblock \emph{Handbook of Markov Chain Monte Carlo}, 2\penalty0 (11), 2011.
+\newblock {\em Handbook of Markov Chain Monte Carlo}.
 
-\bibitem[Sorensen and Gianola(2007)]{sorensen2007likelihood}
-Daniel Sorensen and Daniel Gianola.
-\newblock \emph{Likelihood, Bayesian, and MCMC methods in quantitative
+\bibitem[PyTorch, 2017]{pytorch}
+PyTorch (2017).
+\newblock Pytorch, automatic differentiation package.
+\newblock \url{https://github.com/pytorch/pytorch}.
+
+\bibitem[Sorensen and Gianola, 2007]{sorensen2007likelihood}
+Sorensen, D. and Gianola, D. (2007).
+\newblock {\em Likelihood, Bayesian, and MCMC methods in quantitative
   genetics}.
-\newblock Springer Science \& Business Media, 2007.
+\newblock Springer Science \& Business Media.
 
-\bibitem[Tolpin et~al.(2015)Tolpin, van~de Meent, and
-  Wood]{tolpin2015probabilistic}
-David Tolpin, Jan-Willem van~de Meent, and Frank Wood.
+\bibitem[Tolpin et~al., 2015]{tolpin2015probabilistic}
+Tolpin, D., van~de Meent, J.-W., and Wood, F. (2015).
 \newblock Probabilistic programming in anglican.
-\newblock In \emph{Joint European Conference on Machine Learning and Knowledge
-  Discovery in Databases}, pages 308--311. Springer, 2015.
+\newblock In {\em Joint European Conference on Machine Learning and Knowledge
+  Discovery in Databases}. Springer.
 
-\bibitem[Wood et~al.(2014)Wood, Meent, and Mansinghka]{wood2014new}
-Frank Wood, Jan~Willem Meent, and Vikash Mansinghka.
+\bibitem[Wood et~al., 2014]{wood2014new}
+Wood, F., Meent, J.~W., and Mansinghka, V. (2014).
 \newblock A new approach to probabilistic programming inference.
-\newblock In \emph{Artificial Intelligence and Statistics}, pages 1024--1032,
-  2014.
+\newblock In {\em Artificial Intelligence and Statistics}.
 
 \end{thebibliography}
