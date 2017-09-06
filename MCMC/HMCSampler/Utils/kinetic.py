@@ -43,7 +43,7 @@ class Kinetic():
         '''' (p dot p) / 2 and Mass matrix M = \mathbb{I}_{dim,dim}'''
         self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
-        K = 0.5 * P.mm(self.M).mm(torch.transpose(P, 0, 1))
+        K = 0.5 * P.t().mm(self.M).mm(P)
         if grad:
             return self.ke_gradients(P, K)
         else:
