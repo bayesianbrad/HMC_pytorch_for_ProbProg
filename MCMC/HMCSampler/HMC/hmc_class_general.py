@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import math
 from torch.autograd import Variable
 from Utils.core import VariableCast
-from Utils.program import program_simple as program
+from Utils.program import programif as program
 from Utils.kinetic import Kinetic
 
 np.random.seed(1234)
@@ -51,7 +51,7 @@ class HMCsampler():
         else:
             self.max_traj = max_traj
         if min_traj is None:
-            self.min_traj = np.random.uniform(0, 18)
+            self.min_traj = np.random.uniform(1, 18)
         else:
             self.min_traj = min_traj
         self.M         = M
@@ -94,8 +94,7 @@ class HMCsampler():
             # update momentum
             p = p + step_size * self.potential.eval(values, grad=True)
             # update values
-            values = values_init + step_size * self.kinetic.gauss_ke(p, grad= True)
-
+            values = values + step_size * self.kinetic.gauss_ke(p, grad= True)
 
         # Do a final update of the momentum for a half step
         p = p + 0.5 * step_size * self.potential.eval(values, grad= True)
