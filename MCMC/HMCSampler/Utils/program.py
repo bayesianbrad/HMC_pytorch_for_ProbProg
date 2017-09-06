@@ -145,7 +145,6 @@ class program_linear_reg(program):
         x23591 = x23471 * c23590 + x23474 # some problem on Variable, Variable.data
 
         # x23592 = Variable(x23591.data + x23474.data, requires_grad = True)
-        parms.append(x23591) # Maybe add this
 
         c23593 = VariableCast(torch.Tensor([1.0]))
         normal_obj2 = dis.Normal(x23591, c23593)
@@ -179,10 +178,78 @@ class program_linear_reg(program):
         p23611 = torch.add([p23585, p23589, p23596, p23603, p23610])
         # return E from the model
         # Do I want the gradients of x23471 and x23474? and nothing else.
-        x23612 = [x23471, x23474]
+        if grad:
+            gradients = self.calc_grad(p23611, parms)
+            return VariableCast(gradients)
+        elif grad2:
+            gradients = self.calc_grad(p23611, values)
+            return p23611, VariableCast(gradients)
+        else:
+            return p23611, values
 
-        print("log joint: ", p23611)
-        print(x23612)
+    def eval(self, values, grad=False, grad2=False):
+        logp = []
+        parms = []
+        c23582 = VariableCast(torch.Tensor([0.0]))
+        c23583 = VariableCast(torch.Tensor([10.0]))
+        normal_obj1 = dis.Normal(c23582, c23583)
+        x23474 = Variable(normal_obj1.sample().data, requires_grad=True)  # sample
+        parms.append(x23474)
+        p23585 = normal_obj1.logpdf(x23474)  # prior
+        logp.append(p23585)
+        c23586 = VariableCast(torch.Tensor([0.0]))
+        c23587 = VariableCast(torch.Tensor([10.0]))
+        normal_obj2 = dis.Normal(c23586, c23587)
+        x23471 = Variable(normal_obj2.sample().data, requires_grad=True)  # sample
+        parms.append(x23471)
+        p23589 = normal_obj2.logpdf(x23471)  # prior
+        logp.append(p23589)
+        c23590 = VariableCast(torch.Tensor([1.0]))
+        # Do I cast this as a variable with requires_grad = True ???
+        x23591 = x23471 * c23590 + x23474  # some problem on Variable, Variable.data
+
+        # x23592 = Variable(x23591.data + x23474.data, requires_grad = True)
+
+        c23593 = VariableCast(torch.Tensor([1.0]))
+        normal_obj2 = dis.Normal(x23591, c23593)
+
+        c23595 = VariableCast(torch.Tensor([2.1]))
+        y23481 = c23595
+        p23596 = normal_obj2.logpdf(y23481)  # obs, log likelihood
+        logp.append(p23596)
+        c23597 = VariableCast(torch.Tensor([2.0]))
+
+        # This is highly likely to be the next variable
+        x23598 = torch.mul(x23471, c23597) + x23474
+        # x23599 = torch.add(x23598, x23474)
+        c23600 = torch.Tensor([1.0])
+        # x23601 = dis.Normal(x23599, c23600)
+
+        normal_obj3 = dis.Normal(x23598, c23600)
+        c23602 = torch.Tensor([3.9])
+        y23502 = c23602
+        p23603 = normal_obj3.logpdf(y23502)  # obs, log likelihood
+        logp.append(p23603)
+        c23604 = torch.Tensor([3.0])
+        x23605 = Variable(torch.mul(x23471, c23604).data, requires_grad=True)
+        x23606 = torch.add(x23605, x23474)
+        c23607 = torch.Tensor([1.0])
+        normal_obj4 = dis.Normal(x23606, c23607)
+        c23609 = torch.Tensor([5.3])
+        y23527 = c23609
+        p23610 = normal_obj4.log_pdf(y23527)  # obs, log likelihood
+        logp.append(p23610)
+        p23611 = torch.add([p23585, p23589, p23596, p23603, p23610])
+        # return E from the model
+        # Do I want the gradients of x23471 and x23474? and nothing else.
+        if grad:
+            gradients = self.calc_grad(p23611, parms)
+            return VariableCast(gradients)
+        elif grad2:
+            gradients = self.calc_grad(p23611, values)
+            return p23611, VariableCast(gradients)
+        else:
+            return p23611, values
 class programif():
     ''''This needs to be a function of all free variables.
          If I provide a map of all vlues and computes the log density
