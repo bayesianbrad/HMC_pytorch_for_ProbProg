@@ -9,7 +9,7 @@ License: MIT
 '''
 from HMC.hmc_class_general import HMCsampler as HMC
 from Utils.plotting_and_saving import Plotting
-hmcsampler  = HMC(burn_in=100, n_samples= 200)
+hmcsampler  = HMC(burn_in=100, n_samples = 1000)
 samples, samples_with_burnin, mean =  hmcsampler.run_sampler()
 plots = Plotting(samples,samples_with_burnin,mean)
 plots.call_all_methods()
