@@ -9,34 +9,24 @@ License: MIT
 '''
 import torch
 import numpy as np
-from torch.autograd import Variable
 import Distributions.distributions as dis
+from torch.autograd import Variable
 from core import VariableCast
 class program():
-    ''''This needs to be a function of all free variables.
-         If I provide a map of all values and computes the log density
-         and assigns values rather than samples.
-         If I don't provide then it samples
-         For any variable values provided in the map, they are assigned
-
-         method
-         def eval
-
-         Needs to be a class '''
+    '''
+    Base class for all programs. Values comes in as  tensor and outputs as list
+    Unpacking of that list to a tensor is done in the integrator module.
+    '''
     def __init__(self):
-    #     '''Generating code, returns  a map of variable names / symbols
-    #      store all variables of interest / latent parameters in here.
-    #       Strings -  A list of all the unique numbers of the para'''
-    #     # self.params = [{'x' + Strings[i] : None} for i in range(len(Strings))]
+
         self.params  = {'x':None}
 
     def calc_grad(self, logjoint, parms):
         ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
             data from the Variable of the gradients '''
-        grad = torch.autograd.grad([logjoint], [parms], grad_outputs=torch.ones(parms[0].data.size()))
+        grad = torch.autograd.grad([logjoint], [parms], grad_outputs=torch.ones(len(parms),parms[0].data.size()[1]))
         # note: Having grad_outputs set to the dimensions of the first element in the list, implies that we believe all
         # other values are the same size.
-        # print(grad)
         if parms.size()[0] == 1:
             gradients = torch.Tensor(1,parms.size()[0])
         else:
@@ -57,7 +47,7 @@ class program():
                 temp = Variable(value.data, requires_grad=True)
                 parms.append(value)
         return parms
-class program_simple(program):
+class simple(program):
     def __init__(self):
         super().__init__()
 
@@ -65,7 +55,7 @@ class program_simple(program):
         ''' Generates the initial state and returns the samples and logjoint evaluated at initial samples  '''
 
         ################## Start FOPPL input ##########
-        logp = [] # empty list to store logps of each variable
+        logp = []
         parms = []
         a = VariableCast(0.0)
         b = VariableCast(2.236)
@@ -77,13 +67,9 @@ class program_simple(program):
         obs2 = VariableCast(7.0)
         p_y_g_x    = dis.Normal(parms[0], std)
 
-        # TO DO Ask Yuan, is it either possible to have once an '.logpdf' method is initiated can we do a
-        # logp.append(<'variable upon which .logpdf method used'>)
         logp.append(normal_object.logpdf(parms))
         logp.append(p_y_g_x.logpdf(obs2))
-        # TO DO We will need to su m all the logs here.
-        # Do I have them stored in a dictionary with the value
-        # or do we have a separate thing for the logs?
+
         ################# End FOPPL output ############
 
         # sum up all logs
@@ -132,11 +118,10 @@ class program_simple(program):
             return logjoint, VariableCast(gradients)
         else:
             return logjoint, parms
+    @property
     def free_vars(self):
         return self.params
-
-
-class program_linear_reg(program):
+class linearreg(program):
     def __init__(self):
         super().__init__()
 
@@ -206,15 +191,7 @@ class program_linear_reg(program):
 
     def eval(self, values, grad=False, grad2=False):
         logp = []
-        parms = []
-        for value in values:
-            if isinstance(value, Variable):
-                temp = Variable(value.data, requires_grad = True)
-                parms.append(temp)
-            else:
-                temp = VariableCast(value)
-                temp = Variable(value.data, requires_grad = True)
-                parms.append(value)
+        parms = self.tensor_to_list(values)
         c23582 = VariableCast(torch.Tensor([0.0]))
         c23583 = VariableCast(torch.Tensor([10.0]))
         normal_obj1 = dis.Normal(c23582, c23583)
@@ -275,7 +252,7 @@ class program_linear_reg(program):
             return p23611, VariableCast(gradients)
         else:
             return p23611, values
-class programif():
+class conditionalif(program):
     ''''This needs to be a function of all free variables.
          If I provide a map of all vlues and computes the log density
          and assigns values rather than samples.
