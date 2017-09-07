@@ -45,7 +45,7 @@ class program():
             gradients[i,:] = grad[i][0].data.unsqueeze(0)  # ensures that each row of the grads represents a params grad
         return gradients
 
-class program_simple(program):
+class conjgauss(program):
     def __init__(self):
         super().__init__()
 
@@ -122,7 +122,7 @@ class program_simple(program):
     #     return self.params
 
 
-class program_linear_reg(program):
+class linearreg(program):
     def __init__(self):
         super().__init__()
 
@@ -261,7 +261,7 @@ class program_linear_reg(program):
             return p23611, VariableCast(gradients)
         else:
             return p23611, values
-class programif(program):
+class conditionalif(program):
     ''''This needs to be a function of all free variables.
          If I provide a map of all vlues and computes the log density
          and assigns values rather than samples.
