@@ -9,15 +9,13 @@ Created on Mon Aug 14 15:31:26 2017
 import torch
 import numpy as np
 import time
-import matplotlib.pyplot as plt
-import math
+import importlib
 from torch.autograd import Variable
 from Utils.core import VariableCast
-from Utils.program import programif as program
 from Utils.kinetic import Kinetic
 
-np.random.seed(1234)
-torch.manual_seed(1234)
+# np.random.seed(1234)
+# torch.manual_seed(1234)
 
 
 class HMCsampler():
@@ -35,7 +33,7 @@ class HMCsampler():
 
     '''
     def __init__(self, burn_in= 100, n_samples= 1000, M= None,  min_step= None, max_step= None,\
-                 min_traj= None, max_traj= None):
+                 min_traj= None, max_traj= None, model = 'conjgauss'):
         self.burn_in    = burn_in
         self.n_samples  = n_samples
         if min_step is None:
@@ -57,7 +55,10 @@ class HMCsampler():
         self.M         = M
         self.step_size = np.random.uniform(self.min_step, self.max_step)
         self.traj_size = int(np.random.uniform(self.min_traj, self.max_traj))
-        self.potential = program()
+        self.model     = model
+        if model:
+            program        = getattr(importlib.import_module('Utils.program'), model) # import Utils.program.model #getattr(importlib.import_module("module.submodule"), "MyClass")
+            self.potential = program()
         # to calculate acceptance probability
         self.count     = 0
 
@@ -191,6 +192,10 @@ class HMCsampler():
             # update parameters and draw new momentum
             self.step_size = np.random.uniform(self.min_step, self.max_step)
             self.traj_size = int(np.random.uniform(self.min_traj, self.max_traj))
+            if i == np.floor(self.n_samples/4) or i == np.floor(self.n_samples/2) or i == np.floor(3*self.n_samples/4):
+                print(' At interation {}'.format(i))
+
+
 
         target_acceptance = self.count / (self.n_samples)
         samples_reduced   = samples[self.burn_in:, :]
