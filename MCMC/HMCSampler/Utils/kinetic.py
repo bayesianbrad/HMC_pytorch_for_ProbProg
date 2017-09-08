@@ -36,7 +36,7 @@ class Kinetic():
             else:
                 self.M  = VariableCast(torch.inverse(M))
         else:
-            self.M  = VariableCast(torch.eye(p.size()[1])) # inverse of identity is identity
+            self.M  = VariableCast(torch.eye(p.size()[0])) # inverse of identity is identity
 
 
     def gauss_ke(self,p, grad = False):
@@ -44,6 +44,7 @@ class Kinetic():
         self.p = VariableCast(p)
         P = Variable(self.p.data, requires_grad=True)
         K = 0.5 * P.t().mm(self.M).mm(P)
+
         if grad:
             return self.ke_gradients(P, K)
         else:
@@ -57,4 +58,4 @@ class Kinetic():
         else:
             return K
     def ke_gradients(self, P, K):
-        return torch.autograd.grad([K], [P], grad_outputs=torch.ones(P.size()))[0]
+        return torch.autograd.grad([K], [P])[0]
