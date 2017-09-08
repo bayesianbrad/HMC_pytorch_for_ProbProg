@@ -13,7 +13,7 @@ import torch
 import numpy as np
 from torch.autograd import Variable
 
-d = 3
+d = 1
 a  = Variable(torch.ones(1,d), requires_grad = True)
 b = Variable(2*torch.ones(1,d), requires_grad  = True)
 c = Variable(3*torch.ones(1,d), requires_grad  = True)
@@ -37,10 +37,13 @@ print(x)
 # unpack x
 # for i in range(len(params)):
 #     y += torch.log(params[i].mm(params[i].t()))
+print('Debug size values', x.size())
+print('Debug size values1', x[0, :].size())
+print('Debug size values2', x[1, :].size())
 def log_normal(value):
     value = value.unsqueeze(-1).t()
-    mean = Variable(torch.rand(3).unsqueeze(-1).t())
-    std  = Variable(torch.rand(3).unsqueeze(-1).t())
+    mean = Variable(torch.rand(d).unsqueeze(-1).t())
+    std  = Variable(torch.rand(d).unsqueeze(-1).t())
     true_grad = -(value.data  - mean.data)/std.data**2
     print('True grad for :', true_grad)
     return (-0.5 *  torch.pow(value - mean, 2) / std**2) -  torch.log(std)
@@ -50,8 +53,8 @@ y3 = log_normal(x[2,:])
 # print(y1,y2,y3)
 y = y1+y2+y3
 # print(y)
-gradients = torch.autograd.grad(outputs=y,inputs=x, grad_outputs = torch.ones(3,3), retain_graph = True)
-print(gradients[0].data * 1/3)
+gradients = torch.autograd.grad(outputs=y,inputs=x, grad_outputs = torch.ones(x.size()), retain_graph = True)
+print(gradients[0].data * 1/x.size()[0])
 # y.backward()
 # print(a.grad)
 # print(b.grad)
