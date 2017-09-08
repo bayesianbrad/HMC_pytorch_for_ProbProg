@@ -49,7 +49,7 @@ class Plotting():
         iter = np.arange(0, np.shape(self.samples_with_burnin)[0])
         if np.shape(self.samples)[1] > 1:
             for i in range(np.shape(self.samples)[1]):
-                ax.plot(iter, self.samples_with_burnin, label='Parameter {0} '.format(i))
+                ax.plot(iter, self.samples_with_burnin[:,i], label='Parameter {0} '.format(i))
                 ax.set_title('Trace plot for the parameters')
                 plt.legend()
                 fname = 'trace.png'
