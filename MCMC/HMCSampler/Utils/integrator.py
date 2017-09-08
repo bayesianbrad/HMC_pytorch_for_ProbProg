@@ -73,15 +73,13 @@ class Integrator():
         for i in range(traj_size - 1):
             # range equiv to [2:nsteps] as we have already performed the first step
             # update momentum
-            print('Debug: Location: integrator.leapfrog Value: p size and p value', p.data.size(), p)
-            print('Debug: Location: integrator.leapfrog Value: step_size' ,step_size)
             p = p + step_size * self.potential.eval(values, grad=True)
-            print('Debug: Location: integrator.leapfrog Value: the first half step has succeeded ')
             # update values
             values = values + step_size * self.kinetic.gauss_ke(p, grad=True)
-            print('')
 
         # Do a final update of the momentum for a half step
         p = p + 0.5 * step_size * self.potential.eval(values, grad=True)
+        print('Debug p, vlaues leapfrog', p, values)
+
         # return new proposal state
         return values, p
