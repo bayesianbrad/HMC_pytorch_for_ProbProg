@@ -23,7 +23,8 @@ class program():
     #
     def calc_grad(self, logjoint, values):
         ''' Stores the gradients, grad, in a tensor, where each row corresponds to each the
-            data from the Variable of the gradients '''
+            data from the Variable of the gradients
+            grad returns a variable of the gradients w.r.t parameters'''
         assert(isinstance(values, Variable))
         print()
         print(values)
@@ -31,18 +32,6 @@ class program():
         # For some reason all the gradients are d times bigger than they should be, where d is the dimension
 
         return grad
-    #
-    # def tensor_to_list(self,values):
-    #     params = []
-    #     for value in values:
-    #         if isinstance(value, Variable):
-    #             temp = Variable(value.data, requires_grad=True)
-    #             params.append(temp)
-    #         else:
-    #             temp = VariableCast(value)
-    #             temp = Variable(value.data, requires_grad=True)
-    #             params.append(value)
-    #     return params
 class conjgauss(program):
     def __init__(self):
         super().__init__()
@@ -264,7 +253,6 @@ class linearreg(program):
         if grad:
             gradients = 1 / values.size()[0]  * torch.autograd.grad(p23611, values, grad_outputs=torch.ones(values.size()))[0].data
             # For some reason all the gradients are d times bigger than they should be, where d is the dimension
-            print(gradients)
             return Variable(gradients)
         elif grad_loop:
             gradients = 1 / values.size()[0] * \
@@ -280,12 +268,14 @@ class conditionalif(program):
         self.params = {'x': None}
 
     def generate(self):
-        logp = []  # empty list to store logps of each variable
+        dim    = 1
+        params = Variable(torch.FloatTensor(1, dim).zero_())
         a = VariableCast(0.0)
         b = VariableCast(1)
         c1 = VariableCast(-1)
         normal_obj1 = dis.Normal(a, b)
         x = Variable(normal_obj1.sample().data, requires_grad=True)
+        params = x
         logp_x = normal_obj1.logpdf(x)
 
         if torch.gt(x.data, torch.zeros(x.size()))[0][0]:
@@ -299,22 +289,18 @@ class conditionalif(program):
 
         logp_x_y = logp_x + logp_y_x
 
-        return logp_x_y, x, VariableCast(self.calc_grad(logp_x_y, x))
 
-        # sum up all logs
-        logp_x_y = VariableCast(torch.zeros(1, 1))
-        for logprob in logp:
-            logp_x_y = logp_x_y + logprob
-        return logp_x_y, x, VariableCast(self.calc_grad(logp_x_y, x))
+        return logp_x_y, params, self.calc_grad(logp_x_y, params), dim
 
     def eval(self, values, grad=False, grad_loop=False):
         ''' Takes a map of variable names, to variable values '''
-        params = self.tensor_to_list(values)
+        assert(isinstance(values, Variable))
+        ################## Start FOPPL input ##########
+        values = Variable(values.data, requires_grad=True)
         a = VariableCast(0.0)
         b = VariableCast(1)
         c1 = VariableCast(-1)
         normal_obj1 = dis.Normal(a, b)
-        values = Variable(values.data, requires_grad=True)
         logp_x = normal_obj1.logpdf(values)
         # else:
         #     x = normal_object.sample()
@@ -322,18 +308,18 @@ class conditionalif(program):
         if torch.gt(values.data, torch.zeros(values.size()))[0][0]:
             y = VariableCast(1)
             normal_obj2 = dis.Normal(b, b)
-            logp_y_x = normal_obj2.logpdf(y)
+            logp_y_x    = normal_obj2.logpdf(y)
         else:
             y = VariableCast(1)
             normal_obj3 = dis.Normal(c1, b)
-            logp_y_x = normal_obj3.logpdf(y)
+            logp_y_x    = normal_obj3.logpdf(y)
 
         logjoint = Variable.add(logp_x, logp_y_x)
         if grad:
             gradients = self.calc_grad(logjoint, values)
-            return VariableCast(gradients)
+            return gradients
         elif grad_loop:
             gradients = self.calc_grad(logjoint, values)
-            return logjoint, VariableCast(gradients)
+            return logjoint, gradients
         else:
             return logjoint, values
