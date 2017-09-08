@@ -47,24 +47,51 @@ class Plotting():
         print('Saving trace plots.....')
         fig, ax = plt.subplots()
         iter = np.arange(0, np.shape(self.samples_with_burnin)[0])
-        ax.plot(iter, self.samples_with_burnin, label= ' values ')
-        ax.set_title('Trace plot for the parameters')
-        fname = 'trace.png'
-        fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+        if np.shape(self.samples)[1] > 1:
+            for i in range(np.shape(self.samples)[1]):
+                ax.plot(iter, self.samples_with_burnin, label='Parameter {0} '.format(i))
+                ax.set_title('Trace plot for the parameters')
+                plt.legend()
+                fname = 'trace.png'
+                fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+        else:
+            ax.plot(iter, self.samples_with_burnin, label= ' values ')
+            ax.set_title('Trace plot for the parameters')
+            plt.legend()
+            fname = 'trace.png'
+            fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
 
     def histogram(self):
         print('Saving histogram.....')
         weights = np.ones_like(self.samples) / float(len(self.samples))
         fig, ax = plt.subplots()
-        ax.hist(self.samples,  bins = 'auto', normed=1)
-        ax.set_xlabel(' Samples ')
-        ax.set_ylabel('Density')
-        ax.set_title('Histogram of samples \n' + r'$\mu_{\mathrm{emperical}}$' + '=' + '{}'.format(self.mean.data[0][0]))
+        if np.shape(self.samples)[1] > 1:
+            for i in range(np.shape(self.samples)[1]):
+                ax.hist(self.samples[:,i],  bins = 'auto', normed=1, label= r'$\mu_{\mathrm{emperical}}$' + '=' + '{0}'.format(
+                        self.mean.data[0][i]))
+                ax.set_title('Histogram of samples ')
+                ax.set_xlabel(' Samples ')
+                ax.set_ylabel('Density')
+                ax.grid(True)
+            plt.legend()
+            fname = 'histogram.png'
+                # Ensures directory for this figure exists for model, if not creates it
+            fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+
+
+        else:
+            ax.hist(self.samples, bins='auto', normed=1)
+            ax.set_title(
+                'Histogram of samples \n' + r'$\mu_{\mathrm{emperical}}$' + '=' + '{0}'.format(self.mean.data[0][0]))
+            ax.set_xlabel(' Samples ')
+            ax.set_ylabel('Density')
         # plt.axis([40, 160, 0, 0.03])
-        ax.grid(True)
+            ax.grid(True)
+            plt.legend()
         # Ensures directory for this figure exists for model, if not creates it
-        fig.savefig(os.path.join(self.PATH_fig,'histogram.png' ), dpi = 400)
+            fig.savefig(os.path.join(self.PATH_fig,'histogram.png' ), dpi = 400)
         # plt.show()
+
     def save_data(self):
         print('Saving data....')
         df1 = pd.DataFrame(self.samples)
