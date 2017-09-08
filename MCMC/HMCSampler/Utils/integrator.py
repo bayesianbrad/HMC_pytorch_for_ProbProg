@@ -13,7 +13,8 @@ from torch.autograd import Variable
 
 class Integrator():
 
-    def __init__(self, step_size = 0.03, traj_size = 10):
+    def __init__(self, potential, step_size = 0.03, traj_size = 10):
+        self.potential   = potential
         self.step_size   = step_size
         self.traj_size   = traj_size
 
@@ -28,6 +29,7 @@ class Integrator():
         for i in range(len(params)):
             temp[i,:] = params[i]
         return temp
+
     def leapfrog(self, p_init, values, grad_init):
         '''Performs the leapfrog steps of the HMC for the specified trajectory
         length, given by num_steps

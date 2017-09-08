@@ -29,19 +29,16 @@ def testing_normal(mean, std):
     print(normal_obj.iscontinous())
     # Pytorch gradients
     print('Printing autograd gradients: ')
-    # print(diff_logpdf[0][0].data.unsqueeze(0), diff_logpdf[1][0].data.unsqueeze(0))
-    # print(dir(diff_logpdf[0][:]))
-    # print(type(diff_logpdf))
-    # print(len(diff_logpdf))
-    # print(diff_logpdf2)
-    # print(diff_logpdf3)
+    print(diff_logpdf)
+    print(diff_logpdf2)
+    print(diff_logpdf3)
     # # print('Sample Gradient' , diff_logpdf4)
     # # True gradients
-    # print()
-    # print('Printing true gradients ')
-    # print('grad_sample',true_grad_normal(sample,mean,std,diff = 'sample').data)
-    # print('grad_mean',true_grad_normal(sample,mean,std,diff = 'mean').data)
-    # print('grad_std', true_grad_normal(sample, mean, std, diff = 'std').data)
+    print()
+    print('Printing true gradients ')
+    print('grad_sample',true_grad_normal(sample,mean,std,diff = 'sample').data)
+    print('grad_mean',true_grad_normal(sample,mean,std,diff = 'mean').data)
+    print('grad_std', true_grad_normal(sample, mean, std, diff = 'std').data)
 
 
 def true_grad_laplace(sample, loc, scale, diff):
