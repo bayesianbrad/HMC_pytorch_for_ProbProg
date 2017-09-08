@@ -169,7 +169,7 @@ class linearreg(program):
         y23502 = c23602
         p23603 = normal_obj3.logpdf(y23502)  # obs, log likelihood
         logp.append(p23603)
-        c23604 = torch.Tensor([3.0])
+        c23604 = Variable(torch.Tensor([3.0]))
         x23605 = Variable(torch.mul(x23471, c23604).data, requires_grad = True)
         x23606 = torch.add(x23605, x23474)
         c23607 = torch.Tensor([1.0])
