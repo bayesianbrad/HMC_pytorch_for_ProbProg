@@ -25,8 +25,8 @@ from Utils.core import VariableCast
 from Utils.kinetic import Kinetic
 from Utils.integrator import Integrator
 from Utils.metropolis_step import Metropolis
-np.random.seed(1234)
-torch.manual_seed(1234)
+# np.random.seed(1234)
+# torch.manual_seed(1234)
 
 
 class HMCsampler():
@@ -77,11 +77,10 @@ class HMCsampler():
         print(' The sampler is now running')
         # In the future dim = # of variables will not be needed as Yuan will provide
         # that value in the program and it shall return the required dim.
-        logjoint_init, values_init, grad_init, dim = self.potential.generate(self.dim)
+        logjoint_init, values_init, grad_init, dim = self.potential.generate()
         metropolis   = Metropolis(self.potential, self.integrator, self.M)
         temp,count   = metropolis.acceptance(values_init, logjoint_init, grad_init)
         samples      = Variable(torch.zeros(self.n_samples,dim))
-        print('Debug: Location HMC.run_sampler(), value of temp: ', temp)
         samples[0] = temp.data.t()
 
 
@@ -89,7 +88,11 @@ class HMCsampler():
         for i in range(self.n_samples-1):
             logjoint_init, grad_init = self.potential.eval(temp, grad_loop= True)
             temp, count = metropolis.acceptance(temp, logjoint_init, grad_init)
-            samples[i+1,:] = temp.data
+            try:
+                samples[i+1,:] = temp.data.t()
+            except RuntimeError:
+                print(i)
+                break
             # update parameters and draw new momentum
             if i == np.floor(self.n_samples/4) or i == np.floor(self.n_samples/2) or i == np.floor(3*self.n_samples/4):
                 print(' At interation {}'.format(i))
