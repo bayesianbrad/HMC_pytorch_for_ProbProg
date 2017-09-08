@@ -79,7 +79,7 @@ class Integrator():
 
         # Do a final update of the momentum for a half step
         p = p + 0.5 * step_size * self.potential.eval(values, grad=True)
-        print('Debug p, vlaues leapfrog', p, values)
+        # print('Debug p, vlaues leapfrog', p, values)
 
         # return new proposal state
         return values, p
