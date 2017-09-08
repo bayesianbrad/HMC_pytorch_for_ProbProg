@@ -85,4 +85,4 @@ class Metropolis():
             return values, self.count
         else:
             # print('Debug : reject')
-            return values_init
+            return values_init, self.count
