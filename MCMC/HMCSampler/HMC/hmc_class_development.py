@@ -18,14 +18,13 @@ Created on Mon Aug 14 15:31:26 2017
 import torch
 import numpy as np
 import time
-import matplotlib.pyplot as plt
 import math
+import importlib
 from torch.autograd import Variable
 from Utils.core import VariableCast
-from Utils.program import program_simple as program
 from Utils.kinetic import Kinetic
-from HMC import integrator
-
+from Utils.integrator import Integrator
+from Utils.metropolis_step import Metropolis
 np.random.seed(1234)
 torch.manual_seed(1234)
 
@@ -44,100 +43,23 @@ class HMCsampler():
     ----------
 
     '''
-    def __init__(self, burn_in= 100, n_samples= 1000, M= None,  min_step= None, max_step= None,\
+    def __init__(self, burn_in= 100, n_samples= 1000, model = 'conjgauss', dim =1, M= None,  min_step= None, max_step= None,\
                  min_traj= None, max_traj= None):
         self.burn_in    = burn_in
         self.n_samples  = n_samples
-        if min_step is None:
-            self.min_step = np.random.uniform(0.01, 0.07)
-        else:
-            self.min_step = min_step
-        if max_step is None:
-            self.max_step = np.random.uniform(0.07, 0.18)
-        else:
-            self.max_step = max_step
-        if max_traj is None:
-            self.max_traj = np.random.uniform(18, 25)
-        else:
-            self.max_traj = max_traj
-        if min_traj is None:
-            self.min_traj = np.random.uniform(1, 18)
-        else:
-            self.min_traj = min_traj
-        self.M         = M
-        self.step_size = np.random.uniform(self.min_step, self.max_step)
-        self.traj_size = int(np.random.uniform(self.min_traj, self.max_traj))
-        self.potential = program()
-        self.integrator= integrator(self.step_size, self.traj_size)
-        # to calculate acceptance probability
-        self.count     = 0
+        self.M          = M
+        self.model      = model
+        # External dependencies
+        program         = getattr(importlib.import_module('Utils.dev_program'), model) # import Utils.program.model #getattr(importlib.import_module("module.submodule"), "MyClass")
+        self.potential  = program()
+        self.integrator = Integrator(self.potential, min_step, max_step, \
+                                     min_traj, max_traj)
+        self.dim        = dim
 
         # TO DO : Implement a adaptive step size tuning from HMC
         # TO DO : Have a desired target acceptance ratio
         # TO DO : Implement a adaptive trajectory size from HMC
-    def sample_momentum(self,values,dim):
-        assert(isinstance(values, list))
-        return VariableCast(torch.randn(len(values),dim))
 
-    def hamiltonian(self, logjoint, p):
-        """Computes the Hamiltonian  given the current postion and momentum
-        H = U(x) + K(p)
-        U is the potential energy and is = -log_posterior(x)
-        Parameters
-        ----------
-        logjoint    - Type:torch.autograd.Variable \mathbb{R}^{1 \times 1}
-        p           - Type:torch.Tensor \mathbb{R}^{1 \times D}.
-                    Description: Auxiliary momentum
-        log_potential :Function from state to position to 'energy'= -log_posterior
-
-        Returns
-        -------
-        hamitonian : float
-        """
-        T = self.kinetic.gauss_ke(p, grad=False)
-        return -logjoint + T
-
-    def acceptance(self, logjoint_init, values_init, grad_init):
-        '''Returns the new accepted state
-
-        Parameters
-        ----------
-
-        Output
-        ------
-        returns accepted or rejected proposal
-        '''
-
-        # generate initial momentum
-
-        #### FLAG
-        dim    = values_init[0].data.size()[0]
-        p_init = self.sample_momentum(values_init,dim)
-        # generate kinetic energy object.
-        self.kinetic = Kinetic(p_init,self.M)
-        # calc hamiltonian  on initial state
-        orig         = self.hamiltonian(logjoint_init, p_init)
-
-        # generate proposals
-        values, p    = self.integrator.leapfrog(p_init, values_init, grad_init)
-
-        # calculate new hamiltonian given current
-        logjoint_prop, _ = self.potential.eval(values, grad= False)
-
-        current      = self.hamiltonian(logjoint_prop, p)
-        alpha        = torch.min(torch.exp(orig - current))
-        # calculate acceptance probability
-        if isinstance(alpha, Variable):
-            p_accept = torch.min(torch.ones(1,1), alpha.data)
-        else:
-            p_accept = torch.min(torch.ones(1,1),  alpha)
-        # print(p_accept)
-        if p_accept[0][0] > torch.Tensor(1,1).uniform_()[0][0]: #[0][0] dirty code to get integersr
-            # Updates count globally for target acceptance rate
-            self.count = self.count + 1
-            return values
-        else:
-            return values_init
 
     def run_sampler(self):
         ''' Runs the hmc internally for a number of samples and updates
@@ -151,29 +73,29 @@ class HMCsampler():
         ----------
         A tensor of the number of required samples
         Acceptance rate
-
-
         '''
         print(' The sampler is now running')
-        logjoint_init, values_init, grad_init = self.potential.generate()
-        temp = self.acceptance(logjoint_init, values_init, grad_init)
-        n_dim = values_init.size()[1]
-        samples      = Variable(torch.zeros(self.n_samples,n_dim))
-        samples[0, :] = temp.data
-        self.step_size = np.random.uniform(self.min_step, self.max_step)
-        self.n_steps = int(np.random.uniform(self.min_traj, self.max_traj))
-        # Then run for loop from 2:n_samples
-        samples      = Variable(torch.zeros(self.n_samples,1))
+        # In the future dim = # of variables will not be needed as Yuan will provide
+        # that value in the program and it shall return the required dim.
+        logjoint_init, values_init, grad_init, dim = self.potential.generate(self.dim)
+        metropolis   = Metropolis(self.potential, self.integrator, self.M)
+        temp,count   = metropolis.acceptance(values_init, logjoint_init, grad_init)
+        samples      = Variable(torch.zeros(self.n_samples,dim))
+        print('Debug: Location HMC.run_sampler(), value of temp: ', temp)
+        samples[0] = temp.data.t()
 
+
+        # Then run for loop from 2:n_samples
         for i in range(self.n_samples-1):
-            logjoint_init, grad_init = self.potential.eval(temp, grad2= True)
-            temp = self.acceptance(logjoint_init,temp, grad_init)
+            logjoint_init, grad_init = self.potential.eval(temp, grad_loop= True)
+            temp, count = metropolis.acceptance(temp, logjoint_init, grad_init)
             samples[i+1,:] = temp.data
             # update parameters and draw new momentum
-            self.step_size = np.random.uniform(self.min_step, self.max_step)
-            self.traj_size = int(np.random.uniform(self.min_traj, self.max_traj))
+            if i == np.floor(self.n_samples/4) or i == np.floor(self.n_samples/2) or i == np.floor(3*self.n_samples/4):
+                print(' At interation {}'.format(i))
 
-        target_acceptance = self.count / (self.n_samples)
+        # Basic summary statistics
+        target_acceptance =  count / (self.n_samples)
         samples_reduced   = samples[self.burn_in:, :]
         mean = torch.mean(samples_reduced,dim=0, keepdim= True)
         print()
