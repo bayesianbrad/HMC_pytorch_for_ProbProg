@@ -11,15 +11,16 @@ Created on Wed Aug  21 11:00:58 2017
 import torch
 from torch.autograd import Variable
 import numpy as np
-from matplotlib import pyplot as plt 
+from matplotlib import pyplot as plt
+
 np.random.seed(1234)
 torch.manual_seed(1234)
 def main():
     global count
     count       = 0
-    num_samples = 10000
+    num_samples = 1000
     # Number of dimensions for samples
-    ndim       = 5
+    ndim       = 4
     sigma      = 0.34782378
     sample1 = torch.Tensor(num_samples, ndim)
 #    Creates a positve definite and symmetric covaraince matrix.
@@ -59,6 +60,8 @@ def main():
     print('empirical mean : ', sam1mean)
     print('empirical_cov  :\n', samp1_var)
     print('Average acceptance rate is: ', count / num_samples)
+    plot_sample_traces(sampl1np)
+    estimated_autocorrelation(sampl1np)
 #    print('****** TRUE MEAN AND COV *****')
 #    print('true mean: ', np.zeros((1,ndim)))
 #    print('true cov: ' , cov.numpy())
@@ -153,7 +156,7 @@ def hamiltonian(position, momentum, energy_function,ndim):
     -------
     hamitonian : float
     """
-    U = energy_function(position,ndim) 
+    U = -energy_function(position,ndim)
     T = kinetic_energy(momentum)
     return U + T
 
@@ -218,6 +221,26 @@ def hmc(initial_x, step_size, num_steps,log_posterior, ndim, count):
         return x, count
     else:
         return initial_x,count
+def plot_sample_traces(samples):
+    fig, ax = plt.subplots()
+    iter    = np.arange(0,np.shape(samples)[0])
+    for i in range(np.shape(samples)[1]):
+        ax.plot(iter, samples[:,i], label = r'$\theta_{}$'.format(i))
+    ax.set_title('Trace plots for the parameters')
+    plt.show()
 
+def estimated_autocorrelation(x):
+    """
+    http://stackoverflow.com/q/14297012/190597
+    http://en.wikipedia.org/wiki/Autocorrelation#Estimation
+    """
+    n = len(x)
+    variance = x.var()
+    x = x-x.mean()
+    r = np.correlate(x, x, mode = 'full')[-n:]
+    assert np.allclose(r, np.array([(x[:n-k]*x[-(n-k):]).sum() for k in range(n)]))
+    result = r/(variance*(np.arange(n, 0, -1)))
+    print(result)
+    return result
 
 main()
