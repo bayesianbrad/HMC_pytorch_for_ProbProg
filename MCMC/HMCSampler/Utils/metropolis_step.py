@@ -79,10 +79,10 @@ class Metropolis():
         # print(p_accept)
         if p_accept[0][0] > torch.Tensor(1, 1).uniform_()[0][0]:  # [0][0] dirty code to get integersr
             # Updates count globally for target acceptance rate
-            print('Debug : Accept')
-            print('Debug : Count ', self.count)
+            # print('Debug : Accept')
+            # print('Debug : Count ', self.count)
             self.count = self.count + 1
             return values, self.count
         else:
-            print('Debug : reject')
+            # print('Debug : reject')
             return values_init
