@@ -88,15 +88,12 @@ class HMCsampler():
         for i in range(self.n_samples-1):
             logjoint_init, grad_init = self.potential.eval(temp, grad_loop= True)
             temp, count = metropolis.acceptance(temp, logjoint_init, grad_init)
-            try:
-                samples[i+1,:] = temp.data.t()
-            except RuntimeError:
-                print(i)
-                break
-
-            if (i == 389):
-                logjoint_init, grad_init = self.potential.eval(temp, grad_loop=True)
-                temp, count = metropolis.acceptance(temp, logjoint_init, grad_init)
+            samples[i + 1, :] = temp.data.t()
+            # try:
+            #     samples[i+1,:] = temp.data.t()
+            # except RuntimeError:
+            #     print(i)
+            #     break
             # update parameters and draw new momentum
             if i == np.floor(self.n_samples/4) or i == np.floor(self.n_samples/2) or i == np.floor(3*self.n_samples/4):
                 print(' At interation {}'.format(i))
