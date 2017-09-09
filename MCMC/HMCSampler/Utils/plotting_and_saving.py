@@ -29,6 +29,8 @@ class Plotting():
         if cov is not None:
             self.cov = cov
         if model is not None:
+            # model      = model + 'small'
+            model = model
             self.PATH  = '/Users/bradley/Documents/Aims_work/Miniproject2/Project_notes/MCMC/report_data_and_plots' +'/' + model
             os.makedirs(self.PATH, exist_ok=True)
             self.PATH_fig = os.path.join(self.PATH, 'figures')
@@ -49,14 +51,18 @@ class Plotting():
         iter = np.arange(0, np.shape(self.samples_with_burnin)[0])
         if np.shape(self.samples)[1] > 1:
             for i in range(np.shape(self.samples)[1]):
-                ax.plot(iter, self.samples_with_burnin[:,i], label='Parameter {0} '.format(i))
+                ax.plot(iter, self.samples[:,i], label='Parameter {0} '.format(i))
                 ax.set_title('Trace plot for the parameters')
+                ax.set_xlabel('Iterations')
+                ax.set_ylabel('Sampled values of the Parameter')
                 plt.legend()
                 fname = 'trace.png'
                 fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
         else:
-            ax.plot(iter, self.samples_with_burnin, label= ' values ')
-            ax.set_title('Trace plot for the parameters')
+            ax.plot(iter, self.samples, label= 'Parameter')
+            ax.set_title('Trace plot for the parameter')
+            ax.set_xlabel('Iterations')
+            ax.set_ylabel('Sampled values of the Parameter')
             plt.legend()
             fname = 'trace.png'
             fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
@@ -80,9 +86,9 @@ class Plotting():
 
 
         else:
-            ax.hist(self.samples, bins='auto', normed=1)
+            ax.hist(self.samples, bins='auto', normed=1, label= r'$\mu_{\mathrm{emperical}}$' + '=' + '{0}'.format(self.mean.data[0][0]))
             ax.set_title(
-                'Histogram of samples \n' + r'$\mu_{\mathrm{emperical}}$' + '=' + '{0}'.format(self.mean.data[0][0]))
+                'Histogram of samples')
             ax.set_xlabel(' Samples ')
             ax.set_ylabel('Density')
         # plt.axis([40, 160, 0, 0.03])
