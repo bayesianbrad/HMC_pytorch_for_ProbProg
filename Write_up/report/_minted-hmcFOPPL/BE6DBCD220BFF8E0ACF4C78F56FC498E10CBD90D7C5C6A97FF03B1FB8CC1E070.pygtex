@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{;;; conjugate\PYGZus{}gaussian}
+\PYG{p}{(}\PYG{k}{def }\PYG{n+nv}{src0}
+  \PYG{p}{(}\PYG{n+nf}{foppl\PYGZhy{}query}
+    \PYG{p}{(}\PYG{k}{let }\PYG{p}{[}\PYG{n+nv}{x} \PYG{p}{(}\PYG{n+nf}{sample} \PYG{p}{(}\PYG{n+nf}{normal} \PYG{l+m+mf}{0.0} \PYG{l+m+mf}{1.0}\PYG{p}{))]}
+      \PYG{p}{(}\PYG{n+nf}{observe} \PYG{p}{(}\PYG{n+nf}{normal} \PYG{n+nv}{x} \PYG{l+m+mf}{1.0}\PYG{p}{)} \PYG{l+m+mf}{7.0}\PYG{p}{)}
+      \PYG{n+nv}{x}\PYG{p}{)))}
+\end{Verbatim}

@@ -29,7 +29,6 @@ Neal, R.~M. et~al. (2011).
 \bibitem[PyTorch, 2017]{pytorch}
 PyTorch (2017).
 \newblock Pytorch, automatic differentiation package.
-\newblock \url{https://github.com/pytorch/pytorch}.
 
 \bibitem[Sorensen and Gianola, 2007]{sorensen2007likelihood}
 Sorensen, D. and Gianola, D. (2007).

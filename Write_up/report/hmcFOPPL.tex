@@ -2,43 +2,44 @@
 \usepackage[accepted]{aistats2017}
 \usepackage[round]{natbib}
 \usepackage{listings}
+\usepackage{minted}
 \usepackage{color}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{dsfont}
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
-
-\lstset{ %
-	backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
-	basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-	breaklines=true,                 % sets automatic line breaking
-	captionpos=b,                    % sets the caption-position to bottom
-	commentstyle=\color{mygreen},    % comment style
-	deletekeywords={...},            % if you want to delete keywords from the given language
-	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
-	frame=single,	                   % adds a frame around the code
-	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-	keywordstyle=\color{blue},       % keyword style
-	language=Octave,                 % the language of the code
-	morekeywords={*,...},            % if you want to add more keywords to the set
-	numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-	numbersep=5pt,                   % how far the line-numbers are from the code
-	numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
-	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
-	showstringspaces=false,          % underline spaces within strings only
-	showtabs=false,                  % show tabs within strings adding particular underscores
-	stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
-	stringstyle=\color{mymauve},     % string literal style
-	tabsize=2,	                   % sets default tabsize to 2 spaces
-%	title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
-}
+%\definecolor{mygreen}{rgb}{0,0.6,0}
+%\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+%\definecolor{mymauve}{rgb}{0.58,0,0.82}
+%
+%\lstset{ %
+%	backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+%	basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+%	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+%	breaklines=true,                 % sets automatic line breaking
+%	captionpos=b,                    % sets the caption-position to bottom
+%	commentstyle=\color{mygreen},    % comment style
+%	deletekeywords={...},            % if you want to delete keywords from the given language
+%	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+%	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+%	frame=single,	                   % adds a frame around the code
+%	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+%	keywordstyle=\color{blue},       % keyword style
+%	language=Octave,                 % the language of the code
+%	morekeywords={*,...},            % if you want to add more keywords to the set
+%	numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+%	numbersep=5pt,                   % how far the line-numbers are from the code
+%	numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+%	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+%	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+%	showstringspaces=false,          % underline spaces within strings only
+%	showtabs=false,                  % show tabs within strings adding particular underscores
+%	stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+%	stringstyle=\color{mymauve},     % string literal style
+%	tabsize=2,	                   % sets default tabsize to 2 spaces
+%%	title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+%}
  % If your paper is accepted, change the options for the package
 % aistats2017 as follows:
 %
@@ -70,7 +71,7 @@
 \aistatstitle{Hamiltonian Monte Carlo Inference for a First Order Probabilistic Programming Language }
 
 %\aistatsauthor{ Bradley Gram-Hansen \And Frank Wood \And  Author 3 }
-\aistatsauthor{ Bradley Gram-Hansen \And Yuan Zhou \And Frank Wood }
+\aistatsauthor{ Bradley Gram-Hansen \And Frank Wood }
 %\aistatsaddress{ Institution 1 \And  Institution 2 \And Institution 3 } ]
 \aistatsaddress{ Department of Engineering,  University of Oxford } ]
 \begin{abstract}
@@ -213,17 +214,23 @@ The negation of the momentum variables at the end of the trajectory makes the Me
 Where $U = -\log(\pi(x))$,  $M$ is the number of samples we wish to take , $(x^{'}, p^{'})$ is the generated proposal and we propose setting $x^{m} = x^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
 A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $q$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $q$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $q_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
 
-\section{Something}
+\section{Example Programs and Compiled Output}
 
-\subsection{Second Level Heading}
+\subsection{Programs}
 
 Second level headings are initial caps, flush left, bold, and in point
 size 10. Use one line space before the second level heading and one-half line
 space after the second level heading.
+\inputminted{clojure}{code/conditionalif.clj}
+\inputminted{clojure}{code/conjugategauss.clj}
+blah blakdsf sf sd fsd fsdf
+\inputminted{clojure}{code/linearregression.clj}
+
 
 \subsubsection{Models and Results}
 
 Here we introduce a section of simple models and show how the transformed FOPPL code is compiled and how inference is performed. 
+\inputminted{python}{code/lr_out.py}
 \paragraph{Fourth Level Heading}
 
 Fourth level headings must be flush left, initial caps, bold, and
@@ -296,7 +303,7 @@ Soma             &Cell body (contains cell nucleus) \\
 \end{center}git 
 \end{table}
 
-\section{SUPPLEMENTARY MATERIAL}
+\section{Experimental Results}
 \label{sec:supmat}
 
 
