@@ -26,8 +26,6 @@ class program():
             data from the Variable of the gradients
             grad returns a variable of the gradients w.r.t parameters'''
         assert(isinstance(values, Variable))
-        print()
-        print(values)
         grad = torch.autograd.grad(logjoint, values, grad_outputs=torch.ones(values.data.size()))[0]
         # For some reason all the gradients are d times bigger than they should be, where d is the dimension
 
