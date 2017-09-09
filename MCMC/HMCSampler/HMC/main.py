@@ -10,8 +10,13 @@ License: MIT
 from HMC.hmc_class_development import HMCsampler as HMC
 from Utils.plotting_and_saving import Plotting
 models = ['conjgauss', 'conditionalif', 'linearreg']
-for i in range(len(models)):
-    hmcsampler  = HMC(burn_in=0, n_samples = 5000, model= models[i])
-    samples, samples_with_burnin, mean =  hmcsampler.run_sampler()
-    plots = Plotting(samples,samples_with_burnin,mean, model = models[i])
-    plots.call_all_methods()
+i = 2
+# for i in range(len(models)):
+#     hmcsampler  = HMC(burn_in=0, n_samples = 5000, model= models[i])
+#     samples, samples_with_burnin, mean =  hmcsampler.run_sampler()
+#     plots = Plotting(samples,samples_with_burnin,mean, model = models[i])
+#     plots.call_all_methods()    hmcsampler  = HMC(burn_in=0, n_samples = 5000, model= models[i])
+hmcsampler  = HMC(burn_in=10, n_samples = 1000, model= models[i])
+samples_with_burnin,samples, mean =  hmcsampler.run_sampler()
+plots = Plotting(samples,samples_with_burnin,mean, model = models[i])
+plots.call_all_methods()
