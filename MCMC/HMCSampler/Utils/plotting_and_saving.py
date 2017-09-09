@@ -10,7 +10,7 @@ License: MIT
 import numpy as np
 import pandas as pd
 import os
-import errno
+from itertools import cycle
 from torch.autograd import Variable
 from matplotlib import pyplot as plt
 
@@ -39,6 +39,7 @@ class Plotting():
             os.makedirs(self.PATH_data, exist_ok=True)
         else:
             self.PATH = '/Users/bradley/Documents/Aims_work/Miniproject2/Project_notes/MCMC/report_data_and_plots'
+        self.colors = cycle([ "blue", "green","black", "maroon", "navy", "olive", "purple", "red", "teal"])
     def plot_trace(self):
         '''
 
@@ -48,19 +49,10 @@ class Plotting():
         '''
         print('Saving trace plots.....')
         fig, ax = plt.subplots()
-        iter = np.arange(0, np.shape(self.samples_with_burnin)[0])
-        if np.shape(self.samples)[1] > 1:
-            for i in range(np.shape(self.samples)[1]):
-                ax.plot(iter, self.samples[:,i], label='Parameter {0} '.format(i))
-                ax.set_title('Trace plot for the parameters')
-                ax.set_xlabel('Iterations')
-                ax.set_ylabel('Sampled values of the Parameter')
-                plt.legend()
-                fname = 'trace.png'
-                fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
-        else:
-            ax.plot(iter, self.samples, label= 'Parameter')
-            ax.set_title('Trace plot for the parameter')
+        iter = np.arange(0, np.shape(self.samples)[0])
+        for i in range(np.shape(self.samples)[1]):
+            ax.plot(iter, self.samples[:,i], label='Parameter {0} '.format(i))
+            ax.set_title('Trace plot for the parameters')
             ax.set_xlabel('Iterations')
             ax.set_ylabel('Sampled values of the Parameter')
             plt.legend()
@@ -72,7 +64,7 @@ class Plotting():
         weights = np.ones_like(self.samples) / float(len(self.samples))
         fig, ax = plt.subplots()
         if np.shape(self.samples)[1] > 1:
-            for i in range(np.shape(self.samples)[1]):
+            for i in range(np.shape(self.samples_with_burnin)[1]):
                 ax.hist(self.samples[:,i],  bins = 'auto', normed=1, label= r'$\mu_{\mathrm{emperical}}$' + '=' + '{0}'.format(
                         self.mean.data[0][i]))
                 ax.set_title('Histogram of samples ')
@@ -97,7 +89,28 @@ class Plotting():
         # Ensures directory for this figure exists for model, if not creates it
             fig.savefig(os.path.join(self.PATH_fig,'histogram.png' ), dpi = 400)
         # plt.show()
+    def auto_corr(self, ax=None):
+        print('Plotting autocorrelation......')
+        for i in range(self.samples_with_burnin.shape[1]):
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            x = self.samples_with_burnin[:,i].flatten()
+            x = x - x.mean()
 
+            autocorr = np.correlate(x, x, mode='full')
+            autocorr = autocorr[x.size:]
+            autocorr /= autocorr.max()
+            markerline, stemline, sline = ax.stem(autocorr, label = 'Parameter ' + str(i))
+            plt.setp(stemline,color= next(self.colors),linewidth= 0.2)
+            plt.setp(markerline, markerfacecolor = next(self.colors), markersize =0.3)
+            plt.setp(sline, linewidth = 0.2)
+            ax.set_title(' Autocorrelation after burn in')
+            ax.set_ylabel('Autocorrelation')
+            ax.set_xlabel('Samples')
+            ax.legend(loc="best")
+            fname = 'Autocorrelation plot_' +'parameter_' +str(i)+ '.png'
+            fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+            plt.clf()
     def save_data(self):
         print('Saving data....')
         df1 = pd.DataFrame(self.samples)
@@ -111,4 +124,5 @@ class Plotting():
     def call_all_methods(self):
         self.plot_trace()
         self.histogram()
+        self.auto_corr()
         self.save_data()
