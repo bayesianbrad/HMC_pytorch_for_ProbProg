@@ -9,10 +9,12 @@ License: MIT
 '''
 
 import torch
-from torch.autograd import Variable
+
+from Depriciated.program import program
 from core import VariableCast
-from program import program
 from kinetic import Kinetic
+
+
 # TO DO: Check how to call a class method within  a class
 def test():
     prog_obj = program()

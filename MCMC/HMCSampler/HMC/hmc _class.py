@@ -25,8 +25,8 @@ from Utils.core import VariableCast
 from Utils.kinetic import Kinetic
 from Utils.integrator import Integrator
 from Utils.metropolis_step import Metropolis
-np.random.seed(1234)
-torch.manual_seed(1234)
+# np.random.seed(1234)
+# torch.manual_seed(1234)
 
 
 class HMCsampler():
@@ -50,7 +50,7 @@ class HMCsampler():
         self.M          = M
         self.model      = model
         # External dependencies
-        program         = getattr(importlib.import_module('Utils.dev_program'), model) # import Utils.program.model #getattr(importlib.import_module("module.submodule"), "MyClass")
+        program         = getattr(importlib.import_module('Utils.program'), model) # import Utils.program.model #getattr(importlib.import_module("module.submodule"), "MyClass")
         self.potential  = program()
         self.integrator = Integrator(self.potential, min_step, max_step, \
                                      min_traj, max_traj)
