@@ -13,6 +13,8 @@ import os
 from itertools import cycle
 from torch.autograd import Variable
 from matplotlib import pyplot as plt
+from pandas.plotting import autocorrelation_plot
+from statsmodels.graphics import tsaplots
 
 class Plotting():
 
@@ -89,28 +91,51 @@ class Plotting():
         # Ensures directory for this figure exists for model, if not creates it
             fig.savefig(os.path.join(self.PATH_fig,'histogram.png' ), dpi = 400)
         # plt.show()
-    def auto_corr(self, ax=None):
-        print('Plotting autocorrelation......')
-        for i in range(self.samples_with_burnin.shape[1]):
-            fig = plt.figure()
-            ax = fig.add_subplot(111)
-            x = self.samples_with_burnin[:,i].flatten()
-            x = x - x.mean()
+    def auto_corr(self):
+        print('Plotting autocorrelation.....')
+        fig, ax = plt.subplots(nrows = 1, ncols = np.shape(self.samples)[1], sharex= True, sharey= True, squeeze=False)
+        #squeeze ensures that we can use size(1) object, and size(n,n) objects.
+        # sub plots spits back on figure object and 1 X np.shape(self.samples)[1] axis objects, stored in ax.
+        i = 0
 
-            autocorr = np.correlate(x, x, mode='full')
-            autocorr = autocorr[x.size:]
-            autocorr /= autocorr.max()
-            markerline, stemline, sline = ax.stem(autocorr, label = 'Parameter ' + str(i))
-            plt.setp(stemline,color= next(self.colors),linewidth= 0.2)
-            plt.setp(markerline, markerfacecolor = next(self.colors), markersize =0.3)
-            plt.setp(sline, linewidth = 0.2)
-            ax.set_title(' Autocorrelation after burn in')
-            ax.set_ylabel('Autocorrelation')
-            ax.set_xlabel('Samples')
-            ax.legend(loc="best")
-            fname = 'Autocorrelation plot_' +'parameter_' +str(i)+ '.png'
-            fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
-            plt.clf()
+        def label(ax, string):
+            ax.annotate(string, (1, 1), xytext=(-8, -8), ha='right', va='top',
+                        size=14, xycoords='axes fraction', textcoords='offset points')
+        lag = 50
+        for row in ax:
+            for col in row:
+                tsaplots.plot_acf(self.samples[:,i], ax=col, title= '',lags= lag,alpha=0.05,use_vlines=True)
+                # alpha sets 95% confidence interval, lag - is autocorrelation lag
+                # label(col, '  ')
+                i = i + 1
+
+        plt.xlabel("")
+        plt.ylabel('')
+        plt.suptitle('Autocorrelation for lag {}'.format(lag))
+        fname = 'Autocorrelation plot.png'
+        plt.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+
+        # print('Plotting autocorrelation......')
+        # for i in range(self.samples.shape[1]):
+        #     fig = plt.figure()
+        #     ax = fig.add_subplot(111)
+        #     x = self.samples[:,i].flatten()
+        #     x = x - x.mean()
+        #
+        #     autocorr = np.correlate(x, x, mode='full')
+        #     autocorr = autocorr[x.size:]
+        #     autocorr /= autocorr.max()
+        #     markerline, stemline, sline = ax.stem(autocorr, label = 'Parameter ' + str(i))
+        #     plt.setp(stemline,color= next(self.colors),linewidth= 0.2)
+        #     plt.setp(markerline, markerfacecolor = next(self.colors), markersize =0.3)
+        #     plt.setp(sline, linewidth = 0.2)
+        #     ax.set_title(' Autocorrelation plot')
+        #     ax.set_ylabel('Autocorrelation')
+        #     ax.set_xlabel('Samples')
+        #     ax.legend(loc="best")
+        #     fname = 'Autocorrelation plot_' +'parameter_' +str(i)+ '.png'
+        #     fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+        #     plt.clf()
     def save_data(self):
         print('Saving data....')
         df1 = pd.DataFrame(self.samples)
