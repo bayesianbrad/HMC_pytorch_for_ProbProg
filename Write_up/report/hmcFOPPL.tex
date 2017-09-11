@@ -9,6 +9,9 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{dsfont}
+\usepackage{pgf}
+\usepackage{subcaption}
+%\graphicspath{{report_data_and_plots/}}
 %\definecolor{mygreen}{rgb}{0,0.6,0}
 %\definecolor{mygray}{rgb}{0.5,0.5,0.5}
 %\definecolor{mymauve}{rgb}{0.58,0,0.82}
@@ -154,7 +157,7 @@ We start with a state at $t = 0$ and then evaluate at a subsequent time $t + \ep
 \begin{align}
 p_{i}(t + \frac{\epsilon}{2}) &= p_{i}(t) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(q(t))}{\partial q_{i}} \\
 q_{i}(t + \epsilon) &= q_{i}(t) + \epsilon\frac{\partial K(p(t + \frac{\epsilon}{2}))}{dp_{i}}\\
-p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U}{\partial q_{i}}
+p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(q(t+\epsilon))}{\partial q_{i}}
 \end{align}
 \footnote{For the usual choice of kinetic energy, we have $\frac{\partial K(p + \frac{\epsilon}{2})}{dp_{i}} = \frac{p_{i}(t + \frac{\epsilon}{2})}{m_{i}}$}
 
@@ -167,6 +170,8 @@ The $p$ components are specified to be independent, with component $p_{i}$ havin
 The kinetic energy $K(p) = \sum_{i =1}^{d}\frac{p_{i}^{2}}{2m_{i}}(q(t + \epsilon))
 $
 \subsubsection{Properties of the Integrator}
+Reversibility
+
 \subsubsection{The Algorithm}
 
 \begin{enumerate}
@@ -224,10 +229,11 @@ We now present a few simple FOPPL programs and discuss both their statistical an
 The conjugate Gaussian, is a model in which we can analytically calculate the true posterior $p(x | y) \propto p(x,y) $, as the product of two Gaussians is also a Gaussian. For our particular model we \mintinline{clojure}{sample} $x \sim \mathcal{N}(0, 1)$ and we \mintinline{clojure}{observe} $y = 7$, with likelihood $p(y|x) = \mathcal{N}(y | x, 1)$.  In FOPPL we have the following output:
 \inputminted{clojure}{code/conjugategauss.clj}
 
-Thus, the joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. Where in this model $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. 
-\inputminted{clojure}{code/conjugategauss.clj}
+Thus, the joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}^{2}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. Where in this model $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. Thus the true mean that our model should infer is $\bar{\mu} = 5$. 
 \subsection{Conditional If}
+The \mintinline{clojure}{if} statement is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired. 
 \inputminted{clojure}{code/conditionalif.clj}
+I
 \subsection{Linear Regression}
 \inputminted{clojure}{code/linearregression.clj}
 
@@ -236,7 +242,86 @@ Thus, the joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \
 
 Here we introduce a section of simple models and the results of inference via our custom built HMC sampler on those programs. For a sample output of the compiler for the linear regression program, please see section \ref{sec:supmat}. 
 \paragraph{Fourth Level Heading}
-
+\begin{figure*}[ht]
+	\centering
+	\subcaptionbox{Fig1}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{conjgauss/figures/histogram.pdf}}\quad
+	\subcaptionbox{Fig2}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{conjgauss/figures/trace.pdf}}\quad
+	\subcaptionbox{Fig3}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{conjgauss/figures/Autocorrelationplot.pdf}}
+	
+	\bigskip
+	
+	\subcaptionbox{Fig4}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{conditionalif/figures/histogram.pdf}}\quad
+	\subcaptionbox{Fig5}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{conditionalif/figures/trace.pdf}}\quad
+	\subcaptionbox{Fig6}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{conditionalif/figures/Autocorrelationplot.pdf}}
+	
+	\bigskip
+	
+    \subcaptionbox{Fig1}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{linearreg/figures/histogram.pdf}}\quad
+	\subcaptionbox{Fig2}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{linearreg/figures/trace.pdf}}\quad
+	\subcaptionbox{Fig3}[.3\linewidth][c]{%
+		\includegraphics[width=.2\linewidth]{linearreg/figures/Autocorrelationplot.pdf}}
+	\caption{All plots}
+\end{figure*}
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}{0.33\textwidth}
+%		\centering
+%		\includegraphics[width=0.9\textwidth]{conjgauss/figures/histogram.pdf} % first figure itself
+%	\end{minipage}\hfill
+%	\begin{minipage}{0.33\textwidth}
+%		\centering
+%		\includegraphics[width=0.9\textwidth]{conjgauss/figures/trace.pdf} % second figure itself
+%	\end{minipage}
+%	\begin{minipage}{0.33\textwidth}
+%	\centering
+%	\includegraphics[width=0.9\textwidth]{conjgauss/figures/Autocorrelationplot.pdf} % second figure itself
+%\end{minipage}
+%\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}{0.33\textwidth}
+%		\centering
+%		\includegraphics[width=0.9\textwidth]{conditionalif/figures/histogram.pdf} % first figure itself
+%	\end{minipage}\hfill
+%	\begin{minipage}{0.33\textwidth}
+%		\centering
+%		\includegraphics[width=0.9\textwidth]{conditionalif/figures/trace.pdf} % second figure itself
+%	\end{minipage}
+%	\begin{minipage}{0.33\textwidth}
+%	\centering
+%	\includegraphics[width=0.9\textwidth]{conditionalif/figures/Autocorrelationplot.pdf} % second figure itself
+%\end{minipage}
+%\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}{0.33\textwidth}
+%		\centering
+%		\includegraphics[width=0.9\textwidth]{linearreg/figures/histogram.pdf} % first figure itself
+%	\end{minipage}\hfill
+%	\begin{minipage}{0.33\textwidth}
+%		\centering
+%		\includegraphics[width=0.9\textwidth]{linearreg/figures/trace.pdf} % second figure itself
+%	\end{minipage}
+%	\begin{minipage}{0.33\textwidth}
+%	\centering
+%	\includegraphics[width=0.9\textwidth]{linearreg/figures/Autocorrelationplot.pdf} % second figure itself
+%\end{minipage}
+%\end{figure}
+%%\end{figure}
+%\begin{figure}[ht]
+%	\begin{center}
+%		\input{conjgauss/figures/histogram.pgf}
+%	\end{center}
+%	\vspace{0.3in}
+%\end{figure}
 Fourth level headings must be flush left, initial caps, bold, and
 Roman type.  Use one line space before the fourth level heading, and
 place the section text immediately after the heading with no line
@@ -279,12 +364,21 @@ and each figure should be numbered consecutively.
 Make sure that the figure caption does not get separated from the
 figure. Leave extra white space at the bottom of the page rather than
 splitting the figure and figure caption.
-\begin{figure}[h]
-\vspace{.3in}
-\centerline{\fbox{This figure intentionally left non-blank}}
-\vspace{.3in}
-\caption{Sample Figure Caption}
-\end{figure}
+%\begin{figure}[ht]
+%	\vspace{.3in}
+%	\centering
+%	\includegraphics[width=.3\textwidth]{weierstrass_si_small/resized002.png}\quad
+%	\includegraphics[width=.3\textwidth]{weierstrass_si_small/resized003.png}
+%	\vspace{.3in}
+%	\caption{A prediction of the Weierstrass on 20\% of the data set, 200 pts, in the single-input model. The top row is a linear combination of covariance functions operating on the original observations. The middle row represents the prediction, the posterior mean is in green, the observables are in red and the targets are in blue. The bottom row is the posterior covariance at the levels 0 and 4.}
+%	\label{pics:si_wie_s}
+%\end{figure}
+%\begin{figure}[h]
+%\vspace{.3in}
+%\centerline{\fbox{This figure intentionally left non-blank}}
+%\vspace{.3in}
+%\caption{Sample Figure Caption}
+%\end{figure}
 
 \subsubsection{Tables}
 
@@ -294,21 +388,23 @@ See Table~\ref{sample-table}.
 Use one line space before the table title, one line space after the table title, and one line space after the table. The table title must be
 initial caps and each table numbered consecutively.
 
-\begin{table}[h]
-\caption{Sample Table Title} \label{sample-table}
-\begin{center}
-\begin{tabular}{ll}
-{\bf PART}  &{\bf DESCRIPTION} \\
-\hline \\
-Dendrite         &Input terminal \\
-Axon             &Output terminal \\
-Soma             &Cell body (contains cell nucleus) \\
-\end{tabular}
-\end{center}git 
-\end{table}
+%\begin{table}
+%\caption{Sample Table Title} \label{sample-table}
+%\begin{center}
+%\begin{tabular}{ll}
+%{\bf PART}  &{\bf DESCRIPTION} \\
+%\hline \\
+%Dendrite         &Input terminal \\
+%Axon             &Output terminal \\
+%Soma             &Cell body (contains cell nucleus) \\
+%\end{tabular}
+%\end{center}git 
+%\end{table}
 
 \section{Supplementary Material}
 \label{sec:supmat}
+
+In the supplementary material we show sum examples of the compiler output for the various models shown and we also discuss the implementation of the HMC algorithm itself in pytorch. 
 \inputminted{python}{code/lr_out.py}
 
 \section{INSTRUCTIONS FOR CAMERA-READY PAPERS}
