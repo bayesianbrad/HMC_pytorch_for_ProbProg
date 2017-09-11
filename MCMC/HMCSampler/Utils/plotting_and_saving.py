@@ -12,10 +12,31 @@ import pandas as pd
 import os
 from itertools import cycle
 from torch.autograd import Variable
+import matplotlib as mpl
+mpl.use('pgf')
 from matplotlib import pyplot as plt
 from pandas.plotting import autocorrelation_plot
 from statsmodels.graphics import tsaplots
 
+pgf_with_latex = {                      # setup matplotlib to use latex for output
+    "pgf.texsystem": "pdflatex",        # change this if using xetex or lautex
+    "text.usetex": True,                # use LaTeX to write all text
+    "font.family": "serif",
+    "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
+    "font.sans-serif": [],
+    "font.monospace": [],
+    "axes.labelsize": 8,               # LaTeX default is 10pt font.
+    "font.size": 8,
+    "legend.fontsize": 8,               # Make the legend/label fonts a little smaller
+    "xtick.labelsize": 8,
+    "ytick.labelsize": 8,
+    "figure.figsize": [4,4],     # default fig size of 0.9 textwidth
+    "pgf.preamble": [
+        r"\usepackage[utf8x]{inputenc}",    # use utf8 fonts becasue your computer can handle it :)
+        r"\usepackage[T1]{fontenc}",        # plots will be generated using this preamble
+        ]
+    }
+mpl.rcParams.update(pgf_with_latex)
 class Plotting():
 
     def __init__(self, samples,samples_with_burnin, mean, model = None, cov= None):
@@ -33,7 +54,7 @@ class Plotting():
         if model is not None:
             # model      = model + 'small'
             model = model
-            self.PATH  = '/Users/bradley/Documents/Aims_work/Miniproject2/Project_notes/MCMC/report_data_and_plots' +'/' + model
+            self.PATH  = '/Users/bradley/Documents/Aims_work/Miniproject2/Project_notes/Write_up/report' +'/' + model
             os.makedirs(self.PATH, exist_ok=True)
             self.PATH_fig = os.path.join(self.PATH, 'figures')
             os.makedirs(self.PATH_fig, exist_ok=True)
@@ -50,7 +71,7 @@ class Plotting():
         :return:
         '''
         print('Saving trace plots.....')
-        fig, ax = plt.subplots(figsize=(3,3))
+        fig, ax = plt.subplots()
         iter = np.arange(0, np.shape(self.samples)[0])
         for i in range(np.shape(self.samples)[1]):
             ax.plot(iter, self.samples[:,i], label='Parameter {0} '.format(i))
@@ -59,12 +80,14 @@ class Plotting():
             ax.set_ylabel('Sampled values of the Parameter')
             plt.legend()
             fname = 'trace.pgf'
+            fname2 = 'trace.pdf'
             fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+            fig.savefig(os.path.join(self.PATH_fig, fname2))
 
     def histogram(self):
         print('Saving histogram.....')
         weights = np.ones_like(self.samples) / float(len(self.samples))
-        fig, ax = plt.subplots(figsize=(3,3))
+        fig, ax = plt.subplots()
         if np.shape(self.samples)[1] > 1:
             for i in range(np.shape(self.samples_with_burnin)[1]):
                 ax.hist(self.samples[:,i],  bins = 'auto', normed=1, label= r'$\mu_{\mathrm{emperical}}$' + '=' + '{0}'.format(
@@ -74,8 +97,10 @@ class Plotting():
                 ax.set_ylabel('Density')
             plt.legend()
             fname = 'histogram.pgf'
+            fname2 = 'histogram.pdf'
                 # Ensures directory for this figure exists for model, if not creates it
-            fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+            fig.savefig(os.path.join(self.PATH_fig, fname))
+            fig.savefig(os.path.join(self.PATH_fig,fname2))
 
 
         else:
@@ -88,10 +113,11 @@ class Plotting():
             plt.legend()
         # Ensures directory for this figure exists for model, if not creates it
             fig.savefig(os.path.join(self.PATH_fig,'histogram.pgf' ), dpi = 400)
+            fig.savefig(os.path.join(self.PATH_fig, 'histogram.pdf'))
         # plt.show()
     def auto_corr(self):
         print('Plotting autocorrelation.....')
-        fig, ax = plt.subplots(nrows = 1, ncols = np.shape(self.samples)[1], sharex= True, sharey= True, squeeze=False, )
+        fig, ax = plt.subplots(nrows = 1, ncols = np.shape(self.samples)[1], sharex= True, sharey= True, squeeze=False)
         #squeeze ensures that we can use size(1) object, and size(n,n) objects.
         # sub plots spits back on figure object and 1 X np.shape(self.samples)[1] axis objects, stored in ax.
         i = 0
@@ -110,8 +136,10 @@ class Plotting():
         plt.xlabel("")
         plt.ylabel('')
         plt.suptitle('Autocorrelation for lag {}'.format(lag))
-        fname = 'Autocorrelation plot.png'
+        fname = 'Autocorrelationplot.pgf'
         plt.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
+        fname2 = 'Autocorrelationplot.pdf'
+        plt.savefig(os.path.join(self.PATH_fig, fname2), dpi=400)
 
         # print('Plotting autocorrelation......')
         # for i in range(self.samples.shape[1]):
