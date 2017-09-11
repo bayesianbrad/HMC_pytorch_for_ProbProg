@@ -50,7 +50,7 @@ class Plotting():
         :return:
         '''
         print('Saving trace plots.....')
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(3,3))
         iter = np.arange(0, np.shape(self.samples)[0])
         for i in range(np.shape(self.samples)[1]):
             ax.plot(iter, self.samples[:,i], label='Parameter {0} '.format(i))
@@ -58,13 +58,13 @@ class Plotting():
             ax.set_xlabel('Iterations')
             ax.set_ylabel('Sampled values of the Parameter')
             plt.legend()
-            fname = 'trace.png'
+            fname = 'trace.pgf'
             fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
 
     def histogram(self):
         print('Saving histogram.....')
         weights = np.ones_like(self.samples) / float(len(self.samples))
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(3,3))
         if np.shape(self.samples)[1] > 1:
             for i in range(np.shape(self.samples_with_burnin)[1]):
                 ax.hist(self.samples[:,i],  bins = 'auto', normed=1, label= r'$\mu_{\mathrm{emperical}}$' + '=' + '{0}'.format(
@@ -72,9 +72,8 @@ class Plotting():
                 ax.set_title('Histogram of samples ')
                 ax.set_xlabel(' Samples ')
                 ax.set_ylabel('Density')
-                ax.grid(True)
             plt.legend()
-            fname = 'histogram.png'
+            fname = 'histogram.pgf'
                 # Ensures directory for this figure exists for model, if not creates it
             fig.savefig(os.path.join(self.PATH_fig, fname), dpi=400)
 
@@ -86,14 +85,13 @@ class Plotting():
             ax.set_xlabel(' Samples ')
             ax.set_ylabel('Density')
         # plt.axis([40, 160, 0, 0.03])
-            ax.grid(True)
             plt.legend()
         # Ensures directory for this figure exists for model, if not creates it
-            fig.savefig(os.path.join(self.PATH_fig,'histogram.png' ), dpi = 400)
+            fig.savefig(os.path.join(self.PATH_fig,'histogram.pgf' ), dpi = 400)
         # plt.show()
     def auto_corr(self):
         print('Plotting autocorrelation.....')
-        fig, ax = plt.subplots(nrows = 1, ncols = np.shape(self.samples)[1], sharex= True, sharey= True, squeeze=False)
+        fig, ax = plt.subplots(nrows = 1, ncols = np.shape(self.samples)[1], sharex= True, sharey= True, squeeze=False, )
         #squeeze ensures that we can use size(1) object, and size(n,n) objects.
         # sub plots spits back on figure object and 1 X np.shape(self.samples)[1] axis objects, stored in ax.
         i = 0
