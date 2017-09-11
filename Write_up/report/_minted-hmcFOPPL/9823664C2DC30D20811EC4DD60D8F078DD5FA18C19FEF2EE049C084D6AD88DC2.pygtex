@@ -43,7 +43,8 @@
 \PYG{n}{c23609}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{5.3}\PYG{p}{])}
 \PYG{n}{y23527} \PYG{o}{=} \PYG{n}{c23609}
 \PYG{n}{p23610} \PYG{o}{=} \PYG{n}{x23608}\PYG{o}{.}\PYG{n}{log\PYGZus{}pdf}\PYG{p}{(} \PYG{n}{y23527}\PYG{p}{)} 
-\PYG{n}{p23611} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{add}\PYG{p}{([}\PYG{n}{p23585}\PYG{p}{,}\PYG{n}{p23589}\PYG{p}{,}\PYG{n}{p23596}\PYG{p}{,}\PYG{n}{p23603}\PYG{p}{,}\PYG{n}{p23610}\PYG{p}{])}
+\PYG{n}{p23611} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{add}\PYG{p}{([}\PYG{n}{p23585}\PYG{p}{,}\PYG{n}{p23589}\PYG{p}{,}\PYG{o}{/}
+		\PYG{n}{p23596}\PYG{p}{,}\PYG{n}{p23603}\PYG{p}{,}\PYG{n}{p23610}\PYG{p}{])}
 \PYG{c+c1}{\PYGZsh{} return E from the model}
 \PYG{n}{x23612} \PYG{o}{=} \PYG{p}{[}\PYG{n}{x23471}\PYG{p}{,}\PYG{n}{x23474}\PYG{p}{]}
 \end{Verbatim}

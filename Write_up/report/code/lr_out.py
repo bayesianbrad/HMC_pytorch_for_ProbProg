@@ -42,6 +42,7 @@ x23608 = Normal(x23606,  c23607)
 c23609= torch.Tensor([5.3])
 y23527 = c23609
 p23610 = x23608.log_pdf( y23527) 
-p23611 = torch.add([p23585,p23589,p23596,p23603,p23610])
+p23611 = torch.add([p23585,p23589,/
+		p23596,p23603,p23610])
 # return E from the model
 x23612 = [x23471,x23474]

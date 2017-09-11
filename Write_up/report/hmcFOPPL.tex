@@ -166,8 +166,8 @@ The distribution of the $p$'s can be chosen by us and are independent of the $q$
 The $p$ components are specified to be independent, with component $p_{i}$ having variance $m_{i}$.
 The kinetic energy $K(p) = \sum_{i =1}^{d}\frac{p_{i}^{2}}{2m_{i}}(q(t + \epsilon))
 $
-
-\subsubsection{The algorithm}
+\subsubsection{Properties of the Integrator}
+\subsubsection{The Algorithm}
 
 \begin{enumerate}
 	\item Step 1: Changes only the momentum
@@ -218,19 +218,23 @@ A function that implements a single iteration of the HMC algorithm is given in a
 
 \subsection{Programs}
 
-Second level headings are initial caps, flush left, bold, and in point
-size 10. Use one line space before the second level heading and one-half line
-space after the second level heading.
-\inputminted{clojure}{code/conditionalif.clj}
+We now present a few simple FOPPL programs and discuss both their statistical and syntactic structures. 
+
+\subsection{Conjugate Gaussian}
+The conjugate Gaussian, is a model in which we can analytically calculate the true posterior $p(x | y) \propto p(x,y) $, as the product of two Gaussians is also a Gaussian. For our particular model we \mintinline{clojure}{sample} $x \sim \mathcal{N}(0, 1)$ and we \mintinline{clojure}{observe} $y = 7$, with likelihood $p(y|x) = \mathcal{N}(y | x, 1)$.  In FOPPL we have the following output:
 \inputminted{clojure}{code/conjugategauss.clj}
-blah blakdsf sf sd fsd fsdf
+
+Thus, the joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. Where in this model $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. 
+\inputminted{clojure}{code/conjugategauss.clj}
+\subsection{Conditional If}
+\inputminted{clojure}{code/conditionalif.clj}
+\subsection{Linear Regression}
 \inputminted{clojure}{code/linearregression.clj}
 
 
 \subsubsection{Models and Results}
 
-Here we introduce a section of simple models and show how the transformed FOPPL code is compiled and how inference is performed. 
-\inputminted{python}{code/lr_out.py}
+Here we introduce a section of simple models and the results of inference via our custom built HMC sampler on those programs. For a sample output of the compiler for the linear regression program, please see section \ref{sec:supmat}. 
 \paragraph{Fourth Level Heading}
 
 Fourth level headings must be flush left, initial caps, bold, and
@@ -303,9 +307,9 @@ Soma             &Cell body (contains cell nucleus) \\
 \end{center}git 
 \end{table}
 
-\section{Experimental Results}
+\section{Supplementary Material}
 \label{sec:supmat}
-
+\inputminted{python}{code/lr_out.py}
 
 \section{INSTRUCTIONS FOR CAMERA-READY PAPERS}
 
