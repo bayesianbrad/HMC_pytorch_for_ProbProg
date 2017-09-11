@@ -406,50 +406,74 @@ class mixture(program):
         self.params = {'x': None}
 
     def generate(self):
-        dim    = 1
+        dim = 1
         logp = []
-        params = Variable(torch.FloatTensor(1, dim).zero_())
+        params = []
+        values = Variable(torch.FloatTensor(1, dim).zero_())
         a = VariableCast(0.0)
         c1 = VariableCast(10.0)
         b = VariableCast(1.0)
         c2 = VariableCast(2.0)
         normal_obj1 = dis.Normal(a, b)
         x1 = Variable(normal_obj1.sample().data, requires_grad=True)
-        params = x1
+        params.append(x1)
         logp_x1 = normal_obj1.logpdf(x1)
         logp.append(logp_x1)
-
-        if torch.gt(x1.data, torch.zeros(x1.size()))[0][0]:
+        print(torch.gt(x1.data, 0.5*torch.ones(x1.size()))[0][0])
+        if torch.gt(x1.data, 0.5*torch.ones(x1.size()))[0][0]:
             normal_obj2 = dis.Normal(c1, c2)
-            x1          = normal_obj2.sample()
-            logp_x1_x1 = normal_obj2.logpdf(x1)
-            logp.append(logp_x1_x1)
-        params = x1
+            x2          = Variable(normal_obj2.sample().data, requires_grad = True)
+            params.append(x2)
+            logp_x2_x1  = normal_obj2.logpdf(x2)
+            logp.append(logp_x2_x1)
+
+
         logjoint = VariableCast(torch.zeros(1, 1))
         for logprob in logp:
             logjoint = logprob + logjoint
 
-        return logjoint, params, self.calc_grad(logjoint, params), dim
+        for i in range(len(params)):
+            if i == 0:
+                values = params[i]
+            else:
+                values = torch.cat((values, params[i]), dim=0)
+
+        grad = torch.autograd.grad(logjoint, params, grad_outputs=torch.ones(values.size()))
+        gradients   = torch.zeros(1,1)
+        for i in grad:
+            gradients += 1/values.size()[0] * i.data
+        gradients = Variable(gradients)
+
+
+        if len(params) > 1:
+            values = values[1,:].unsqueeze(-1)
+        return logjoint,values, gradients, dim
 
     def eval(self, values, grad=False, grad_loop=False):
-        ''' Takes a map of variable names, to variable values '''
-        assert(isinstance(values, Variable))
-        values = Variable(values.data, requires_grad=True)
+        ''' Takes a map of variable names, to variable values
+            : double x;
+        2: x ~ Gaussian(0, 1);
+        3: if (x > 0.5) then
+        4: x ~ Gaussian(10, 2);
+        5: return x;
+        https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/final.pdf
+        '''
         logp = []
+        assert (isinstance(values, Variable))
+        values = Variable(values.data, requires_grad = True)
         ################## Start FOPPL input ##########
         a = VariableCast(0.0)
         c1 = VariableCast(10.0)
         b = VariableCast(1.0)
-        c2 = VariableCast(2.0)
+        c2 = VariableCast(1.41)
         normal_obj1 = dis.Normal(a, b)
         logp_x1 = normal_obj1.logpdf(values)
         logp.append(logp_x1)
         # else:
         #     x = normal_object.sample()
         #     x = Variable(x.data, requires_grad = True)
-        if torch.gt(values.data, torch.zeros(values.size()))[0][0]:
+        if torch.gt(values.data, torch.Tensor([0.5]))[0]:
             normal_obj2 = dis.Normal(c1, c2)
-            values = normal_obj2.sample()
             logp_x1_x1 = normal_obj2.logpdf(values)
             logp.append(logp_x1_x1)
 
