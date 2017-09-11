@@ -25,8 +25,8 @@ from Utils.core import VariableCast
 from Utils.kinetic import Kinetic
 from Utils.integrator import Integrator
 from Utils.metropolis_step import Metropolis
-# np.random.seed(1234)
-# torch.manual_seed(1234)
+np.random.seed(12345)
+torch.manual_seed(12345)
 
 
 class HMCsampler():
