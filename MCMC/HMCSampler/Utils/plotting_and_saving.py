@@ -54,7 +54,7 @@ class Plotting():
         if model is not None:
             # model      = model + 'small'
             model = model
-            self.PATH  = '/Users/bradley/Documents/Aims_work/Miniproject2/Project_notes/Write_up/report' +'/' + model
+            self.PATH  = '/Users/bradley/Documents/Aims_work/Miniproject2/Project_notes/Write_up/report/report_data_and_plots/' + model
             os.makedirs(self.PATH, exist_ok=True)
             self.PATH_fig = os.path.join(self.PATH, 'figures')
             os.makedirs(self.PATH_fig, exist_ok=True)
