@@ -26,9 +26,16 @@ Neal, R.~M. et~al. (2011).
 \newblock Mcmc using hamiltonian dynamics.
 \newblock {\em Handbook of Markov Chain Monte Carlo}.
 
+\bibitem[Nishimura et~al., 2017]{nishimura2017discontinuous}
+Nishimura, A., Dunson, D., and Lu, J. (2017).
+\newblock Discontinuous hamiltonian monte carlo for sampling discrete
+  parameters.
+\newblock {\em arXiv preprint arXiv:1705.08510}.
+
 \bibitem[PyTorch, 2017]{pytorch}
 PyTorch (2017).
 \newblock Pytorch, automatic differentiation package.
+\newblock \url{https://github.com/pytorch/pytorch}.
 
 \bibitem[Sorensen and Gianola, 2007]{sorensen2007likelihood}
 Sorensen, D. and Gianola, D. (2007).

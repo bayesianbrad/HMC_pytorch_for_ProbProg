@@ -98,38 +98,31 @@
 Monte Carlo Markov Chain (MCMC) methods are a set of powerful inference algorithms \citep{berg2008markov} that enable us to evaluate, model and analyze complicated probabilistic models such as those found in machine learning and Bayesian inference \citep{andrieu2003introduction} and in natural systems, such as those found in Biology \citep{sorensen2007likelihood} and Physics \citep{duane1987hybrid}. 
 However, as the dimensionality of the problem grows many MCMC methods, such as Metropolis-Hastings \citep{hastings1970monte},  become ineffective at being able to generate samples effectively. This can be overcome in some instances by tuning particular parameters or rephrasing the problem in a different manner, but this cannot always be done. One MCMC this is able to circumvent this problem is Hamiltonian Monte Carlo (HMC) \citep{neal2011mcmc}\citep{duane1987hybrid}, which takes inspiration from the physical world and uses a dynamical model to generate new proposals. This in turn enables us to explore larger spaces more effectively globally, rather than getting trapped in local regions. See section \ref{sec:supmat} for more information on HMC. \\
 Choosing the right inference algorithm is critical for probabilistic programming languages \citep{tolpin2015probabilistic} such as Anglican \citep{wood2014new} and others, where we rely upon accurate inference and sampling procedures to evaluate our programs. Although, in practice there is no-one inference or sampling algorithm to rule them all. Thus we rely on a combination of techniques, to deal with both finite parameter and infinite parameter spaces (non-parametric models). To analyze more effectively a subset of the problems that Anglican can, such as finite graphs, FOPPL, a first order probabilistic programming language was constructed so that we could take advantage of fast inference algorithms, such as HMC.\\
-In this work we make two contributions, we introduce a FOPPL compiler that transforms a FOPPL output, a finite graph, into python code that takes advantage of the Automatic differentiation package within Pytorch \citep{pytorch} and an HMC that correctly deals with conditional statements and can deal with both finite continuous and discrete parameters us
+In this work we make two contributions, we introduce a FOPPL compiler that transforms a FOPPL output, a finite graph, into python code that takes advantage of the Automatic differentiation package within Pytorch \citep{pytorch} and an HMC that correctly deals with conditional statements and can deal with both finite continuous and in the future discrete parameters \citep{nishimura2017discontinuous} as well.
+In section \ref{sec:foppl} we talk about FOPPL, its syntax and primary use, in section \ref{sec:hmc} we introduce HMC, in section \ref{sec:exampprog} we give examples of FOPPL programs and the results generated through HMC inference, their analytical properties and results generated. In section \ref{sec:supmat} we provide details of HMC implementation and some examples of the compiled FOPPL output. 
 
-
+\section{FOPPL}
+\label{sec:foppl}
+In this section include some stuff about FOPPL, what is it, the syntax etc.  
 \section{Hamiltonian Monte Carlo}
-In a top level view Hamilton Monte Carlo for Monte Carlo Markov Chain (HMC MCMC) is a two step process. In step one we define a Hamiltonian function in terms of the probability distribution from which we wish to sample from. We introduce a position variable, $q$ (our latent parameters) and momentum variable $p$, where $p$ is an auxiliary variable that typically has a Gaussian distribution.  All $p$'s are assumed independent. 
-In step two, the HMC alternates simple updates for the momentum variables with Metropolis updates. This enables us to propose a new state by computing a trajectory according to Hamiltonian dynamics, implemented with the leapfrog method. 
+\label{sec:hmc}
+In a top level view Hamilton Monte Carlo is a two step process. In step one we define a Hamiltonian function in terms of the probability distribution from which we wish to sample from and in step two, HMC proposes new states generated via Hamiltonian dynamics for which we apply Metropolis updates. Due to the proposals being generated via a physical process, we are able to comprehensively explore our model space \citep{neal2011mcmc}. In part this is due to certain physical properties of the Hamiltonian itself, which we shall explore below and make HMC a very powerful inference algorithm. Adopting the notations from the machine learning literature, we use $x$ to represent the parameters of interest, our latent variables, rather than the typical $\theta$ and $q$ in the HMC literature..
 
-The Hamiltonian of a physical system is defined completely with respect to the position $q$ and $p$ momentum variables, which span the phase space of the system. The Hamiltonian is the Legendre transform of the Lagrangian and gives us the total energy in the system, that is \begin{equation}
-\label{eq:hamreduced}
-H(\textbf{q}, \textbf{p})  = K(p) + U(q)
-\end{equation}
-where the Legendre transform is defined as follows: 
-\begin{equation}
-\label{eq:hamiltonian}
-H(\textbf{q},\textbf{p}) = \sum_{i = 1}^{d}\dot{q}_{l}p_{l} - L(\textbf{q}, \textbf{\.{q}}(\textbf{q}, \textbf{p}))
-\end{equation}
-where $d$ is the system dimensions, and so the full state space with has $2d$ dimensions.  
-Thus, for simplicity, if we set $d = 1$ we can derive the Hamiltonian equations as follows:\begin{equation}
-\label{eq:hameq1}
-\frac{\partial H}{\partial p} = \dot{q} + p\frac{\partial \dot{q}}{\partial p} - \frac{\partial L}{\partial \dot{q}}\frac{\partial \dot{q}}{\partial p} = \dot{q} \end{equation}
+The Hamiltonian of a physical system is defined completely in terms of the sets of points $(\textbf{x}, \textbf{p})$, the position and momentum variables. These points span what is called the phase space, which formally is defined as the cotangent bundle $T^{*}\mathcal{M}$ of the configuration space $\mathcal{M}$, for those with a background in differential geometry. Simply put, we can imagine the phase space as manifold that shows us both how our model evolves and how it is constrained in regards to the total energy within the system. Where the total energy of the system is given by the Hamiltonian, $H(\textbf{x},\textbf{p})$. The Hamiltonian is the Legendre transform of the Lagrangian and is formally defined as $
+H(\textbf{x}, \textbf{p})  = K(\textbf{p}) + U(\textbf{x})$ where $K(\textbf{p})$ represents our kinetic energy and $U(\textbf{x})$ is the potential energy and the Legendre transform is given by $H(\textbf{x},\textbf{p}) = \sum_{i = 1}^{d}\dot{x}_{l}p_{l} - L(\textbf{x}, \textbf{\.{x}}(\textbf{x}, \textbf{p})) $\footnote{The $\dot{}$ represents that the variable is differentiated w.r.t time.} where $d$ is the dimension of each variable.  
+Thus, for simplicity, if we set $d = 1$, we can derive Hamiltonian equations: \begin{equation}
+\frac{\partial H}{\partial p} = \dot{x} + p\frac{\partial \dot{x}}{\partial p} - \frac{\partial L}{\partial \dot{x}}\frac{\partial \dot{x}}{\partial p} = \dot{x} \end{equation}
 and 
 \begin{equation}
 \label{eq:hameq2}
-\frac{\partial H}{\partial q} = p\frac{\partial \dot{q}}{\partial q} - \frac{\partial L}{\partial q} - \frac{\partial L}{\partial \dot{q}}\frac{\partial \dot{q}}{\partial q} = - \frac{\partial L}{\partial q}= -\dot{p}  \end{equation}
-and the process is the same for more than one dimension. 
-where $K(p)$ represents our kinetic energy and $U(q)$ is the potential energy.
+\frac{\partial H}{\partial x} = p\frac{\partial \dot{x}}{\partial x} - \frac{\partial L}{\partial x} - \frac{\partial L}{\partial \dot{x}}\frac{\partial \dot{x}}{\partial x} = - \frac{\partial L}{\partial x}= -\dot{p}  \end{equation}
+from which we can vectorize for higher dimensions. It should be noted that the derivatives for the Lagrangian $L$, come from the Euler-Lagrange equations $\frac{d}{dt}\left(\frac{\partial L}{d\dot{x}}\right) = \frac{\partial L}{dx}$ and the Lagrangian itself, is just a reformulation of Newtonian mechanics.
 
-Within the HMC MCMC framework the ''positions", $q$, are the variables of interest and for each position variable we have to create a fictitious ''momentum", $p$. For compactness let $z = (q,p)$. The potential energy $U(q)$ will be the minus of the log of the probabilty density for the distribution of the position variables we wish to sample, plus \textbf{any} constant that is convenient.  The kinetic energy will represents the dynamics of our variables, for which a popular form of $K(p) = \frac{p^{T} M^{-1} p}{2}$, where $M$ is symmetric, positive definite and typically diagonal. This form of $K(p)$ corresponds to a minus the log probability of the zero mean Gaussian distribution with covariance matrix $M$. For this choice we can write the Hamiltonian equations, for any dimension $d$, as follows:
+Within the HMC MCMC framework the ''positions", $x$, are the variables of interest and for each position variable we have to create a fictitious ''momentum", $p$. For compactness let $z = (x,p)$. The potential energy $U(x)$ will be the minus of the log of the probabilty density for the distribution of the position variables we wish to sample, plus \textbf{any} constant that is convenient.  The kinetic energy will represents the dynamics of our variables, for which a popular form of $K(p) = \frac{p^{T} M^{-1} p}{2}$, where $M$ is symmetric, positive definite and typically diagonal. This form of $K(p)$ corresponds to a minus the log probability of the zero mean Gaussian distribution with covariance matrix $M$. For this choice we can write the Hamiltonian equations, for any dimension $d$, as follows:
 \begin{align}
 \label{eq:ham1neal}
-\dot{q}_{i} &= \frac{dq_{i}}{dt} = [M^{-1}p]_{i}\\
-\label{eq:ham2neal}
+\dot{x}_{i} &= \frac{dx_{i}}{dt} = [M^{-1}p]_{i}\\
+\label{ex:ham2neal}
 \dot{p}_{i} &= \frac{dp_{i}}{dt} = -\frac{\partial U}{\partial q_{i}}
 \end{align}
 
@@ -140,13 +133,13 @@ P(z) = \frac{1}{Z}\exp\left(\frac{-E(z)}{T}\right)
 \end{equation}
 As the Hamiltonian is just an energy function we may can insert \ref{eq:hamreduced}\ into our canonical distribution \ref{eq:canonical}\, which gives us the joint density:
 \begin{equation}
-P(q,p) = \frac{1}{Z}\exp(-U(q))\exp(-K(p)  
+P(x,p) = \frac{1}{Z}\exp(-U(x))\exp(-K(p)  
 \end{equation}
-where $T = 1$ is fixed. And so we can now very easily get to our target distribution $p(q)$, which is dependent on our choice of potential $U(q)$, as this expression factorizes in to two independent probability distributions. 
+where $T = 1$ is fixed. And so we can now very easily get to our target distribution $p(x)$, which is dependent on our choice of potential $U(x)$, as this expression factorizes in to two independent probability distributions. 
 We characterise the posterior distribution for the model parameters using the potential energy function: \begin{equation}
-U(q) = -\log[\pi(q)L(q|D)]
+U(x) = -\log[\pi(x)L(x|D)]
 \end{equation}
-where $\pi(q)$ is the prior distribution, and $L(q|D)$ is the likelihood, not the Lagrangian, of the given data $D$. 
+where $\pi(x)$ is the prior distribution, and $L(x|D)$ is the likelihood, not the Lagrangian, of the given data $D$. 
 
 \subsection{The Integrator}
 
@@ -155,19 +148,19 @@ The leapfrog method enables us to discretise Hamiltons equations and as it is a 
 We start with a state at $t = 0$ and then evaluate at a subsequent time $t + \epsilon , \hdots, t + n\epsilon$, where $\epsilon$ is the step in which we increase and $n$ is the number of time steps. 
 
 \begin{align}
-p_{i}(t + \frac{\epsilon}{2}) &= p_{i}(t) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(q(t))}{\partial q_{i}} \\
-q_{i}(t + \epsilon) &= q_{i}(t) + \epsilon\frac{\partial K(p(t + \frac{\epsilon}{2}))}{dp_{i}}\\
-p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(q(t+\epsilon))}{\partial q_{i}}
+p_{i}(t + \frac{\epsilon}{2}) &= p_{i}(t) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(x(t))}{\partial x_{i}} \\
+x_{i}(t + \epsilon) &= x_{i}(t) + \epsilon\frac{\partial K(p(t + \frac{\epsilon}{2}))}{dp_{i}}\\
+p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(x(t+\epsilon))}{\partial x_{i}}
 \end{align}
 \footnote{For the usual choice of kinetic energy, we have $\frac{\partial K(p + \frac{\epsilon}{2})}{dp_{i}} = \frac{p_{i}(t + \frac{\epsilon}{2})}{m_{i}}$}
 
 For the leapfrog method the local error, error after one step, is of $\mathcal{O}(\epsilon^{2})$ and a global error, error after simulating for some fixed time interval s, which requires $\frac{s}{\epsilon}$ is $\mathcal{O}(\epsilon^{3})$
 Neals implementation of the HMC can only be used to sample from continuous distributions on $\mathbb{R}^{d}$ for which a density function can be evaluated.\\
 We must be able to compute the partial derivative of the log of the density function, the joint. 
-HMC samples from the canonical distribution for $q$ and $p$. $q$ has the distribution of interest as specified by the potential $U(q)$. 
-The distribution of the $p$'s can be chosen by us and are independent of the $q$'s. 
+HMC samples from the canonical distribution for $x$ and $p$. $x$ has the distribution of interest as specified by the potential $U(x)$. 
+The distribution of the $p$'s can be chosen by us and are independent of the $x$'s. 
 The $p$ components are specified to be independent, with component $p_{i}$ having variance $m_{i}$.
-The kinetic energy $K(p) = \sum_{i =1}^{d}\frac{p_{i}^{2}}{2m_{i}}(q(t + \epsilon))
+The kinetic energy $K(p) = \sum_{i =1}^{d}\frac{p_{i}^{2}}{2m_{i}}(x(t + \epsilon))
 $
 \subsubsection{Properties of the Integrator}
 Reversibility
@@ -178,13 +171,13 @@ Reversibility
 	\item Step 1: Changes only the momentum
 	\item Step 2: May change both position and momentum
 \end{enumerate}
-Both steps leave the canonical distribution of (q,p) invariant, hence the distribution remains invariant.
+Both steps leave the canonical distribution of (x,p) invariant, hence the distribution remains invariant.
 
 In \textbf{Step 1} we first draw the $p_{i}$ randomly from their Gaussian distribution independently of the current values of the position values. 
-In \textbf{Step 2} a Metropolis update is performed, using the Hamiltonian dynamics to propose a new state. Starting with the current state $(q,p)$, Hamiltonian dynamics is simulated for $L$ steps using the leapfrog method, with a stepsize of $\epsilon$. $L$ and $\epsilon$ are parameters of the mnodel that need to be tuned.\\
-The momentum vairables at the end of this $L$-step trajectory are then negated, giving s proposed state $(q^{*}. p^{*})$. This proposed state is accepted as the next state in the Markov Chain with probability: \begin{multline}
-\min[1, \exp(-H(q^{*}, p^{*}) + H(p,q)] =\\
-\min[1, \exp(-U(q^{*}) + U(q) - K(p^{*}) + K(p))]
+In \textbf{Step 2} a Metropolis update is performed, using the Hamiltonian dynamics to propose a new state. Starting with the current state $(x,p)$, Hamiltonian dynamics is simulated for $L$ steps using the leapfrog method, with a stepsize of $\epsilon$. $L$ and $\epsilon$ are parameters of the mnodel that need to be tuned.\\
+The momentum vairables at the end of this $L$-step trajectory are then negated, giving s proposed state $(x^{*}. p^{*})$. This proposed state is accepted as the next state in the Markov Chain with probability: \begin{multline}
+\min[1, \exp(-H(x^{*}, p^{*}) + H(p,x)] =\\
+\min[1, \exp(-U(x^{*}) + U(x) - K(p^{*}) + K(p))]
 \end{multline} 
 \begin{algorithm}
 	\label{alg:simpHMC}
@@ -217,10 +210,10 @@ The momentum vairables at the end of this $L$-step trajectory are then negated, 
 If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
 The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.
 Where $U = -\log(\pi(x))$,  $M$ is the number of samples we wish to take , $(x^{'}, p^{'})$ is the generated proposal and we propose setting $x^{m} = x^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
-A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $q$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $q$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $q_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
+A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $x$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $x$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $x_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
 
 \section{Example Programs and Compiled Output}
-
+\label{sec:exampprog}
 \subsection{Programs}
 
 We now present a few simple FOPPL programs and discuss both their statistical and syntactic structures. 
@@ -231,44 +224,40 @@ The conjugate Gaussian, is a model in which we can analytically calculate the tr
 
 Thus, the joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}^{2}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. Where in this model $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. Thus the true mean that our model should infer is $\bar{\mu} = 5$. 
 \subsection{Conditional If}
-The \mintinline{clojure}{if} statement is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired. 
 \inputminted{clojure}{code/conditionalif.clj}
-I
+The \mintinline{clojure}{if} statement is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired, which is why we need additional MCMC methods. In this model, we have a joint distribution of the form $p(x,y) \propto p(x|y) = \mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}$, where $\mathbb{I}(\cdot)$ represents the indicator function. If we are to analytically calculate the mean, we have to look at the case where $x < 0$ and the case where $x>0$. Using the sum rule the evidence can be found by $p(y) = \int p(x,y) dx $, which we analytically calculate to be, $p_{x<0}(y) = -\mathcal{N}(y=1|-1,1)\sqrt{2\pi}$ and for $x>0$ we have  $p_{x>0}(y) = \mathcal{N}(y=1| 1,1)\sqrt{2\pi}$. Thus, by Bayes rule, the full posterior is given as $p(x | y) = \frac{p(y|x)p(x)}{p(y)} = \frac{\mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}}{\sqrt{(2\pi)(\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)} + \mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)} )}}$ and so for $x < 0$,  $\mathbb{E}[x < 0|y] = \frac{-1}{\sqrt{2\pi}} $ and for $x > 0$ we have $\mathbb{E}[x > 0|y] = \frac{1}{\sqrt{2\pi}}$. 
 \subsection{Linear Regression}
 \inputminted{clojure}{code/linearregression.clj}
+In this problem we have a set of points $(x,y)$ and we wish to infer equation of a line in a Bayesian manner, that goes through all of those points. To do this, we must infer the slope and the bias of the line, which is done by placing priors on our parameters of interest and observations. We can analytically calculate the equation of a straight line by using the formula $\left(\frac{y - y_{*}}{x - x_{*}}\right) = m$, which leads to $y = mx + b$. From this we find that the true slope $m = 1.6$ and the bias $b = 0.5$.
 
-
-\subsubsection{Models and Results}
-
-Here we introduce a section of simple models and the results of inference via our custom built HMC sampler on those programs. For a sample output of the compiler for the linear regression program, please see section \ref{sec:supmat}. 
-\paragraph{Fourth Level Heading}
+\subsection{Experimental Results}
 \begin{figure*}[ht]
 	\centering
-	\subcaptionbox{Fig1}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conjgauss/figures/histogram.pdf}}\quad
-	\subcaptionbox{Fig2}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conjgauss/figures/trace.pdf}}\quad
-	\subcaptionbox{Fig3}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conjgauss/figures/Autocorrelationplot.pdf}}
 	
 	\bigskip
 	
-	\subcaptionbox{Fig4}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conditionalif/figures/histogram.pdf}}\quad
-	\subcaptionbox{Fig5}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conditionalif/figures/trace.pdf}}\quad
-	\subcaptionbox{Fig6}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conditionalif/figures/Autocorrelationplot.pdf}}
 	
 	\bigskip
 	
-    \subcaptionbox{Fig1}[.3\linewidth][c]{%
+    \subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{linearreg/figures/histogram.pdf}}\quad
-	\subcaptionbox{Fig2}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{linearreg/figures/trace.pdf}}\quad
-	\subcaptionbox{Fig3}[.3\linewidth][c]{%
+	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{linearreg/figures/Autocorrelationplot.pdf}}
-	\caption{All plots}
+	\caption{Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. The top row represents the conjugate Gaussian model, the middle row represents the conditional if model and the bottom row represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, represents the slope of the line.  }
 \end{figure*}
 %\begin{figure}[ht]
 %	\centering
@@ -321,49 +310,41 @@ Here we introduce a section of simple models and the results of inference via ou
 %		\input{conjgauss/figures/histogram.pgf}
 %	\end{center}
 %	\vspace{0.3in}
-%\end{figure}
-Fourth level headings must be flush left, initial caps, bold, and
-Roman type.  Use one line space before the fourth level heading, and
-place the section text immediately after the heading with no line
-break, but an 11 point horizontal space.
+%%\end{figure}
+%Fourth level headings must be flush left, initial caps, bold, and
+%Roman type.  Use one line space before the fourth level heading, and
+%place the section text immediately after the heading with no line
+%break, but an 11 point horizontal space.
 
 \subsection{CITATIONS, FIGURES, REFERENCES}
 
 
 \subsubsection{Citations in Text}
 
-Citations within the text should include the author's last name and
-year, e.g., (Cheesman, 1985). References should follow any style that
-you are used to using, as long as their style is consistent throughout
-the paper.  Be sure that the sentence reads correctly if the citation
-is deleted: e.g., instead of ``As described by (Cheesman, 1985), we
-first frobulate the widgets,'' write ``As described by Cheesman
-(1985), we first frobulate the widgets.''  %Be sure to avoid
-%accidentally disclosing author identities through citations.
+%Citations within the text should include the author's last name and
+%year, e.g., (Cheesman, 1985). References should follow any style that
+%you are used to using, as long as their style is consistent throughout
+%the paper.  Be sure that the sentence reads correctly if the citation
+%is deleted: e.g., instead of ``As described by (Cheesman, 1985), we
+%first frobulate the widgets,'' write ``As described by Cheesman
+%(1985), we first frobulate the widgets.''  %Be sure to avoid
+%%accidentally disclosing author identities through citations.
 
 \subsubsection{Footnotes}
 
-Indicate footnotes with a number\footnote{Sample of the first
-  footnote.} in the text. Use 8 point type for footnotes. Place the
-footnotes at the bottom of the column in which their markers appear,
-continuing to the next column if required. Precede the footnote
-section of a column with a 0.5 point horizontal rule 1~inch (6~picas)
-long.\footnote{Sample of the second footnote.}
+%Indicate footnotes with a number\footnote{Sample of the first
+%  footnote.} in the text. Use 8 point type for footnotes. Place the
+%footnotes at the bottom of the column in which their markers appear,
+%continuing to the next column if required. Precede the footnote
+%section of a column with a 0.5 point horizontal rule 1~inch (6~picas)
+%long.\footnote{Sample of the second footnote.}
 
 \subsubsection{Figures}
 
-All artwork must be centered, neat, clean, and legible.  All lines
-should be very dark for purposes of reproduction, and art work should
-not be hand-drawn.  Figures may appear at the top of a column, at the
-top of a page spanning multiple columns, inline within a column, or
-with text wrapped around them, but the figure number and caption
-always appear immediately below the figure.  Leave 2 line spaces
-between the figure and the caption. The figure caption is initial caps
-and each figure should be numbered consecutively.
 
-Make sure that the figure caption does not get separated from the
-figure. Leave extra white space at the bottom of the page rather than
-splitting the figure and figure caption.
+%Make sure that the figure caption does not get separated from the
+%figure. Leave extra white space at the bottom of the page rather than
+%splitting the figure and figure caption.
 %\begin{figure}[ht]
 %	\vspace{.3in}
 %	\centering
@@ -379,90 +360,90 @@ splitting the figure and figure caption.
 %\vspace{.3in}
 %\caption{Sample Figure Caption}
 %\end{figure}
-
-\subsubsection{Tables}
-
-All tables must be centered, neat, clean, and legible. Do not use hand-drawn tables. Table number and title always appear above the table.
-See Table~\ref{sample-table}.
-
-Use one line space before the table title, one line space after the table title, and one line space after the table. The table title must be
-initial caps and each table numbered consecutively.
-
-%\begin{table}
-%\caption{Sample Table Title} \label{sample-table}
-%\begin{center}
-%\begin{tabular}{ll}
-%{\bf PART}  &{\bf DESCRIPTION} \\
-%\hline \\
-%Dendrite         &Input terminal \\
-%Axon             &Output terminal \\
-%Soma             &Cell body (contains cell nucleus) \\
-%\end{tabular}
-%\end{center}git 
-%\end{table}
+%
+%\subsubsection{Tables}
+%
+%All tables must be centered, neat, clean, and legible. Do not use hand-drawn tables. Table number and title always appear above the table.
+%See Table~\ref{sample-table}.
+%
+%Use one line space before the table title, one line space after the table title, and one line space after the table. The table title must be
+%initial caps and each table numbered consecutively.
+%
+%%\begin{table}
+%%\caption{Sample Table Title} \label{sample-table}
+%%\begin{center}
+%%\begin{tabular}{ll}
+%%{\bf PART}  &{\bf DESCRIPTION} \\
+%%\hline \\
+%%Dendrite         &Input terminal \\
+%%Axon             &Output terminal \\
+%%Soma             &Cell body (contains cell nucleus) \\
+%%\end{tabular}
+%%\end{center}git 
+%%\end{table}
 
 \section{Supplementary Material}
 \label{sec:supmat}
 
 In the supplementary material we show sum examples of the compiler output for the various models shown and we also discuss the implementation of the HMC algorithm itself in pytorch. 
 \inputminted{python}{code/lr_out.py}
-
+\inputminted{python}{code/hmc_class.py}
 \section{INSTRUCTIONS FOR CAMERA-READY PAPERS}
 
-For the camera-ready paper, if you are using \LaTeX, please make sure
-that you follow these instructions.  (If you are not using \LaTeX,
-please make sure to achieve the same effect using your chosen
-typesetting package.) Blah blah
+%For the camera-ready paper, if you are using \LaTeX, please make sure
+%that you follow these instructions.  (If you are not using \LaTeX,
+%please make sure to achieve the same effect using your chosen
+%typesetting package.) Blah blah
 
-\begin{enumerate}
-    \item Download \texttt{fancyhdr.sty} -- the
-    \texttt{aistats2017.sty} file will make use of it.
-    \item Begin your document with
-    \begin{flushleft}
-    \texttt{\textbackslash documentclass[twoside]\{article\}}\\
-    \texttt{\textbackslash usepackage[accepted]\{aistats2017\}}
-    \end{flushleft}
-    The \texttt{twoside} option for the class article allows the
-    package \texttt{fancyhdr.sty} to include headings for even and odd
-    numbered pages. The option \texttt{accepted} for the package
-    \texttt{aistats2017.sty} will write a copyright notice at the end of
-    the first column of the first page. This option will also print
-    headings for the paper.  For the \emph{even} pages, the title of
-    the paper will be used as heading and for \emph{odd} pages the
-    author names will be used as heading.  If the title of the paper
-    is too long or the number of authors is too large, the style will
-    print a warning message as heading. If this happens additional
-    commands can be used to place as headings shorter versions of the
-    title and the author names. This is explained in the next point.
-    \item  If you get warning messages as described above, then
-    immediately after $\texttt{\textbackslash
-    begin\{document\}}$, write
-    \begin{flushleft}
-    \texttt{\textbackslash runningtitle\{Provide here an alternative shorter version of the title of your
-    paper\}}\\
-    \texttt{\textbackslash runningauthor\{Provide here the surnames of the authors of your paper, all separated by
-    commas\}}
-    \end{flushleft}
-    Note that the text that appears as argument in \texttt{\textbackslash
-      runningtitle} will be printed as a heading in the \emph{even}
-    pages. The text that appears as argument in \texttt{\textbackslash
-      runningauthor} will be printed as a heading in the \emph{odd}
-    pages.  If even the author surnames do not fit, it is acceptable
-    to give a subset of author names followed by ``et al.''
-
-    \item Use the file sample\_paper.tex as an example.
-
-    \item The camera-ready versions of the accepted papers are 8
-      pages, plus any additional pages needed for references.
-
-    \item If you need to include additional appendices,
-      you can include them in the supplementary
-      material file.
-
-    \item Please, don't change the layout given by the above
-      instructions and by the style file.
-
-\end{enumerate}
+%\begin{enumerate}
+%    \item Download \texttt{fancyhdr.sty} -- the
+%    \texttt{aistats2017.sty} file will make use of it.
+%    \item Begin your document with
+%    \begin{flushleft}
+%    \texttt{\textbackslash documentclass[twoside]\{article\}}\\
+%    \texttt{\textbackslash usepackage[accepted]\{aistats2017\}}
+%    \end{flushleft}
+%    The \texttt{twoside} option for the class article allows the
+%    package \texttt{fancyhdr.sty} to include headings for even and odd
+%    numbered pages. The option \texttt{accepted} for the package
+%    \texttt{aistats2017.sty} will write a copyright notice at the end of
+%    the first column of the first page. This option will also print
+%    headings for the paper.  For the \emph{even} pages, the title of
+%    the paper will be used as heading and for \emph{odd} pages the
+%    author names will be used as heading.  If the title of the paper
+%    is too long or the number of authors is too large, the style will
+%    print a warning message as heading. If this happens additional
+%    commands can be used to place as headings shorter versions of the
+%    title and the author names. This is explained in the next point.
+%    \item  If you get warning messages as described above, then
+%    immediately after $\texttt{\textbackslash
+%    begin\{document\}}$, write
+%    \begin{flushleft}
+%    \texttt{\textbackslash runningtitle\{Provide here an alternative shorter version of the title of your
+%    paper\}}\\
+%    \texttt{\textbackslash runningauthor\{Provide here the surnames of the authors of your paper, all separated by
+%    commas\}}
+%    \end{flushleft}
+%    Note that the text that appears as argument in \texttt{\textbackslash
+%      runningtitle} will be printed as a heading in the \emph{even}
+%    pages. The text that appears as argument in \texttt{\textbackslash
+%      runningauthor} will be printed as a heading in the \emph{odd}
+%    pages.  If even the author surnames do not fit, it is acceptable
+%    to give a subset of author names followed by ``et al.''
+%
+%    \item Use the file sample\_paper.tex as an example.
+%
+%    \item The camera-ready versions of the accepted papers are 8
+%      pages, plus any additional pages needed for references.
+%
+%    \item If you need to include additional appendices,
+%      you can include them in the supplementary
+%      material file.
+%
+%    \item Please, don't change the layout given by the above
+%      instructions and by the style file.
+%
+%\end{enumerate}
 
 \subsubsection*{Acknowledgements}
 

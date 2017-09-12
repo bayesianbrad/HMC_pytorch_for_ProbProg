@@ -1,0 +1,69 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\select@language{english}
+\@writefile{toc}{\select@language{english}}
+\@writefile{lof}{\select@language{english}}
+\@writefile{lot}{\select@language{english}}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Intro to HMC MCMC}{1}{section.0.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Metropolis-hastings algorithm}{1}{subsection.0.1.1}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Metropolis-Hasting algorithm}}{1}{algorithm.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}HMC for MCMC}{1}{subsection.0.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{Prerequisites}{1}{section*.1}}
+\newlabel{eq:hamiltonian}{{1}{2}{Prerequisites}{equation.0.1.1}{}}
+\newlabel{eq:hameq1}{{2}{2}{Prerequisites}{equation.0.1.2}{}}
+\newlabel{eq:hameq2}{{3}{2}{Prerequisites}{equation.0.1.3}{}}
+\newlabel{eq:hamreduced}{{4}{2}{Prerequisites}{equation.0.1.4}{}}
+\newlabel{eq:canonical}{{7}{2}{Prerequisites}{equation.0.1.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}The Integrator}{3}{subsection.0.1.3}}
+\@writefile{toc}{\contentsline {subsubsection}{The leapfrog method}{3}{section*.2}}
+\@writefile{toc}{\contentsline {subsubsection}{Some initial points of notice}{3}{section*.3}}
+\@writefile{toc}{\contentsline {subsubsection}{The steps}{4}{section*.4}}
+\newlabel{alg:simpHMC}{{1.3}{4}{The steps}{equation.0.1.14}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces \textbf  {Continuous Hamiltonian Monte Carlo MCMC}}}{4}{algorithm.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Discrete 'Discontinuous' Hamiltonian Monte Carlo (DHMC)}{5}{section.0.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Embedding Discrete Parameters Into a Continuous Space}{5}{subsection.0.2.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces A view of our continuous embedding of a discrete parameter. The shaded region represents the piecewise constant prior density $\pi _{\mathaccentV {tilde}07E{N}}(\mathaccentV {tilde}07E{n})$ over $\mathaccentV {tilde}07E{N}$}}{6}{figure.0.1}}
+\newlabel{fig:contembedding}{{1}{6}{A view of our continuous embedding of a discrete parameter. The shaded region represents the piecewise constant prior density $\pi _{\tilde {N}}(\tilde {n})$ over $\tilde {N}$}{figure.0.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Why does the HMC fail for discrete parameters}{6}{section*.5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Resolution}{6}{subsection.0.2.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Defining the trajectory}{7}{subsection.0.2.3}}
+\newlabel{eq:discpoint}{{16}{7}{Defining the trajectory}{equation.0.2.16}{}}
+\newlabel{fig:bounceback}{{2.3}{8}{Defining the trajectory}{equation.0.2.19}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces If there is not enough momentum energy, then the particle cannot progress to the step}}{8}{figure.0.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}The need for a new momentum}{9}{subsection.0.2.4}}
+\newlabel{eq:hamlaplace1}{{20}{9}{The need for a new momentum}{equation.0.2.20}{}}
+\newlabel{eq:hamlaplace2}{{21}{9}{The need for a new momentum}{equation.0.2.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Creating an Integrator for Laplace Momentum via Operator Splitting}{9}{subsection.0.2.5}}
+\newlabel{alg:intcord}{{2.5}{10}{Creating an Integrator for Laplace Momentum via Operator Splitting}{equation.0.2.25}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Integrator step for purely discrete parameters, with Laplace momentum}}{10}{algorithm.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Mixing Continuous and Discrete Parameters }{10}{subsection.0.2.6}}
+\@writefile{toc}{\contentsline {subsubsection}{The Role of the mass matrix and stepsize}{10}{section*.6}}
+\newlabel{alg:intforDHMC}{{2.6}{11}{Mixing Continuous and Discrete Parameters}{equation.0.2.26}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Integrator for discontinuous HMC}}{11}{algorithm.4}}
+\newlabel{eq:condforeps}{{27}{11}{The Role of the mass matrix and stepsize}{equation.0.2.27}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Automatic differentiation AD}{11}{section.0.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Variable}}{12}{figure.0.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Automatic Differentiation in Pytorch}{12}{subsection.0.3.1}}
+\@writefile{toc}{\contentsline {subsubsection}{Variable}{12}{section*.7}}
+\@writefile{toc}{\contentsline {subsubsection}{Gradients}{12}{section*.8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Neural Networks in Torch}{12}{subsection.0.3.2}}
+\@writefile{toc}{\contentsline {subsubsection}{Training Procedure}{12}{section*.9}}
+\@writefile{toc}{\contentsline {subsubsection}{Loss function}{13}{section*.10}}
+\@writefile{toc}{\contentsline {subsubsection}{Backprop}{13}{section*.11}}
+\@writefile{toc}{\contentsline {subsubsection}{Updating the Weights}{13}{section*.12}}
