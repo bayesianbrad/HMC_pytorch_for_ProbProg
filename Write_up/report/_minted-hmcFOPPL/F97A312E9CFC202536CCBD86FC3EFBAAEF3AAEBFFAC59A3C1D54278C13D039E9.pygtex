@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{c24039}\PYG{o}{=} \PYG{n}{Variable}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{1.0}\PYG{p}{]))}
+\PYG{n}{c24040}\PYG{o}{=} \PYG{n}{Variable}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{2.0}\PYG{p}{]))}
+\PYG{n}{x24041} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{c24039}\PYG{p}{,} \PYG{n}{c24040}\PYG{p}{)}
+\PYG{n}{x22542} \PYG{o}{=} \PYG{n}{Variable}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{0.0}\PYG{p}{]),}\PYGZbs{}
+  \PYG{n}{requires\PYGZus{}grad} \PYG{o}{=} \PYG{n+nb+bp}{True}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} x22542.detach()}
+\PYG{c+c1}{\PYGZsh{} x22542 = x24041.sample()   \PYGZsh{}sample}
+\PYG{n}{p24042} \PYG{o}{=} \PYG{n}{x24041}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{x22542}\PYG{p}{)}
+\PYG{n}{c24043}\PYG{o}{=} \PYG{n}{Variable}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{3.0}\PYG{p}{]))}
+\PYG{n}{x24044} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{x22542}\PYG{p}{,} \PYG{n}{c24043}\PYG{p}{)}
+\PYG{n}{c24045}\PYG{o}{=} \PYG{n}{Variable}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{7.0}\PYG{p}{]))}
+\PYG{n}{y22543} \PYG{o}{=} \PYG{n}{c24045}
+\PYG{n}{p24046} \PYG{o}{=} \PYG{n}{x24044}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{y22543}\PYG{p}{)}
+\PYG{n}{p24047} \PYG{o}{=} \PYG{n}{Variable}\PYG{o}{.}\PYG{n}{add}\PYG{p}{(}\PYG{n}{p24042}\PYG{p}{,}\PYG{n}{p24046}\PYG{p}{)}
+
+\PYG{k}{return} \PYG{n}{p24047}\PYG{p}{,} \PYG{n}{x22542}
+\end{Verbatim}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.1)  13 SEP 2017 12:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.1)  13 SEP 2017 19:09
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -932,28 +932,25 @@ Overfull \hbox (5.1225pt too wide) in paragraph at lines 82--82
 
 
 ]
-LaTeX Font Info:    Try loading font information for U+dsrom on input line 122.
+LaTeX Font Info:    Try loading font information for U+dsrom on input line 126.
 
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/doublestroke/Udsrom.fd
 File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
-)
+) [2]
+Underfull \vbox (badness 4467) has occurred while \output is active []
 
-LaTeX Warning: Reference `eq:ham1neal' on page 2 undefined on input line 143.
-
-
-LaTeX Warning: Reference `eq:ham2neal' on page 2 undefined on input line 143.
-
-[2]
-Underfull \hbox (badness 1331) in paragraph at lines 151--151
-[][]\OT1/cmr/m/n/9 For the usual choice of ki-netic en-ergy, we have
- []
-
-[3]
+ [3]
 \openout5 = `hmcFOPPL.pyg'.
 
- (./_minted-hmcFOPPL/default-pyg-prefix.pygstyle)
+
+(./_minted-hmcFOPPL/default-pyg-prefix.pygstyle)
 (./_minted-hmcFOPPL/default.pygstyle)
+(./_minted-hmcFOPPL/521CD7B832CF88BC7BF0F85F4AFF993B72727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+\openout5 = `hmcFOPPL.pyg'.
+
+
 (./_minted-hmcFOPPL/5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F721
 8BB2F.pygtex)
 \openout5 = `hmcFOPPL.pyg'.
@@ -970,6 +967,21 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 )
+Underfull \hbox (badness 3780) in paragraph at lines 210--211
+[]\OT1/cmr/m/n/10 This model has the fol-low-ing joint $\OML/cmm/m/it/10 p\OT1/
+cmr/m/n/10 (\OML/cmm/m/it/10 x; y\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 /
+ []
+
+
+Underfull \hbox (badness 1824) in paragraph at lines 210--211
+\OML/cmm/m/it/10 p\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x\OMS/cmsy/m/n/10 j\OML/cmm
+/m/it/10 y\OT1/cmr/m/n/10 ) = \OML/cmm/m/it/10 p\OT1/cmr/m/n/10 (\OML/cmm/m/it/
+10 x\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 p\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 y\OMS/
+cmsy/m/n/10 j\OML/cmm/m/it/10 x\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 N\OT1/cmr/m
+/n/10 ([]\OML/cmm/m/it/10 ; []\OT1/cmr/m/n/10 )$, where $[] =
+ []
+
+
 (./_minted-hmcFOPPL/A9CF3BAB1C38B2BE08A8B83D22C141BBAE57070365791F059845F4892B9
 50592.pygtex) (./conif.tex
 
@@ -1031,6 +1043,21 @@ Missing character: There is no ; in font nullfont!
 
 (./_minted-hmcFOPPL/F78FFCB5C1E00AC6DC34B14F9971BF1B72727C7201BBAAF487438A8F721
 8BB2F.pygtex)
+Underfull \hbox (badness 1895) in paragraph at lines 219--220
+[] \OT1/cmr/m/n/10 = []$
+ []
+
+
+Underfull \hbox (badness 3679) in paragraph at lines 219--220
+\OT1/cmr/bx/n/10 IN THIS SEC-TION I NEED TO ADD
+ []
+
+
+Underfull \hbox (badness 1281) in paragraph at lines 219--220
+\OT1/cmr/bx/n/10 LINKS TO FIG-URES AND HOPE-FULLY
+ []
+
+
 (./_minted-hmcFOPPL/2887264127C627F56AC089B94280C71172B6B6C141C549D87D203AB2025
 A790F.pygtex [4]) (./linearreg.tex
 Missing character: There is no ; in font nullfont!
@@ -1042,95 +1069,117 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 )
-<conjgauss/figures/histogram.pdf, id=45, 289.08pt x 289.08pt>
+\openout5 = `hmcFOPPL.pyg'.
+
+
+(./_minted-hmcFOPPL/5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+Underfull \hbox (badness 1454) in paragraph at lines 228--230
+\OT1/cmr/m/n/10 fore, we can con-struct the joint for this model
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 228--230
+
+ []
+
+<conjgauss/figures/histogram.pdf, id=47, 289.08pt x 289.08pt>
 File: conjgauss/figures/histogram.pdf Graphic file (type pdf)
 
 <use conjgauss/figures/histogram.pdf>
-Package pdftex.def Info: conjgauss/figures/histogram.pdf used on input line 251
+Package pdftex.def Info: conjgauss/figures/histogram.pdf used on input line 235
 .
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conjgauss/figures/trace.pdf, id=46, 289.08pt x 289.08pt>
+<conjgauss/figures/trace.pdf, id=48, 289.08pt x 289.08pt>
 File: conjgauss/figures/trace.pdf Graphic file (type pdf)
 
 <use conjgauss/figures/trace.pdf>
-Package pdftex.def Info: conjgauss/figures/trace.pdf used on input line 253.
+Package pdftex.def Info: conjgauss/figures/trace.pdf used on input line 237.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conjgauss/figures/Autocorrelationplot.pdf, id=47, 289.08pt x 289.08pt>
+<conjgauss/figures/Autocorrelationplot.pdf, id=49, 289.08pt x 289.08pt>
 File: conjgauss/figures/Autocorrelationplot.pdf Graphic file (type pdf)
 
 <use conjgauss/figures/Autocorrelationplot.pdf>
 Package pdftex.def Info: conjgauss/figures/Autocorrelationplot.pdf used on inpu
-t line 255.
+t line 239.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conditionalif/figures/histogram.pdf, id=48, 289.08pt x 289.08pt>
+<conditionalif/figures/histogram.pdf, id=50, 289.08pt x 289.08pt>
 File: conditionalif/figures/histogram.pdf Graphic file (type pdf)
 
 <use conditionalif/figures/histogram.pdf>
 Package pdftex.def Info: conditionalif/figures/histogram.pdf used on input line
- 260.
+ 243.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conditionalif/figures/trace.pdf, id=49, 289.08pt x 289.08pt>
+<conditionalif/figures/trace.pdf, id=51, 289.08pt x 289.08pt>
 File: conditionalif/figures/trace.pdf Graphic file (type pdf)
 
 <use conditionalif/figures/trace.pdf>
-Package pdftex.def Info: conditionalif/figures/trace.pdf used on input line 262
+Package pdftex.def Info: conditionalif/figures/trace.pdf used on input line 245
 .
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conditionalif/figures/Autocorrelationplot.pdf, id=50, 289.08pt x 289.08pt>
+<conditionalif/figures/Autocorrelationplot.pdf, id=52, 289.08pt x 289.08pt>
 File: conditionalif/figures/Autocorrelationplot.pdf Graphic file (type pdf)
 
 <use conditionalif/figures/Autocorrelationplot.pdf>
 Package pdftex.def Info: conditionalif/figures/Autocorrelationplot.pdf used on 
-input line 264.
+input line 247.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<linearreg/figures/histogram.pdf, id=51, 289.08pt x 289.08pt>
+<linearreg/figures/histogram.pdf, id=53, 289.08pt x 289.08pt>
 File: linearreg/figures/histogram.pdf Graphic file (type pdf)
 
 <use linearreg/figures/histogram.pdf>
-Package pdftex.def Info: linearreg/figures/histogram.pdf used on input line 269
+Package pdftex.def Info: linearreg/figures/histogram.pdf used on input line 251
 .
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<linearreg/figures/trace.pdf, id=52, 289.08pt x 289.08pt>
+<linearreg/figures/trace.pdf, id=54, 289.08pt x 289.08pt>
 File: linearreg/figures/trace.pdf Graphic file (type pdf)
 
 <use linearreg/figures/trace.pdf>
-Package pdftex.def Info: linearreg/figures/trace.pdf used on input line 271.
+Package pdftex.def Info: linearreg/figures/trace.pdf used on input line 253.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<linearreg/figures/Autocorrelationplot.pdf, id=53, 289.08pt x 289.08pt>
+<linearreg/figures/Autocorrelationplot.pdf, id=55, 289.08pt x 289.08pt>
 File: linearreg/figures/Autocorrelationplot.pdf Graphic file (type pdf)
 
 <use linearreg/figures/Autocorrelationplot.pdf>
 Package pdftex.def Info: linearreg/figures/Autocorrelationplot.pdf used on inpu
-t line 273.
+t line 255.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-(./_minted-hmcFOPPL/9823664C2DC30D20811EC4DD60D8F078DD5FA18C19FEF2EE049C084D6AD
-88DC2.pygtex)
-(./_minted-hmcFOPPL/23F234C24DB27B434E8BB4BEF48DEA18FFD0E27758DDABE43ECA8E8A64C
-FA641.pygtex
-Underfull \vbox (badness 2689) has occurred while \output is active []
-
- [5]
+(./_minted-hmcFOPPL/F97A312E9CFC202536CCBD86FC3EFBAAEF3AAEBFFAC59A3C1D54278C13D
+039E9.pygtex
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 )
+(./_minted-hmcFOPPL/2F7B2CA8F10502CAB4F829EF9FE42652DD5FA18C19FEF2EE049C084D6AD
+88DC2.pygtex [5]
 Underfull \vbox (badness 10000) has occurred while \output is active []
+
+)
+(./_minted-hmcFOPPL/D696981D3A5EB640AB8249B6330267BFFFD0E27758DDABE43ECA8E8A64C
+FA641.pygtex
+Underfull \vbox (badness 2020) has occurred while \output is active []
 
  [6 <./conjgauss/figures/histogram.pdf> <./conjgauss/figures/trace.pdf> <./conj
 gauss/figures/Autocorrelationplot.pdf> <./conditionalif/figures/histogram.pdf> 
 <./conditionalif/figures/trace.pdf> <./conditionalif/figures/Autocorrelationplo
 t.pdf> <./linearreg/figures/histogram.pdf> <./linearreg/figures/trace.pdf> <./l
-inearreg/figures/Autocorrelationplot.pdf>] (./hmcFOPPL.bbl
+inearreg/figures/Autocorrelationplot.pdf>])
+(./_minted-hmcFOPPL/F97A312E9CFC202536CCBD86FC3EFBAAEF3AAEBFFAC59A3C1D54278C13D
+039E9.pygtex
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+)
+(./hmcFOPPL.bbl
 ! Undefined control sequence.
-l.44 \newblock \url
+l.50 \newblock \url
                    {https://github.com/pytorch/pytorch}.
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1138,60 +1187,59 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-) [7
+[7]) [8
 
 ] (./hmcFOPPL.aux)
-
-LaTeX Warning: There were undefined references.
-
 runsystem(rm hmcFOPPL.pyg)...executed.
 
  ) 
 Here is how much of TeX's memory you used:
- 21716 strings out of 492995
- 440247 string characters out of 6132705
- 555415 words of memory out of 5000000
- 24793 multiletter control sequences out of 15000+600000
+ 21742 strings out of 492995
+ 441381 string characters out of 6132705
+ 556798 words of memory out of 5000000
+ 24810 multiletter control sequences out of 15000+600000
  13006 words of font info for 53 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 48i,12n,78p,1555b,802s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 48i,11n,78p,1778b,802s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
-</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></
-usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></us
-r/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></us
-r/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr
-/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.pfb></
-usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></
-usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></u
-sr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr
-/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/l
-ocal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/loc
-al/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local
-/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/t
-exlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/tex
-live/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texliv
-e/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2
-017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2017
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2017/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2017/texmf
--dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2017/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2017/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2017/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2017/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2017/texmf-dist/fo
-nts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2017/texmf-dist/font
-s/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2017/texmf-dist/fonts
-/type1/public/doublestroke/dsrom10.pfb></usr/local/texlive/2017/texmf-dist/font
-s/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2017/texmf-dist/
-fonts/type1/public/amsfonts/symbols/msbm5.pfb></usr/local/texlive/2017/texmf-di
-st/fonts/type1/public/amsfonts/symbols/msbm7.pfb></usr/local/texlive/2017/texmf
--dist/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2017/texmf-d
-ist/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on hmcFOPPL.pdf (7 pages, 528937 bytes).
+</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx6.pfb></
+usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></us
+r/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/
+local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/
+local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/l
+ocal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.pfb></us
+r/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmitt10.pfb></us
+r/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr
+/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/l
+ocal/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/loc
+al/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local
+/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/t
+exlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/tex
+live/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texli
+ve/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/
+2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/201
+7/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2017/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2017/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2017/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2017/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2017/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2017/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2017/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2017/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2017/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2017/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2017/texmf-dist/fonts/typ
+e1/public/doublestroke/dsrom10.pfb></usr/local/texlive/2017/texmf-dist/fonts/ty
+pe1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2017/texmf-dist/font
+s/type1/public/amsfonts/symbols/msbm5.pfb></usr/local/texlive/2017/texmf-dist/f
+onts/type1/public/amsfonts/symbols/msbm7.pfb></usr/local/texlive/2017/texmf-dis
+t/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2017/texmf-dist/
+fonts/type1/public/cm-super/sfrm1000.pfb>
+Output written on hmcFOPPL.pdf (8 pages, 546169 bytes).
 PDF statistics:
- 290 PDF objects out of 1000 (max. 8388607)
- 236 compressed objects within 3 object streams
+ 301 PDF objects out of 1000 (max. 8388607)
+ 244 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
  58 words of extra memory for PDF output out of 10000 (max. 10000000)
 

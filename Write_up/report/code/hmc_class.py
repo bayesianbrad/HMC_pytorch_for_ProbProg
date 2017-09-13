@@ -2,7 +2,6 @@ import torch
 import numpy as np
 import importlib
 from torch.autograd import Variable
-from Utils.core import VariableCast
 from Utils.kinetic import Kinetic
 from Utils.integrator import Integrator
 from Utils.metropolis_step import Metropolis

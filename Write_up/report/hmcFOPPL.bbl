@@ -10,6 +10,12 @@ Berg, B.~A. and Billoire, A. (2008).
 \newblock {\em Markov chain monte carlo simulations}.
 \newblock Wiley Online Library.
 
+\bibitem[Blanes and Iserles, 2012]{blanes2012explicit}
+Blanes, S. and Iserles, A. (2012).
+\newblock Explicit adaptive symplectic integrators for solving hamiltonian
+  systems.
+\newblock {\em Celestial Mechanics and Dynamical Astronomy}.
+
 \bibitem[Duane et~al., 1987]{duane1987hybrid}
 Duane, S., Kennedy, A.~D., Pendleton, B.~J., and Roweth, D. (1987).
 \newblock Hybrid monte carlo.

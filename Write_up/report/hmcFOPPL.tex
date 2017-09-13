@@ -104,22 +104,26 @@ In this work we make two contributions, we introduce a FOPPL compiler that trans
 In section \ref{sec:foppl} we talk about FOPPL, its syntax and primary use, in section \ref{sec:hmc} we introduce HMC, in section \ref{sec:exampprog} we give examples of FOPPL programs and the results generated through HMC inference. In section \ref{sec:supmat} we provide details of HMC implementation and some examples of the compiled FOPPL output. 
 \section{FOPPL}
 \label{sec:foppl}
-In this section include some stuff about FOPPL, what is it, the syntax etc.  
+In this section include some stuff about FOPPL, what is it, the syntax etc.  The length of the loops are deterministic and finite, whereas in higher order probabilistic programming languages enable a loop to be unrolled an infinite number of times. 
 \section{Hamiltonian Monte Carlo}
 \label{sec:hmc}
 In a top level view HMC is a two step process. In step one we define a Hamiltonian function in terms of the probability distribution of the model that we aim to perform inference on and in step two, HMC proposes new states generated via Hamiltonian dynamics for which we apply Metropolis updates. As the proposals are being generated via a physical process, we are able to comprehensively explore our model space \citep{neal2011mcmc}. This is in part due to certain physical properties of the Hamiltonian itself, that make HMC a very powerful, multi-purpose inference algorithm. Adopting the notations from the machine learning literature, we use $\textbf{x} \in \mathbb{R}^{n \times d}$ to represent the parameters of interest, our latent variables, rather than the typical $\mathbf{\theta}$ and $\textbf{q}$ in the HMC literature. Where $n$ represents the number of parameters of interest and $d$ is the dimension of the system.
 
 The Hamiltonian of a physical system is defined completely in terms of the sets of points $(\textbf{x}, \textbf{p})$, the position and momentum variables respectively. These points span what is called the phase space, which formally is defined as the cotangent bundle $T^{*}\mathcal{M}$ of the configuration space $\mathcal{M}$. Simply put, we can imagine the phase space as manifold that shows us both how our model evolves, with respect to $\textbf{x}$ and $\textbf{p}$ and how it is constrained in regards to the total energy within the system. Where the total energy of the system is given by the Hamiltonian, $H(\textbf{x},\textbf{p})$. The Hamiltonian is the Legendre transform of the Lagrangian and is formally defined as $
 H(\textbf{x}, \textbf{p})  = K(\textbf{p}) + U(\textbf{x})$ where $K(\textbf{p})$ represents our kinetic energy and $U(\textbf{x})$ is the potential energy and the Legendre transform is given by $H(\textbf{x},\textbf{p}) = \sum_{i = 1}^{d}\dot{x}_{l}p_{l} - L(\textbf{x}, \textbf{\.{x}}(\textbf{x}, \textbf{p})) $\footnote{The $\dot{x}$ represents that the variable is being differentiated with respect to time.}.  
-Thus, for simplicity, if we set $d = 1$, we can derive Hamiltonian equations: \begin{equation}
-\frac{\partial H}{\partial p} = \dot{x} + p\frac{\partial \dot{x}}{\partial p} - \frac{\partial L}{\partial \dot{x}}\frac{\partial \dot{x}}{\partial p} = \dot{x} \end{equation}
+Thus, for simplicity, if we set $d = 1$, we can derive Hamiltonian equations: 
+\begin{equation}
+\label{eq:hameq1}
+\frac{\partial H}{\partial p} = \dot{x} + p\frac{\partial \dot{x}}{\partial p} - \frac{\partial L}{\partial \dot{x}}\frac{\partial \dot{x}}{\partial p} = \dot{x} 
+\end{equation}
 and 
 \begin{equation}
 \label{eq:hameq2}
-\frac{\partial H}{\partial x} = p\frac{\partial \dot{x}}{\partial x} - \frac{\partial L}{\partial x} - \frac{\partial L}{\partial \dot{x}}\frac{\partial \dot{x}}{\partial x} = - \frac{\partial L}{\partial x}= -\dot{p}  \end{equation}
+\frac{\partial H}{\partial x} = p\frac{\partial \dot{x}}{\partial x} - \frac{\partial L}{\partial x} - \frac{\partial L}{\partial \dot{x}}\frac{\partial \dot{x}}{\partial x} = - \frac{\partial L}{\partial x}= -\dot{p}  
+\end{equation}
 from which we can vectorize for higher dimensions. It should be noted that the derivatives for the Lagrangian $L$, come from the Euler-Lagrange equations $\frac{d}{dt}\left(\frac{\partial L}{d\dot{x}}\right) = \frac{\partial L}{dx}$ and the Lagrangian itself, is just a reformulation of Newtonian mechanics.
 
-Within the HMC framework the positions, $\textbf{x}$, are the variables of interest, but in order to simulate Hamiltonian dynamics properly, for each $\textbf{x}$ we must introduce an auxillary momentum variable $\textbf{p}$. But what form should $\textbf{p}$ take? Typically, $\textbf{p}$ is sampled from a normal distribution $\textbf{p} \sim \mathcal{N}(\textbf{0}, \mathds{1})$, although this need not be the case. In HMC, the potential energy $U(\textbf{x})$ represents the negative of the log joint distribution of the model and is a key component within the algorithm.  The kinetic energy $K(\textbf{p})$, is typically taken to be the mean field approximation, which corresponds directly to the log of a centered Gaussian distribution $K(\textbf{p}) = \frac{\textbf{p}^{T} \textbf{M}^{-1} \textbf{p}}{2}$, where $\textbf{M}$ is a symmetric, positive definite and typically diagonal matrix. Although, again we need not choose this form of kinetic energy and in some cases, such as those when we are dealing with discrete parameters, it is actually more beneficial to use a different kinetic function\citep{nishimura2017discontinuous}. Thus, if we are to use the standard kinetic energy, which we do for all our current models, then Hamilton's equations take the form $
+Within the HMC framework the positions, $\textbf{x}$, are the variables of interest, but in order to simulate Hamiltonian dynamics properly, for each $\textbf{x}$ we must introduce an auxillary momentum variable $\textbf{p}$. But what form should $\textbf{p}$ take? Typically, $\textbf{p}$ is sampled from a normal distribution $\textbf{p} \sim \mathcal{N}(\textbf{0}, \mathds{1})$, although this need not be the case. In HMC, the potential energy $U(\textbf{x})$ represents the negative of the log joint distribution of the model and is a key component within the algorithm.  The kinetic energy $K(\textbf{p})$, is typically taken to be the mean field approximation, which corresponds directly to the log of a centered Gaussian distribution $K(\textbf{p}) = \frac{\textbf{p}^{T} \textbf{M}^{-1} \textbf{p}}{2}$, where $\textbf{M}$, the mass matrix, is a symmetric, positive definite and typically diagonal matrix. Although, again we need not choose this form of kinetic energy and in some cases, such as those when we are dealing with discrete parameters, it is actually more beneficial to use a different kinetic function\citep{nishimura2017discontinuous}. Thus, if we are to use the standard kinetic energy, which we do for all our current models, then Hamilton's equations take the form $
 \dot{\textbf{x}} = \frac{d\textbf{x}}{dt} = [\textbf{M}^{-1}\textbf{p}]$ and $ \dot{\textbf{p}} = \frac{d\textbf{p}}{dt} = -\frac{\partial U}{\partial \textbf{x}}$.\\
 To understand why the potential energy represents the joint, we take inspiration from the canonical distribution found in statistical mechanics
 $P(\textbf{x},\textbf{p}) = \frac{1}{Z}\exp\left(\frac{-E(\textbf{x},\textbf{p})\kappa_{b}}{T}\right)$,
@@ -130,51 +134,32 @@ P(\textbf{x},\textbf{p}) = \frac{1}{Z}\exp(-U(\textbf{x}))\exp(-K(\textbf{p}))
 It should be noted, that it is not always the case that Hamiltonian is separable, for example see Riemannian HMC \citep{girolami2011riemann}. As this expression is exponentiated and there are no implicit dependencies between the parameters, we can marginalize out the distribution of axillary momentum, leaving us with just the target distribution, the joint, $P(\textbf{x})  = \exp(-U(\textbf{x}))$, from which can take the $\ln$ to get:
 \begin{equation}
 U(\textbf{x}) = -\ln P(\textbf{x})
-\end{equation} and so the potential is entirely dependent on the choice of the joint distribution.
-\textbf{CHECKPOINT} as this expression factorizes in to two independent probability distributions. 
-We characterise the posterior distribution for the model parameters using the potential energy function: \begin{equation}
-U(x) = -\log[\pi(x)L(x|D)]
+\end{equation} and so the potential is entirely dependent on the choice of the joint distribution. However, the expression $P(\textbf{x})$ factorizes further via the product rule,
+into the product of a prior $p(\textbf{x})$ for the parameters of interest and a likelihood $p(\textbf{x}|\textbf{y})$ given the observations $\textbf{y}$: \begin{equation}
+U(\textbf{x}) = -\log[p(\textbf{x})p(\textbf{x}|\textbf{y})]
 \end{equation}
-where $\pi(x)$ is the prior distribution, and $L(x|D)$ is the likelihood, not the Lagrangian, of the given data $D$. 
 
 \subsection{The Integrator}
 
-\textbf{Talk about the properties of integrators, why they are important and why we are using the leapfrog integrator.}
-The leapfrog method enables us to discretise Hamiltons equations and as it is a valid integrator, it allows us to numerically solve Hamiltons equations \ref{eq:ham1neal} and \ref{eq:ham2neal}. In doing so, we generate new proposals given some initial state 
-We start with a state at $t = 0$ and then evaluate at a subsequent time $t + \epsilon , \hdots, t + n\epsilon$, where $\epsilon$ is the step in which we increase and $n$ is the number of time steps. 
+In order to implement HMC correctly we require an integrator that will enable us to solve the Hamilton's equations, equations \ref{eq:hameq1} - \ref{eq:hameq2}. For an integrator to do this it must be both time reversible and volume preserving, as the flow of the phase space is fixed. The time reversibility is due to the fact that no physical system should have a preferred direction of time, if I start at my initial conditions, I should eventually arrive back at those initial conditions. In order to ensure that our integrator is volume preserving, we require our integrator to be symplectic. This means that given a transformation $\textbf{Q} \in Sp(2d, \mathbb{R})$ such that $\textbf{Q}(\textbf{p}_{0}, \textbf{x}_{0}) \mapsto (\textbf{x}, \textbf{p})$, which maps an initial state to some evolved state, in order for that transformation to preserve Hamilton's equations it must be canonical. But, this can be only true if given some matrix $J = \left(\begin{array}{cc} \mathbf{0} & \mathbb{I} \\ -\mathbb{I} & \mathbf{0}\end{array}\right)$ the relation $\textbf{Q}^{T}J\textbf{Q} = J$ is satisfied, which can only be done if $\textbf{Q}$ is symplectic. This can be proved as follows. If we have a transformation $R = R(\textbf{x})$, then $\dot{R} = \textbf{Q}^{T}J\textbf{Q}\frac{\partial H}{\partial \textbf{Q}} = J\frac{\partial H}{\partial \textbf{Q}}$\footnote{We can write $\textbf{z} = (\textbf{x}, \textbf{p})$ and taking the vectorized form of equations \ref{eq:hameq1} - \ref{eq:hameq2}, in terms of Laplacians, we can succinctly write Hamilton's equations as $\dot{\textbf{z}} = J\nabla_{\textbf{z}}H(\textbf{z})$. }, which is true if and only if $\textbf{Q}^{T}J\textbf{Q} = J$ and thus the transformation is sympletic.
+
+A popular choice within the HMC literature is the Leapfrog method, equations \ref{eq:leapfrog1}-\ref{eq:lf2}. Not only does it satisfy the physical constraints of the model, but it has very small local  $\mathcal{O}(\epsilon^{2})$ and global errors $\mathcal{O}(\epsilon^{3})$ with fast convergence \citep{neal2011mcmc}.  We shall be using the Leapfrog integrator throughout our current work, however, this to can take alternative forms, see for example \citep{girolami2011riemann}\citep{nishimura2017discontinuous} and \citep{blanes2012explicit}. The Leapfrog method enables us to generate new proposals given some initial state, that is, if start with a state at $t = 0$ and then evaluate at a subsequent time $t + \epsilon , \hdots, t + N\epsilon$, where $\epsilon$ is the step in which we increase and $N$ is the number of time steps, we will generate a new state $(\textbf{x}(t + N\epsilon),\textbf{p}(t + N\epsilon))$ which will act as our new proposal. 
 
 \begin{align}
-p_{i}(t + \frac{\epsilon}{2}) &= p_{i}(t) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(x(t))}{\partial x_{i}} \\
-x_{i}(t + \epsilon) &= x_{i}(t) + \epsilon\frac{\partial K(p(t + \frac{\epsilon}{2}))}{dp_{i}}\\
-p_{i}(t + \epsilon) &= p_{i}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\frac{\partial U(x(t+\epsilon))}{\partial x_{i}}
+\label{eq:leapfrog1}
+\textbf{p}(t + \frac{\epsilon}{2}) &= \textbf{p}(t) - \left(\frac{\epsilon}{2}\right) \nabla_\textbf{x}U(\textbf{x}(t)) \\
+\textbf{x}(t + \epsilon) &= \textbf{x}(t) + \epsilon \nabla_{\textbf{p}}K(\textbf{p}(t + \frac{\epsilon}{2}))\\
+\label{eq:lf2}
+\textbf{p}(t + \epsilon) &= \textbf{p}(t + \frac{\epsilon}{2}) - \left(\frac{\epsilon}{2}\right)\nabla_{\textbf{x}} U(\textbf{x}(t+\epsilon))
 \end{align}
-\footnote{For the usual choice of kinetic energy, we have $\frac{\partial K(p + \frac{\epsilon}{2})}{dp_{i}} = \frac{p_{i}(t + \frac{\epsilon}{2})}{m_{i}}$}
+\subsection{The Algorithm}
 
-For the leapfrog method the local error, error after one step, is of $\mathcal{O}(\epsilon^{2})$ and a global error, error after simulating for some fixed time interval s, which requires $\frac{s}{\epsilon}$ is $\mathcal{O}(\epsilon^{3})$
-Neals implementation of the HMC can only be used to sample from continuous distributions on $\mathbb{R}^{d}$ for which a density function can be evaluated.\\
-We must be able to compute the partial derivative of the log of the density function, the joint. 
-HMC samples from the canonical distribution for $x$ and $p$. $x$ has the distribution of interest as specified by the potential $U(x)$. 
-The distribution of the $p$'s can be chosen by us and are independent of the $x$'s. 
-The $p$ components are specified to be independent, with component $p_{i}$ having variance $m_{i}$.
-The kinetic energy $K(p) = \sum_{i =1}^{d}\frac{p_{i}^{2}}{2m_{i}}(x(t + \epsilon))
-$
-\subsubsection{Properties of the Integrator}
-Reversibility
 
-\subsubsection{The Algorithm}
-
-\begin{enumerate}
-	\item Step 1: Changes only the momentum
-	\item Step 2: May change both position and momentum
-\end{enumerate}
-Both steps leave the canonical distribution of (x,p) invariant, hence the distribution remains invariant.
-
-In \textbf{Step 1} we first draw the $p_{i}$ randomly from their Gaussian distribution independently of the current values of the position values. 
-In \textbf{Step 2} a Metropolis update is performed, using the Hamiltonian dynamics to propose a new state. Starting with the current state $(x,p)$, Hamiltonian dynamics is simulated for $L$ steps using the leapfrog method, with a stepsize of $\epsilon$. $L$ and $\epsilon$ are parameters of the mnodel that need to be tuned.\\
-The momentum vairables at the end of this $L$-step trajectory are then negated, giving s proposed state $(x^{*}. p^{*})$. This proposed state is accepted as the next state in the Markov Chain with probability: \begin{multline}
-\min[1, \exp(-H(x^{*}, p^{*}) + H(p,x)] =\\
-\min[1, \exp(-U(x^{*}) + U(x) - K(p^{*}) + K(p))]
-\end{multline} 
+Before we provide the algorithm we shall briefly discuss how the second stage of HMC works, that is the Metropolis step. Starting with the current state $(\textbf{x},\textbf{p})$, Hamiltonian dynamics is simulated for $L$ steps using the Leapfrog integrator, with a step size of $\epsilon$. After, $L$ steps we generate a new proposed state and in order to decide whether we should accept or reject this proposal \citep{duane1987hybrid} introduced the following:
+\begin{multline}
+\min[1, \exp(-H(\textbf{x}^{*}, \textbf{p}^{*}) + H(\textbf{x}, \textbf{p})] =\\
+\min[1, \exp(-U(\textbf{x}{*}) + U(\textbf{x}) - K(\textbf{p}^{*}) + K(\textbf{p}))]
+\end{multline}where $ (\textbf{x}^{*}, \textbf{p}^{*})$ is the proposed state and $(\textbf{x}, \textbf{p})$ is the current state. The authors issue a note of caution, as the potential is the negative of the joint, we have the above. However, many implementations of HMC do not take this into account and so the proposal is in some instances defined as above, but the potential to be the positive of the joint. 
 \begin{algorithm}
 	\label{alg:simpHMC}
 	\caption{\textbf{Continuous Hamiltonian Monte Carlo MCMC}}
@@ -182,50 +167,48 @@ The momentum vairables at the end of this $L$-step trajectory are then negated, 
 		\Procedure{HMC}{$x_{0}$, $\epsilon$, $L$,$U$, $M$}
 		\For{$m = 1 \text{ to } M$}
 		\State {$ p^{0} \sim \mathcal{N}(0,\mathds{1})$}
-		\State {$ x^{m} \gets x^{m-1}$}
-		\State {$x^{'} \gets x^{m-1}$}
-		\State {$ p^{'} \gets p^{0}$}
+		\State {$(\textbf{x}_{0}, \textbf{p}_{0}) \gets (\textbf{x}^{(t)}, \textbf{p}^{(t)})$}
+		\State {$\textbf{p}_{0} \gets \textbf{p}_{0} + \frac{\epsilon}{2}\nabla_{\textbf{x}} U(\textbf{x}_{0})$}
 		\For{$i = 1 \text{ to } L$}
-		\State {$x^{'}$ , $p \gets$ Leapfrog($x^{'}, p^{'}, \epsilon$)}
+		\State {$(\hat{\textbf{x}}, \hat{\textbf{p}}) \gets$ Leapfrog($\textbf{x}_{0}, \textbf{p}_{0}, \epsilon$)}
 		\EndFor
-		\State {$\alpha = \min\left\{1, \frac{\exp \left\{-U(x^{'}) - K(p^{'})\right\}}{\exp \left\{U(x^{m-1}) - K(p^{0})\right\}}\right\}$}
+		\State {$\textbf{p}_{L} \gets \textbf{p}_{L} - \frac{\epsilon}{2}\nabla_{\textbf{x}} U(\textbf{x}_{L})$}
+		\State {$\alpha = \min\left\{1, \exp \left\{H(\textbf{x}^{(t)}, \textbf{p}^{(t)}) - H(\hat{\textbf{x}}, \hat{\textbf{p}})\right\}\right\}$}
 		\State {$u \sim Uniform(0,1)$}
 		\If{ $u < \alpha $}
-		\State {\Return $ x^{m} \gets x^{'}$, $p^{m} \gets -p $}  \Comment{Accept}
+		\State {\Return $ \textbf{x}^{(t + 1)} \gets \hat{\textbf{x}}$}  \Comment{Accept}
 		\Else
-		\State {\Return $x^{m}  \gets x^{m-1}$ , $p^{m} \gets p^{0}$} \Comment{Reject}
+		\State {\Return $\textbf{x}^{(t+1)}  \gets \textbf{x}^{t}$} \Comment{Reject}
 		\EndIf
 		\EndFor
-		\State {Leapfrog($x$, $p$, $\epsilon$)} 
-		\State {$p^{'} \gets p - \frac{\epsilon}{2}\nabla_{x} U(x)$} \Comment{Half step for momentum}
-		\State {$x^{'} \gets x + \epsilon \nabla_{p} K(p^{'})$} \Comment{Full step for position} 
-		\State {$p^{'} \gets p - \frac{\epsilon}{2}\nabla_{x}U(x^{'})$} \Comment{Half step for momentum}
-		\State {\Return $x^{'}$ , $p^{'}$}
+		\State {Leapfrog($\textbf{x}$, $\textbf{p}$, $\epsilon$)} 
+		\State {$\textbf{x}_{i} \gets \textbf{x}_{i} + \epsilon \nabla_{\textbf{p}} K(\textbf{p}_{i})$} 
+		\State {$\textbf{p}_{i} \gets \textbf{p}_{i-1} + \frac{\epsilon}{2}\nabla_{\textbf{x}}U(\textbf{x}_{i-1})$}
+		\State {\Return $\hat{\textbf{x}}$ , $\hat{\textbf{p}}$}
 		\EndProcedure
 	\end{algorithmic} 
 \end{algorithm}
 If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some function. 
-The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$, and the momentum will be replaced before it is used again, in the first step of the next iteration.
-Where $U = -\log(\pi(x))$,  $M$ is the number of samples we wish to take , $(x^{'}, p^{'})$ is the generated proposal and we propose setting $x^{m} = x^{'}$ and $p^{m} = -p^{'}$ and then accept or reject this proposal according to the Metropolis update step. 
-A function that implements a single iteration of the HMC algorithm is given in algorithm 2. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $x$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $x$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, for leapfrog steps, the number of leapfrog steps in the trajectory, $L$, and the current position, $x_{current}$, that the trajectory starts from. Momentum variables are sampled within this function, and discarded at the end, with only the next position being returned. 
+The negation of the momentum variables at the end of the trajectory makes the Metropolis proposal symmetrical, as needed for the acceptance probability above to be valid. This negation need not be done in practice, since $K(p) = K(-p)$ for the Gaussian momentum, and the momentum will be replaced before it is used again in the first step of the next iteration.
+A function that implements a single iteration of the HMC algorithm is given in algorithm 1. There are three additional functions within this iteration: $U$, which returns the potential energy given a value for $x$,  $\nabla U$, which returns the vector of partial derivatives of $U$ given $x$ and $\nabla K$, which returns the vector of partial derivatives of $K$ given $p$. Other arguments are the stepsize, $\epsilon$, the number of Leapfrog steps to perform in each trajectory, $L$. It should be noted, that $L$ and $\epsilon$ are parameters that need to be tuned. Likewise, if the form of the kinetic is taken to be the log of a Gaussian, $\textbf{M}$ becomes another parameter that needs to be tuned. Although, one could use Riemannian HMC \citep{girolami2011riemann} to generate a mass matrix on the fly, which is based on the properties of the model that you are sampling from.
 
 \section{Example Programs and Experiments}
 \label{sec:exampprog}
 \subsection{Programs}
 
-We now present a few simple FOPPL programs and discuss both their statistical and syntactic structures. 
+We now present a few simple FOPPL programs and discuss both their statistical forms and the results generated via HMC inference. In all the graphical model plots, shaded circles represent \mintinline{clojure}{observe}d parameters, un-shaded circles represent the latent variables, our parameters of interest and diamonds represent a deterministic statement. To generate our graphical plots, all models were run for 1000 iterations, with no burn in.  
 
-\subsection{Conjugate Gaussian}
-The conjugate Gaussian, is a model in which we can analytically calculate the true posterior $p(x | y) \propto p(x,y) $, as the product of two Gaussians is also a Gaussian. For our particular model we \mintinline{clojure}{sample} $x \sim \mathcal{N}(0, 1)$ and we \mintinline{clojure}{observe} $y = 7$, with likelihood $p(y|x) = \mathcal{N}(y | x, 1)$.  In FOPPL we have the following output:
+\subsubsection{Conjugate Gaussian}
+The conjugate Gaussian, is a model in which we can analytically calculate the true posterior $p(x | y) \propto p(x,y) $, as the product of two Gaussians is also a Gaussian. For our particular model we \mintinline{clojure}{sample} $x \sim \mathcal{N}(0, 1)$ and we \mintinline{clojure}{observe} $y = 7$, with likelihood $p(y|x) = \mathcal{N}(y | x, 1)$.  In FOPPL we have the following program:
 \inputminted{clojure}{code/conjugategauss.clj}
 \begin{figure}[ht]
 	\begin{center}
 		\input{conjgauss}
 	\end{center}
-	\caption{conditional gauss.}
+	\caption{The FOPPL code for the conditional Gaussian}
 \end{figure}
-Thus, the joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}^{2}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. Where in this model $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. Thus the true mean that our model should infer is $\bar{\mu} = 5$. 
-\subsection{Conditional If}
+This model has the following joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}^{2}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. Where in this model $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. Thus, the true mean that our model should infer is $\bar{\mu} = 5$. This is indeed the value that we get as can be seen via figures \ref{fig:plotconj1} - \ref{fig:plotconj3}.
+\subsubsection{Conditional If}
 \inputminted{clojure}{code/conditionalif.clj}
 \begin{figure}[ht]
 	\begin{center}
@@ -233,8 +216,8 @@ Thus, the joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \
 	\end{center}
 	\caption{Conditional if graphical model}
 \end{figure}
-The \mintinline{clojure}{if} statement is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired, which is why we need additional MCMC methods. In this model, we have a joint distribution of the form $p(x,y) \propto p(x|y) = \mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}$, where $\mathbb{I}(\cdot)$ represents the indicator function. If we are to analytically calculate the mean, we have to look at the case where $x < 0$ and the case where $x>0$. Using the sum rule the evidence can be found by $p(y) = \int p(x,y) dx $, which we analytically calculate to be, $p_{x<0}(y) = -\mathcal{N}(y=1|-1,1)\sqrt{2\pi}$ and for $x>0$ we have  $p_{x>0}(y) = \mathcal{N}(y=1| 1,1)\sqrt{2\pi}$. Thus, by Bayes rule, the full posterior is given as $p(x | y) = \frac{p(y|x)p(x)}{p(y)} = \frac{\mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}}{\sqrt{(2\pi)(\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)} + \mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)} )}}$ and so for $x < 0$,  $\mathbb{E}[x < 0|y] = \frac{-1}{\sqrt{2\pi}} $ and for $x > 0$ we have $\mathbb{E}[x > 0|y] = \frac{1}{\sqrt{2\pi}}$. 
-\subsection{Linear Regression}
+The \mintinline{clojure}{if} statement is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired, which is why we need additional MCMC methods. In this model, we have a joint distribution of the form $p(x,y) \propto p(x|y) = \mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}$, where $\mathbb{I}(\cdot)$ represents the indicator function. If we are to analytically calculate the mean, we have to look at the case where $x < 0$ and the case where $x>0$. Using the sum rule the evidence can be found by $p(y) = \int p(x,y) dx $, which we analytically calculate to be, $p_{x<0}(y) = -\mathcal{N}(y=1|-1,1)\sqrt{2\pi}$ and for $x>0$ we have  $p_{x>0}(y) = \mathcal{N}(y=1| 1,1)\sqrt{2\pi}$. Thus, by Bayes rule, the full posterior is given as $p(x | y) = \frac{p(y|x)p(x)}{p(y)} = \frac{\mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}}{\sqrt{(2\pi)(\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)} + \mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)} )}}$ \textbf{IN THIS SECTION I NEED TO ADD LINKS TO FIGURES AND HOPEFULLY GET THAT GRAPH PLOTTED OUT}.  
+\subsubsection{Linear Regression}
 \inputminted{clojure}{code/linearregression.clj}
 \begin{figure}[ht]
 	\begin{center}
@@ -242,38 +225,38 @@ The \mintinline{clojure}{if} statement is typically challenging to implement for
 	\end{center}
 	\caption{Linear regression model as a graph.}
 \end{figure}
-In this problem we have a set of points $(x,y)$ and we wish to infer equation of a line in a Bayesian manner, that goes through all of those points. To do this, we must infer the slope and the bias of the line, which is done by placing priors on our parameters of interest and observations. We can analytically calculate the equation of a straight line by using the formula $\left(\frac{y - y_{*}}{x - x_{*}}\right) = m$, which leads to $y = mx + b$. From this we find that the true slope $m = 1.6$ and the bias $b = 0.5$.
-
+In this problem we have a set of points $(x,y)$ and we wish to infer equation of a line in a Bayesian manner, that goes through all of those points. To do this, we must infer the slope and the bias of the line, which is done by placing priors on our parameters of interest and observations. In this model for both the slope and bias, we \mintinline{clojure}{sample} from $\mathcal{N}(0,10.0)$ and we state that likelihood of the model is of the form of a conditional Gaussian $\mathcal{N}(y_{n}| z_{n}, 1.0)$ with a mean dependent on our sampled line.   Therefore, we can construct the joint for this model as follows: 
+$p(x_{n},s,b,z_{n}, y_{n}) \propto p(s,b,z_{n} | x_{n}, y_{n}) = p(s)p(b)p(y | z_{n}, 1) =\mathcal{N}(0,5^{2})\mathcal{N}(y_{n}|z_{n},1.0)$. We can analytically calculate the equation of a straight line by using the formula $\left(\frac{y - y_{*}}{x - x_{*}}\right) = m$, which leads to $y = mx + b$. From this we find that the true slope $m = 1.6$ and the bias $b = 0.5$. We again see from figures \ref{fig:plotlr1}-\ref{fig:plotlr3}, that the HMC correctly calculates the true values of the parameters.\\
+	
 \subsection{Experimental Results}
-\begin{figure*}[ht]
+	\begin{figure*}[ht]
 	\centering
-	\subcaptionbox{}[.3\linewidth][c]{%
+	\subcaptionbox{\label{fig:plotconj1}}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conjgauss/figures/histogram.pdf}}\quad
 	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conjgauss/figures/trace.pdf}}\quad
-	\subcaptionbox{}[.3\linewidth][c]{%
+	\subcaptionbox{\label{fig:plotconj3}}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conjgauss/figures/Autocorrelationplot.pdf}}
 	
 	\bigskip
-	
-	\subcaptionbox{}[.3\linewidth][c]{%
+	\subcaptionbox{	\label{fig:plotif1}}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conditionalif/figures/histogram.pdf}}\quad
 	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conditionalif/figures/trace.pdf}}\quad
-	\subcaptionbox{}[.3\linewidth][c]{%
+	\subcaptionbox{	\label{fig:plotif3}}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conditionalif/figures/Autocorrelationplot.pdf}}
 	
 	\bigskip
-	
-    \subcaptionbox{}[.3\linewidth][c]{%
+    \subcaptionbox{	\label{fig:plotlr1} Blue: bias . Orange: slope}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{linearreg/figures/histogram.pdf}}\quad
-	\subcaptionbox{}[.3\linewidth][c]{%
+	\subcaptionbox{Blue: bias . Orange: slope}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{linearreg/figures/trace.pdf}}\quad
-	\subcaptionbox{}[.3\linewidth][c]{%
+	\subcaptionbox{	\label{fig:plotlr3}Left: bias . Right: slope.}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{linearreg/figures/Autocorrelationplot.pdf}}
-	\caption{Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. The top row represents the conjugate Gaussian model, the middle row represents the conditional if model and the bottom row represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, represents the slope of the line.  }
-\end{figure*}
+	\caption{Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. The \textit{top row} represents the conjugate Gaussian model, the \textit{middle row} represents the conditional if model and the \textit{bottom row} represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, represents the slope of the line.  }
+	\end{figure*}
 
+\section{Discussion}
 %Fourth level headings must be flush left, initial caps, bold, and
 %Roman type.  Use one line space before the fourth level heading, and
 %place the section text immediately after the heading with no line
@@ -348,9 +331,11 @@ In this problem we have a set of points $(x,y)$ and we wish to infer equation of
 \section{Supplementary Material}
 \label{sec:supmat}
 
-In the supplementary material we show sum examples of the compiler output for the various models shown and we also discuss the implementation of the HMC algorithm itself in pytorch. 
+In the supplementary material we show some examples of the compiler output for the linear regression and conjugate Gaussian model. We also discuss the implementation of the HMC algorithm itself in pytorch and state how we have interlaced both the inference and FOPPL. As the FOPPL program produces an actual directed graph as output, like the ones seen in section \ref{sec:exampprog}.  We must take that structure and map the edges, vertices and nodes accordingly into the right model output. 
+\inputminted{python}{code/cjgauss.py}
 \inputminted{python}{code/lr_out.py}
 \inputminted{python}{code/hmc_class.py}
+\inputminted{python}{code/cjgauss.py}
 %\section{INSTRUCTIONS FOR CAMERA-READY PAPERS}
 
 %For the camera-ready paper, if you are using \LaTeX, please make sure

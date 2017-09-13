@@ -3,7 +3,6 @@
 \PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
 \PYG{k+kn}{import} \PYG{n+nn}{importlib}
 \PYG{k+kn}{from} \PYG{n+nn}{torch.autograd} \PYG{k+kn}{import} \PYG{n}{Variable}
-\PYG{k+kn}{from} \PYG{n+nn}{Utils.core} \PYG{k+kn}{import} \PYG{n}{VariableCast}
 \PYG{k+kn}{from} \PYG{n+nn}{Utils.kinetic} \PYG{k+kn}{import} \PYG{n}{Kinetic}
 \PYG{k+kn}{from} \PYG{n+nn}{Utils.integrator} \PYG{k+kn}{import} \PYG{n}{Integrator}
 \PYG{k+kn}{from} \PYG{n+nn}{Utils.metropolis\PYGZus{}step} \PYG{k+kn}{import} \PYG{n}{Metropolis}

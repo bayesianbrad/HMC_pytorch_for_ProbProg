@@ -47,4 +47,6 @@
 		\PYG{n}{p23596}\PYG{p}{,}\PYG{n}{p23603}\PYG{p}{,}\PYG{n}{p23610}\PYG{p}{])}
 \PYG{c+c1}{\PYGZsh{} return E from the model}
 \PYG{n}{x23612} \PYG{o}{=} \PYG{p}{[}\PYG{n}{x23471}\PYG{p}{,}\PYG{n}{x23474}\PYG{p}{]}
+
+\PYG{k}{return} \PYG{n}{p23611}\PYG{p}{,} \PYG{n}{x23612}
 \end{Verbatim}

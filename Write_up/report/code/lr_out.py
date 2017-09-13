@@ -46,3 +46,5 @@ p23611 = torch.add([p23585,p23589,/
 		p23596,p23603,p23610])
 # return E from the model
 x23612 = [x23471,x23474]
+
+return p23611, x23612
