@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.1)  13 SEP 2017 22:56
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.1)  13 SEP 2017 23:00
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1167,7 +1167,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 )
-(./_minted-hmcFOPPL/D696981D3A5EB640AB8249B6330267BFFFD0E27758DDABE43ECA8E8A64C
+(./_minted-hmcFOPPL/1D05815D04902C3EA456195E8BEF0F78FFD0E27758DDABE43ECA8E8A64C
 FA641.pygtex
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -1238,7 +1238,7 @@ pe1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2017/texmf-dist/font
 s/type1/public/amsfonts/symbols/msbm7.pfb></usr/local/texlive/2017/texmf-dist/f
 onts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2017/texmf-dist/fon
 ts/type1/public/cm-super/sfrm1000.pfb>
-Output written on hmcFOPPL.pdf (8 pages, 2140539 bytes).
+Output written on hmcFOPPL.pdf (8 pages, 2140550 bytes).
 PDF statistics:
  297 PDF objects out of 1000 (max. 8388607)
  240 compressed objects within 3 object streams

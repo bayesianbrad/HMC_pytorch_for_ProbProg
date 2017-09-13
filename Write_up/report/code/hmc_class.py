@@ -42,11 +42,11 @@ class HMCsampler():
 
     # Then run for loop from 2:n_samples
     for i in range(self.n_samples-1):
-        logjoint_init, grad_init = \
-        self.potential.eval(temp,grad_loop= True)
-        temp, count = metropolis.acceptance(temp,\
-         logjoint_init,grad_init)
-        samples[i + 1, :] = temp.data.t()
+      logjoint_init, grad_init = \
+      self.potential.eval(temp,grad_loop= True)
+      temp, count = metropolis.acceptance(temp,\
+       logjoint_init,grad_init)
+      samples[i + 1, :] = temp.data.t()
 
     # Basic summary statistics
     target_acceptance =  count / (self.n_samples)
