@@ -15,6 +15,12 @@ Duane, S., Kennedy, A.~D., Pendleton, B.~J., and Roweth, D. (1987).
 \newblock Hybrid monte carlo.
 \newblock {\em Physics letters B}.
 
+\bibitem[Girolami and Calderhead, 2011]{girolami2011riemann}
+Girolami, M. and Calderhead, B. (2011).
+\newblock Riemann manifold langevin and hamiltonian monte carlo methods.
+\newblock {\em Journal of the Royal Statistical Society: Series B (Statistical
+  Methodology)}.
+
 \bibitem[Hastings, 1970]{hastings1970monte}
 Hastings, W.~K. (1970).
 \newblock Monte carlo sampling methods using markov chains and their
