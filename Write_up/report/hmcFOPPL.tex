@@ -159,7 +159,7 @@ Before we provide the algorithm we shall briefly discuss how the second stage of
 \begin{multline}
 \min[1, \exp(-H(\textbf{x}^{*}, \textbf{p}^{*}) + H(\textbf{x}, \textbf{p})] =\\
 \min[1, \exp(-U(\textbf{x}{*}) + U(\textbf{x}) - K(\textbf{p}^{*}) + K(\textbf{p}))]
-\end{multline}where $ (\textbf{x}^{*}, \textbf{p}^{*})$ is the proposed state and $(\textbf{x}, \textbf{p})$ is the current state. The authors issue a note of caution, as the potential is the negative of the joint, we have the above. However, many implementations of HMC do not take this into account and so the proposal is in some instances defined as above, but the potential to be the positive of the joint. 
+\end{multline}where $ (\textbf{x}^{*}, \textbf{p}^{*})$ is the proposed state and $(\textbf{x}, \textbf{p})$ is the current state. The authors issue a note of caution, as the potential is the negative of the joint, we have the above. However, many implementations of HMC do not take this into account and so the proposal is in some instances defined as above, but the potential is defined to be the positive of the joint. In our implementation, when the Hamiltonians are being computed we are dealing with the negative of the joint, but during the leapfrog step we are dealing with the positive of the joint, hence the sign changes in algorithm 1.  
 \begin{algorithm}
 	\label{alg:simpHMC}
 	\caption{\textbf{Continuous Hamiltonian Monte Carlo MCMC}}
@@ -199,7 +199,7 @@ A function that implements a single iteration of the HMC algorithm is given in a
 We now present a few simple FOPPL programs and discuss both their statistical forms and the results generated via HMC inference. In all the graphical model plots, shaded circles represent \mintinline{clojure}{observe}d parameters, un-shaded circles represent the latent variables, our parameters of interest and diamonds represent a deterministic statement. To generate our graphical plots, all models were run for 1000 iterations, with no burn in.  
 
 \subsubsection{Conjugate Gaussian}
-The conjugate Gaussian, is a model in which we can analytically calculate the true posterior $p(x | y) \propto p(x,y) $, as the product of two Gaussians is also a Gaussian. For our particular model we \mintinline{clojure}{sample} $x \sim \mathcal{N}(0, 1)$ and we \mintinline{clojure}{observe} $y = 7$, with likelihood $p(y|x) = \mathcal{N}(y | x, 1)$.  In FOPPL we have the following program:
+The conjugate Gaussian is a model in which we can analytically calculate the true posterior $p(x | y) \propto p(x,y) $, as the product of two Gaussians is also a Gaussian. For our particular model we \mintinline{clojure}{sample} $x \sim \mathcal{N}(0, 1)$ and we \mintinline{clojure}{observe} $y = 7$, with likelihood $p(y|x) = \mathcal{N}(y | x, 1)$ and we aim to infer the mean of the posterior.  In FOPPL we have the following program:
 \inputminted{clojure}{code/conjugategauss.clj}
 \begin{figure}[ht]
 	\begin{center}
@@ -216,7 +216,8 @@ This model has the following joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \math
 	\end{center}
 	\caption{Conditional if graphical model}
 \end{figure}
-The \mintinline{clojure}{if} statement is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired, which is why we need additional MCMC methods. In this model, we have a joint distribution of the form $p(x,y) \propto p(x|y) = \mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}$, where $\mathbb{I}(\cdot)$ represents the indicator function. If we are to analytically calculate the mean, we have to look at the case where $x < 0$ and the case where $x>0$. Using the sum rule the evidence can be found by $p(y) = \int p(x,y) dx $, which we analytically calculate to be, $p_{x<0}(y) = -\mathcal{N}(y=1|-1,1)\sqrt{2\pi}$ and for $x>0$ we have  $p_{x>0}(y) = \mathcal{N}(y=1| 1,1)\sqrt{2\pi}$. Thus, by Bayes rule, the full posterior is given as $p(x | y) = \frac{p(y|x)p(x)}{p(y)} = \frac{\mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}}{\sqrt{(2\pi)(\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)} + \mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)} )}}$ \textbf{IN THIS SECTION I NEED TO ADD LINKS TO FIGURES AND HOPEFULLY GET THAT GRAPH PLOTTED OUT}.  
+The \mintinline{clojure}{if} statement is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired, which is why we need additional MCMC methods. In this model, we have a joint distribution of the form $p(x,y) \propto p(x|y) = \mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}$, where $\mathbb{I}(\cdot)$ represents the indicator function. The empirical mean that we generate for this model is 0.58 and if you plot the unnormalized joint, the shape is the same, but the density values are different, see figures \ref{fig:plotif1}-\ref{fig:plotif3}. This implies that we can be confident in the results generated by the HMC.
+% If we are to analytically calculate the mean, we have to look at the case where $x < 0$ and the case where $x>0$. Using the sum rule the evidence can be found by $p(y) = \int p(x,y) dx $, which we analytically calculate to be, $p_{x<0}(y) = -\mathcal{N}(y=1|-1,1)\sqrt{2\pi}$ and for $x>0$ we have  $p_{x>0}(y) = \mathcal{N}(y=1| 1,1)\sqrt{2\pi}$. Thus, by Bayes rule, the full posterior is given as $p(x | y) = \frac{p(y|x)p(x)}{p(y)} = \frac{\mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}}{\sqrt{(2\pi)(\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)} + \mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)} )}}$ .    
 \subsubsection{Linear Regression}
 \inputminted{clojure}{code/linearregression.clj}
 \begin{figure}[ht]
@@ -240,7 +241,7 @@ $p(x_{n},s,b,z_{n}, y_{n}) \propto p(s,b,z_{n} | x_{n}, y_{n}) = p(s)p(b)p(y | z
 	
 	\bigskip
 	\subcaptionbox{	\label{fig:plotif1}}[.3\linewidth][c]{%
-		\includegraphics[width=.2\linewidth]{conditionalif/figures/histogram.pdf}}\quad
+		\includegraphics[width=.2\linewidth]{conditionalif/figures/histogram_with_density.pdf}}\quad
 	\subcaptionbox{}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conditionalif/figures/trace.pdf}}\quad
 	\subcaptionbox{	\label{fig:plotif3}}[.3\linewidth][c]{%
@@ -331,7 +332,7 @@ $p(x_{n},s,b,z_{n}, y_{n}) \propto p(s,b,z_{n} | x_{n}, y_{n}) = p(s)p(b)p(y | z
 \section{Supplementary Material}
 \label{sec:supmat}
 
-In the supplementary material we show some examples of the compiler output for the linear regression and conjugate Gaussian model. We also discuss the implementation of the HMC algorithm itself in pytorch and state how we have interlaced both the inference and FOPPL. As the FOPPL program produces an actual directed graph as output, like the ones seen in section \ref{sec:exampprog}.  We must take that structure and map the edges, vertices and nodes accordingly into the right model output. 
+In the supplementary material we show some examples of the compiler output for the linear regression and conjugate Gaussian models. We also discuss the implementation of the HMC algorithm itself in pytorch and state how we have intertwined both the inference and FOPPL. As the FOPPL program produces an actual directed graph as output, like the ones seen in section \ref{sec:exampprog},  we must take that structure and map the edges, vertices and nodes accordingly into the right model output. This means that we must take care to ensure that the structure of language specific statements such as \mintinline{clojure}{observe}, \mintinline{clojure}{sample}, \mintinline{clojure}{let, defn, if} and language grammar such as \mintinline{clojure}{variable, constant, procedure}. 
 \inputminted{python}{code/cjgauss.py}
 \inputminted{python}{code/lr_out.py}
 \inputminted{python}{code/hmc_class.py}
