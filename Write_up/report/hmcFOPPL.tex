@@ -12,6 +12,7 @@
 \usepackage{pgf}
 \usepackage{subcaption}
 \usepackage{tikz}
+\usepackage{hyperref}
 \usetikzlibrary{bayesnet}
 %\graphicspath{{report_data_and_plots/}}
 %\definecolor{mygreen}{rgb}{0,0.6,0}
@@ -80,12 +81,7 @@
 %\aistatsaddress{ Institution 1 \And  Institution 2 \And Institution 3 } ]
 \aistatsaddress{ Department of Engineering,  University of Oxford } ]
 \begin{abstract}
-  The Abstract paragraph should be indented 0.25 inch (1.5 picas) on
-  both left and right-hand margins. Use 10~point type, with a vertical
-  spacing of 11~points. The {\bf Abstract} heading must be centered,
-  bold, and in point size 12. Two line spaces precede the
-  Abstract. The Abstract must be limited to one paragraph.
-\end{abstract}
+In this work we describe how to implement a powerful Monte Carlo Markov Chain (MCMC) inference algorithm, that being Hamiltonian Monte Carlo (HMC), for a First Order Probabilistic Programing language (FOPPL). We discuss how we compile the program specified in FOPPL, into Python code and how we transform that output correctly so that we can perform accurate inference on our probabilistic model, which is represented by a FOPPL program. We give examples of FOPPL programs and provide results of the HMC inference on those programs.  \end{abstract}
 
 \section{Introduction}
 
@@ -100,11 +96,13 @@
 Monte Carlo Markov Chain (MCMC) methods are a set of powerful inference algorithms \citep{berg2008markov} that enable us to evaluate, model and analyze complicated probabilistic models. These include, but are not limited to, areas in machine learning such as Bayesian inference and learning, optimisation for finding the optimal hyper-parameters \citep{andrieu2003introduction} and in natural systems, such as those found in Biology \citep{sorensen2007likelihood} and Physics \citep{duane1987hybrid}. 
 However, as the dimensionality of the problem grows many MCMC methods, such as Metropolis-Hastings \citep{hastings1970monte}, rejection and importance sampling,  become ineffective at being able to generate independent samples effectively. This can be overcome in some instances by tuning particular parameters, or by choosing a better proposal distribution, but in practice this cannot always be done. One MCMC method that is able to circumvent this problem is Hamiltonian Monte Carlo (HMC) \citep{neal2011mcmc}\citep{duane1987hybrid}, which takes inspiration from the physical world and uses a dynamical model to generate new proposals. This in turn enables us to explore larger spaces more effectively globally, rather than getting trapped in local regions. \\
 Choosing the right inference algorithm is critical for probabilistic programming languages \citep{tolpin2015probabilistic} such as Anglican \citep{wood2014new} and others, where we rely upon accurate inference and sampling procedures to evaluate our programs. Although, in practice there is no one inference or sampling algorithm to rule them all. Thus we rely on a combination of techniques to deal with discrete, finite continuous and infinite continuous parameter spaces (non-parametric models). To analyze more effectively a subset of the problems that Anglican and other higher order probabilistic programming languages (HOPPL) can, such as finite graphs, FOPPL, a first order probabilistic programming language was formed so that we could take advantage of fast inference algorithms, such as HMC.\\
-In this work we make two contributions, we introduce a FOPPL compiler that transforms a FOPPL output, a finite graph, into python code that takes advantage of the Automatic differentiation package within Pytorch \citep{pytorch} and an HMC that correctly deals with conditional statements and finite continuous parameters.
+In this work we make two contributions, we introduce a FOPPL compiler that transforms a FOPPL output, a finite graph, into Python code that takes advantage of the Automatic differentiation package within Pytorch \citep{pytorch} and an HMC that correctly deals with conditional statements and finite continuous parameters.
 In section \ref{sec:foppl} we talk about FOPPL, its syntax and primary use, in section \ref{sec:hmc} we introduce HMC, in section \ref{sec:exampprog} we give examples of FOPPL programs and the results generated through HMC inference. In section \ref{sec:supmat} we provide details of HMC implementation and some examples of the compiled FOPPL output. 
 \section{FOPPL}
 \label{sec:foppl}
-In this section include some stuff about FOPPL, what is it, the syntax etc.  The length of the loops are deterministic and finite, whereas in higher order probabilistic programming languages enable a loop to be unrolled an infinite number of times. Although FOPPL is a reduced subset of HOPPLs, it is still a very felxible and rich language, so that one may define incredibly complicated graphical models, such as neural networks.  enough to describe a whole host of probabilistic models. 
+FOPPL is a language that is syntactically simple and has many common elements found within generic programming languages, such as conditional statements \mintinline{clojure}{if} and primitive operations such as \mintinline{clojure}{+,-,/,*}. However, there is no recursion so you cannot unroll a loop an infinite number of times, as you could in a HOPPL. Despite this, FOPPL demonstrates the wide ranging utility of probabilistic programming languages and it is a flexible framework that allows one to implement complicated finite graphical models, which means that we can even write neural networks in FOPPL \citep{woodgroup2017}. When we design a program in FOPPL, FOPPL creates a finite directed graph that provides us with the joint distribution from which it extracts the posterior of the model. To construct a FOPPL program we have a set of syntactic statements at our disposal, such as \mintinline{clojure}{observe}, \mintinline{clojure}{sample}, \mintinline{clojure}{let, defn}, that allow us to \mintinline{clojure}{defn}e functions, \mintinline{clojure}{sample} from distribution objects, \mintinline{clojure}{observe} data and \mintinline{clojure}{let}s you define the variables and constants within your model. In order to compile a FOPPL program to \mintinline{python}{python}, we must preserve the struture of our directed graph, like the ones seen in section \ref{sec:exampprog}.  We map the edges, vertices and nodes accordingly so that the structure of the joint is preserved. We also take into account, which values are our latent values and which values are observed, as within the Pytorch, latent variables must be defined in a special way. This is because, in order to perform HMC on continuous systems, the gradients are required and order to generate the gradient of a latent variable within the model it must be predefined as a \mintinline{python}{torch.autograd.variable.Variable()} object, with the following flag \mintinline{python}{requires_grad= True}. To ensure that those variables, other constants and objects remain unique within our compilation, we introduce a unique naming procedure to ensure that our graphical model structure is preserved.  To do this we set all variables equal to \mintinline{python}{'x' + str(<unique_key>)} and for each parameter in which some primitive operation is performed with the original variable, will have an \mintinline{python}{'x'} label and a string of numbers that is unique, but will increase by one for each operation performed. All priors, likelihoods and posterior distributions are given the label \mintinline{python}{'p' + str(<unique_key>) }, all constants and observed values are given the label \mintinline{python}{'c' + str(<unique_key>) } and if the constant is an observed datum, then the compiler sets  \mintinline{python}{'y'+str(<unique_key>)='c'+str(<unique_key>)}. As Pytorch does not support distribution objects, we had to define our own class of distribution objects, which directly map, for example, a \mintinline{clojure}{normal} object in FOPPL, to a \mintinline{python}{normal} object in Python and labels that object as \mintinline{python}{'d' + str(<unique_key>)}. See the supplementary material, section \ref{sec:supmat} for examples of the compiled output.  \\
+ 
+
 \section{Hamiltonian Monte Carlo}
 \label{sec:hmc}
 In a top level view HMC is a two step process. In step one, we define a Hamiltonian function in terms of the joint probability distribution of the model that we aim to perform inference on and in step two, HMC proposes new states generated via Hamiltonian dynamics for which we apply Metropolis updates. As the proposals are being generated via a physical process, we are able to comprehensively explore our model space \citep{neal2011mcmc}. This is in part due to certain physical properties of the Hamiltonian itself, that make HMC a very powerful, multi-purpose inference algorithm. Adopting the notation from the machine learning literature, we use $\textbf{x} \in \mathbb{R}^{n \times d}$ to represent the parameters of interest, our latent variables, rather than the typical $\mathbf{\theta}$ and $\textbf{q}$ in the HMC literature. Where $n$ represents the number of parameters of interest and $d$ is the dimension of the system.
@@ -159,14 +157,13 @@ Before we provide the full HMC algorithm we shall briefly discuss how the second
 \begin{multline}
 \min[1, \exp(-H(\textbf{x}^{*}, \textbf{p}^{*}) + H(\textbf{x}, \textbf{p})] =\\
 \min[1, \exp(-U(\textbf{x}{*}) + U(\textbf{x}) - K(\textbf{p}^{*}) + K(\textbf{p}))]
-\end{multline}where $ (\textbf{x}^{*}, \textbf{p}^{*})$ is the proposed state and $(\textbf{x}, \textbf{p})$ is the current state Metropolis proposal. A function that implements a a run of the HMC algorithm is given in algorithm \ref{alg:simpHMC}. The authors issue a note of caution, as the potential is the negative of the joint, we have the above. However, many implementations of HMC do not take this into account and so the proposal is in some instances defined as above, but the potential is defined to be the positive of the joint. In our implementation, when the Hamiltonians are being computed we are dealing with the negative of the joint, but during the leapfrog step we are dealing with the positive of the joint, hence the sign changes in algorithm 1.  
+\end{multline}where $ (\textbf{x}^{*}, \textbf{p}^{*})$ is the proposed state and $(\textbf{x}, \textbf{p})$ is the current state Metropolis proposal. A function that implements a a run of the HMC algorithm is given in algorithm \ref{alg:simpHMC}. The authors issue a note of caution, as the potential is the negative of the joint, we have the above. However, many implementations of HMC do not take this into account and so the proposal is in some instances defined as above, but the potential is defined to be the positive of the joint. In our implementation, when the Hamiltonians are being computed we are dealing with the negative of the joint, but during the leapfrog step we are dealing with the positive of the joint, hence the sign changes in algorithm \ref{alg:simpHMC}.  
 \begin{algorithm}
-	\label{alg:simpHMC}
 	\caption{\textbf{Continuous Hamiltonian Monte Carlo MCMC}}
 	\begin{algorithmic}[1]
 		\Procedure{HMC}{$x_{0}$, $\epsilon$, $L$,$U$, $M$}
 		\For{$m = 1 \text{ to } M$}
-		\State {$ p^{0} \sim \mathcal{N}(0,\mathds{1})$}
+		\State {$ \textbf{p}^{0} \sim \mathcal{N}(0,\mathds{1})$}
 		\State {$(\textbf{x}_{0}, \textbf{p}_{0}) \gets (\textbf{x}^{(t)}, \textbf{p}^{(t)})$}
 		\State {$\textbf{p}_{0} \gets \textbf{p}_{0} + \frac{\epsilon}{2}\nabla_{\textbf{x}} U(\textbf{x}_{0})$}
 		\For{$i = 1 \text{ to } L$}
@@ -186,53 +183,51 @@ Before we provide the full HMC algorithm we shall briefly discuss how the second
 		\State {$\textbf{p}_{i} \gets \textbf{p}_{i-1} + \frac{\epsilon}{2}\nabla_{\textbf{x}}U(\textbf{x}_{i-1})$}
 		\State {\Return $\hat{\textbf{x}}$ , $\hat{\textbf{p}}$}
 		\EndProcedure
-	\end{algorithmic} 
+	\end{algorithmic}
+   \label{alg:simpHMC} 
 \end{algorithm}
 If the proposed state is rejected, then the next state is the same as the current state and is counted again when calculating the expected value of some posterior. 
-Theoretically speaking, In order to ensure that the proposal is symmetric, we should negate the momentum variables at the end of the trajectory, to ensure that the Metropolis proposal symmetrical, which is needed for the acceptance probability above to be valid. However, in practice we do not need to perform this negation since $K(p) = K(-p)$ for the Gaussian momentum and after to each iteration the momentum will be replaced before it is used again. Hence, we leave it out of algorithm 1 for now. 
+Theoretically speaking, In order to ensure that the proposal is symmetric, we should negate the momentum variables at the end of the trajectory, to ensure that the Metropolis proposal symmetrical, which is needed for the acceptance probability above to be valid. However, in practice we do not need to perform this negation since $K(p) = K(-p)$ for the Gaussian momentum and after to each iteration the momentum will be replaced before it is used again. Hence, we leave it out of algorithm \ref{alg:simpHMC} for now. 
 The parameters  $\epsilon$ and $L$ are parameters that need to be tuned. Likewise, if the form of the kinetic is taken to be the log of a Gaussian, $\textbf{M}$ becomes another parameter that needs to be tuned correctly. Although, one could use Riemannian HMC \citep{girolami2011riemann} to generate a mass matrix on the fly, which is based on the properties of the model that you are sampling from.
 
 \section{Example Programs and Experiments}
 \label{sec:exampprog}
 \subsection{Programs}
 
-We now present a few simple FOPPL programs and discuss both their statistical forms and the results generated via HMC inference. In all the graphical model plots, shaded circles represent \mintinline{clojure}{observe}d parameters, un-shaded circles represent the latent variables, our parameters of interest and diamonds represent a deterministic statement. To generate our graphical plots, all models were run for 1000 iterations, with no burn in.  
-
+We now present a few simple FOPPL programs and discuss both their statistical forms and the results generated via HMC inference. In all the graphical model plots, shaded circles represent \mintinline{clojure}{observe}d parameters, un-shaded circles represent the latent variables, our parameters of interest, and diamonds represent a deterministic statement. 
 \subsubsection{Conjugate Gaussian}
 The conjugate Gaussian, see figure (\ref{fig:conga}), is a model in which we can analytically calculate the true posterior $p(x | y) \propto p(x,y) $, as the product of two Gaussians is also a Gaussian. For our particular model we \mintinline{clojure}{sample} $x \sim \mathcal{N}(0, 1)$ and we \mintinline{clojure}{observe} $y = 7$, with likelihood $p(y|x) = \mathcal{N}(y | x, 1)$ and we aim to infer the mean of the posterior. In FOPPL we have the following program:
 \inputminted{clojure}{code/conjugategauss.clj}
 \begin{figure}[ht]
-	\label{fig:conga}
 	\begin{center}
 		\input{conjgauss}
 	\end{center}
-	\caption{The FOPPL code for the conditional Gaussian}
+	\caption{The graphical model for the conditional Gaussian}
+	\label{fig:conga}
 \end{figure}
-This model has the following joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}^{2}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. In this model, $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. Thus, the true mean that our model should infer is $\bar{\mu} = 5$. This is indeed the value that we get as can be seen via figures(\ref{fig:plotconj1}-\ref{fig:plotconj3}).
+This model has the following joint $ p(x,y) \propto p(x|y) = p(x)p(y| x) = \mathcal{N}(\bar{\mu}, \bar{\sigma}^{2})$, where $\bar{\mu} = \left(\frac{\mu_{0}\sigma^{2} + \sigma^{2}_{0}\sum_{i=1}^{n}y_{i}}{\sigma^{2}\sigma^{2}_{0}}\right) \bar{\sigma}^{2}$ and $\bar{\sigma}^{2} = \left(\frac{1}{\sigma^{2}_{0}} + \frac{n}{\sigma^{2}}\right)^{-1} $. In this model, $n$ is the total number of observed datum $y$, $\mu_{0} = 0 $ and $\sigma_{0}^{2} = 1$ are the prior mean and variance and $\sigma^{2} = 1.0 $ is the likelihood variance. Thus, the true mean that our model should infer is $\bar{\mu} = 5$. This is indeed the value that we get as can be seen via figures (\ref{fig:plotconj1}-\ref{fig:plotconj3}).
 \subsubsection{Conditional If}
 \begin{figure}[ht]
-	\label{fig:conif}
 	\begin{center}
 		\input{conif}
 	\end{center}
-	\caption{Conditional if graphical model}
+	\caption{The graphical model for condition if}
+	\label{fig:conif}
 \end{figure}
-The conditional \mintinline{clojure}{if} statement, see figure (\ref{fig:conif})is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired, which is why we need additional MCMC methods to be able to perform efficiently in in higher dimensions. In FOPPL we would write a simple conditional \mintinline{clojure}{if} program as follows:\inputminted{clojure}{code/conditionalif.clj}
+The conditional \mintinline{clojure}{if} statement, see figure (\ref{fig:conif}) is typically challenging to implement for gradient based methods, due to the branching effects that occur at the condition. For trace based samplers, such as importance sampling, this is not a problem as multiple traces are recorded for each path taken. However, in higher dimensions these types of samplers are heavily impaired, which is why we need additional MCMC methods to be able to perform efficiently in in higher dimensions. In FOPPL we would write a simple conditional \mintinline{clojure}{if} program as follows:\inputminted{clojure}{code/conditionalif.clj}
  In this model, we have a joint distribution of the form $p(x,y) \propto p(x|y) = \mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}$, where $\mathbb{I}(\cdot)$ represents the indicator function. The empirical mean that we generate for this model is 0.58 and if you plot the unnormalized joint, the shape is the same, but the density values are of course different, see figures (\ref{fig:plotif1}-\ref{fig:plotif3}). This implies that we can be confident in the results generated by the HMC.
 % If we are to analytically calculate the mean, we have to look at the case where $x < 0$ and the case where $x>0$. Using the sum rule the evidence can be found by $p(y) = \int p(x,y) dx $, which we analytically calculate to be, $p_{x<0}(y) = -\mathcal{N}(y=1|-1,1)\sqrt{2\pi}$ and for $x>0$ we have  $p_{x>0}(y) = \mathcal{N}(y=1| 1,1)\sqrt{2\pi}$. Thus, by Bayes rule, the full posterior is given as $p(x | y) = \frac{p(y|x)p(x)}{p(y)} = \frac{\mathcal{N}(0,1)\mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)}\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)}}{\sqrt{(2\pi)(\mathcal{N}(y = 1|-1,1)^{\mathbb{I}(x < 0)} + \mathcal{N}(y = 1|1,1)^{\mathbb{I}(x > 0)} )}}$ .    
 \subsubsection{Linear Regression}
 \begin{figure}[ht]
-	\label{fig:lrgraph}
 	\begin{center}
 		\input{linearreg}
 	\end{center}
-	\caption{Linear regression model as a graph.}
+	\caption{The graphical model for Linear regression}
+    \label{fig:lrgraph}
 \end{figure}
-In this problem we have a set of points $\{(x,y)\}$ and we wish to infer the equation of a line in a Bayesian manner, such that the line goes through all of those points. See figure (\ref{fig:lrgraph}) for a graphical model of the model. To do this, we must infer the slope and the bias of the line, which is done by placing priors on our parameters of interest and observations. The FOPPL program corresponding to figure (\ref{fig:lrgraph}) can be written as follows: \inputminted{clojure}{code/linearregression.clj}.In this model for both the slope and bias, we \mintinline{clojure}{sample} from $\mathcal{N}(0,10.0)$ and we state that likelihood of the model is of the form of a conditional Gaussian $\mathcal{N}(y_{n}| z_{n}, 1.0)$ with a mean dependent on our sampled line.   Therefore, we can construct the joint for this model as follows: 
-$p(x_{n},s,b,z_{n}, y_{n}) \propto p(s,b,z_{n} | x_{n}, y_{n}) = p(s)p(b)p(y | z_{n}, 1) =\mathcal{N}(0,5^{2})\mathcal{N}(y_{n}|z_{n},1.0)$. We can analytically calculate the equation of a straight line by using the formula $\left(\frac{y - y_{*}}{x - x_{*}}\right) = m$, which leads to $y = mx + b$. From this we find that the true slope $m = 1.6$ and the bias $b = 0.5$. We again see from figures \ref{fig:plotlr1}-\ref{fig:plotlr3}, that the HMC correctly calculates the true values of the parameters.\\
-	
-\subsection{Experimental Results}
-	\begin{figure*}[ht]
+In this problem we have a set of points $\{(x_{n},y_{n})\}$ and we wish to infer the equation of a line in a Bayesian manner, such that the line goes through all of those points. See figure (\ref{fig:lrgraph}) for a graphical model of the model. To do this, we must infer the slope and the bias of the line, which is done by placing priors on our parameters of interest. The FOPPL program corresponding to figure (\ref{fig:lrgraph}) can be written as follows:\inputminted{clojure}{code/linearregression.clj}In this model for both the slope and bias, we \mintinline{clojure}{sample} from $\mathcal{N}(0,10.0)$ and we state that likelihood of the model is of the form of a conditional Gaussian $\mathcal{N}(y_{n}| z_{n}, 1.0)$ with a mean dependent on our sampled line. Therefore, we can construct the joint for this model as $p(x_{n},s,b,z_{n}, y_{n}) \propto p(s,b,z_{n} | x_{n}, y_{n}) = p(s)p(b)p(y | z_{n}, 1) =\mathcal{N}(0,5^{2})\mathcal{N}(y_{n}|z_{n},1.0)$ We can analytically calculate the equation of a straight line by using the formula $\left(\frac{y - y_{*}}{x - x_{*}}\right) = s$, which leads to $y = sx + b$. From which we find that the true slope $s = 1.6$ and the bias $b = 0.5$. We again see from figures (\ref{fig:plotlr1}-\ref{fig:plotlr3}), that the HMC correctly calculates the true values of the parameters.\\
+
+	\begin{figure*}[ht!]
 	\centering
 	\subcaptionbox{\label{fig:plotconj1}}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{conjgauss/figures/histogram.pdf}}\quad
@@ -257,9 +252,13 @@ $p(x_{n},s,b,z_{n}, y_{n}) \propto p(s,b,z_{n} | x_{n}, y_{n}) = p(s)p(b)p(y | z
 	\subcaptionbox{	\label{fig:plotlr3}Left: bias . Right: slope.}[.3\linewidth][c]{%
 		\includegraphics[width=.2\linewidth]{linearreg/figures/Autocorrelationplot.pdf}}
 	\caption{Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. \textit{Top row} represents the conjugate Gaussian model,\textit{Middle row} represents the conditional if model. \textit{Bottom row} represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, represents the slope of the line.  }
-	\end{figure*}
-
+	\label{fig:allplots}	
+\end{figure*}
+\subsection{Experimental Results}
+Here we present the results of running HMC inference on our FOPPL programs. All plots were generated by running HMC until 1000 samples had been collected, we use no burn in period and so all results presented are of all samples generated. See figure (\ref{fig:allplots}). 
 \section{Discussion}
+
+In this paper we have presented the HMC algorithm, we have introduced the reader to FOPPL and have explained how we merge together HMC inference and FOPPL programs. We are currently expanding the HMC algorithm for use with both discrete and continuous parameters. This does require the design of new integrator, which has been proposed by \citep{nishimura2017discontinuous}, however, it has never been implemented for a probabilistic programming language, to the authors knowledge.  
 %Fourth level headings must be flush left, initial caps, bold, and
 %Roman type.  Use one line space before the fourth level heading, and
 %place the section text immediately after the heading with no line
@@ -330,15 +329,23 @@ $p(x_{n},s,b,z_{n}, y_{n}) \propto p(s,b,z_{n} | x_{n}, y_{n}) = p(s)p(b)p(y | z
 %%\end{tabular}
 %%\end{center}git 
 %%\end{table}
-
 \section{Supplementary Material}
 \label{sec:supmat}
 
-In the supplementary material we show some examples of the compiler output for the linear regression and conjugate Gaussian models. We also discuss the implementation of the HMC algorithm itself in pytorch and state how we have intertwined both the inference and FOPPL. As the FOPPL program produces an actual directed graph as output, like the ones seen in section \ref{sec:exampprog},  we must take that structure and map the edges, vertices and nodes accordingly into the right model output. This means that we must take care to ensure that the structure of language specific statements such as \mintinline{clojure}{observe}, \mintinline{clojure}{sample}, \mintinline{clojure}{let, defn, if} and language grammar such as \mintinline{clojure}{variable, constant, procedure}. 
+In the supplementary material we show some examples of the compiler output for the conjugate Gaussian and linear regression models. We also briefly discuss the implementation of the HMC algorithm, with correct implementation of conditional statements in Pytorch.  All code used to generate results can be found on github\footnote{\url{https://github.com/Bjgh/Project_notes}}\\
+
+\subsection{Compiler Output}
+Here we present some examples of the FOPPL compiler output for Python. 
+The following output is for the conjugate Gaussian model:  
 \inputminted{python}{code/cjgauss.py}
+This is the output for the linear regression model:
 \inputminted{python}{code/lr_out.py}
+
+\subsection{HMC Implementation}
+
+Below we present a top level view of the HMC sampler, without going into explicit details. Although as stated previously, all code can be found on our github page. The HMC can take a variety of inputs, depending on the users specification. The most important input is the \mintinline{python}{program()} object, which is a class of the compiled output. The \mintinline{python}{program()} itself inherits directly from a base class which performs the differentiation of the log joint distribution, with respect to the parameters of interest. Within the \mintinline{python}{program()} class we have a method \mintinline{python}{program.generate()} which simulates the chosen model once and intialises the latent variables within the model. This returns all initial values regarding log joint, the initial state, gradient log joint and the number of parameters of interest given by the dimension. It then calls another method within class \mintinline{python}{program.eval()}, which no longer performs the sampling steps and instead evaluates the model at various values generated via the Leapfrog function. The rest of the program follows from algorithm \ref{alg:simpHMC}.
+ 
 \inputminted{python}{code/hmc_class.py}
-\inputminted{python}{code/cjgauss.py}
 %\section{INSTRUCTIONS FOR CAMERA-READY PAPERS}
 
 %For the camera-ready paper, if you are using \LaTeX, please make sure
@@ -398,8 +405,7 @@ In the supplementary material we show some examples of the compiler output for t
 
 \subsubsection*{Acknowledgements}
 
-Use unnumbered third level headings for the acknowledgements.  All
-acknowledgements go at the end of the paper.
+The authors acknowledge Yuan for her help in designing the compiler. 
 
 \subsubsection*{References}
 \bibliographystyle{apalike}

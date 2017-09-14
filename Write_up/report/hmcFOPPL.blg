@@ -3,44 +3,44 @@ Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: hmcFOPPL.aux
 The style file: apalike.bst
 Database file #1: mini_proj.bib
-You've used 12 entries,
+You've used 13 entries,
             1935 wiz_defined-function locations,
-            534 strings with 5548 characters,
-and the built_in function-call counts, 3916 in all, are:
-= -- 366
-> -- 179
-< -- 7
-+ -- 62
-- -- 58
-* -- 291
-:= -- 732
-add.period$ -- 37
-call.type$ -- 12
-change.case$ -- 86
-chr.to.int$ -- 12
-cite$ -- 12
-duplicate$ -- 165
-empty$ -- 260
-format.name$ -- 79
-if$ -- 743
+            539 strings with 5691 characters,
+and the built_in function-call counts, 4186 in all, are:
+= -- 392
+> -- 186
+< -- 8
++ -- 64
+- -- 60
+* -- 308
+:= -- 784
+add.period$ -- 40
+call.type$ -- 13
+change.case$ -- 92
+chr.to.int$ -- 13
+cite$ -- 13
+duplicate$ -- 178
+empty$ -- 280
+format.name$ -- 82
+if$ -- 794
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 13
-newline$ -- 63
-num.names$ -- 36
-pop$ -- 94
+missing$ -- 14
+newline$ -- 68
+num.names$ -- 39
+pop$ -- 99
 preamble$ -- 1
-purify$ -- 88
+purify$ -- 94
 quote$ -- 0
-skip$ -- 121
+skip$ -- 132
 stack$ -- 0
-substring$ -- 148
-swap$ -- 11
+substring$ -- 160
+swap$ -- 12
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 68
+type$ -- 74
 warning$ -- 0
-while$ -- 24
+while$ -- 26
 width$ -- 0
-write$ -- 147
+write$ -- 159

@@ -66,4 +66,9 @@ Wood, F., Meent, J.~W., and Mansinghka, V. (2014).
 \newblock A new approach to probabilistic programming inference.
 \newblock In {\em Artificial Intelligence and Statistics}.
 
+\bibitem[Wood~Group, 2017]{woodgroup2017}
+Wood~Group, O. (2017).
+\newblock \textit{In Prep} a tutorial on probabilistic programming.
+\newblock {\em Foundations and Trends in Machine Learning}.
+
 \end{thebibliography}
