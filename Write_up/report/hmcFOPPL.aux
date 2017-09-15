@@ -27,6 +27,8 @@
 \citation{wood2014new}
 \citation{pytorch}
 \citation{woodgroup2017}
+\citation{Hickey2008}
+\citation{woodgroup2017}
 \@LN@col{1}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}}
 \@LN@col{2}
@@ -35,9 +37,9 @@
 \citation{neal2011mcmc}
 \citation{nishimura2017discontinuous}
 \@LN@col{1}
+\@LN@col{2}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Hamiltonian Monte Carlo}{2}{section.3}}
 \newlabel{sec:hmc}{{3}{2}{Hamiltonian Monte Carlo}{section.3}{}}
-\@LN@col{2}
 \newlabel{eq:hameq1}{{1}{2}{Hamiltonian Monte Carlo}{equation.3.1}{}}
 \newlabel{eq:hameq2}{{2}{2}{Hamiltonian Monte Carlo}{equation.3.2}{}}
 \citation{girolami2011riemann}
@@ -47,13 +49,13 @@
 \citation{blanes2012explicit}
 \citation{duane1987hybrid}
 \@LN@col{1}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}The Integrator}{3}{subsection.3.1}}
 \@LN@col{2}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}The Integrator}{3}{subsection.3.1}}
 \newlabel{eq:leapfrog1}{{6}{3}{The Integrator}{equation.3.6}{}}
 \newlabel{eq:lf2}{{8}{3}{The Integrator}{equation.3.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The Algorithm}{3}{subsection.3.2}}
 \citation{girolami2011riemann}
 \@LN@col{1}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The Algorithm}{4}{subsection.3.2}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces \textbf  {Continuous Hamiltonian Monte Carlo MCMC}\relax }}{4}{algorithm.1}}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{alg:simpHMC}{{1}{4}{\textbf {Continuous Hamiltonian Monte Carlo MCMC}\relax }{algorithm.1}{}}
@@ -62,39 +64,41 @@
 \newlabel{sec:exampprog}{{4}{4}{Example Programs and Experiments}{section.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Programs}{4}{subsection.4.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Conjugate Gaussian}{4}{subsubsection.4.1.1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The graphical model for the conditional Gaussian\relax }}{4}{figure.caption.2}}
-\newlabel{fig:conga}{{1}{4}{The graphical model for the conditional Gaussian\relax }{figure.caption.2}{}}
+\citation{wood2014new}
 \@LN@col{1}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The graphical model for the conditional Gaussian\relax }}{5}{figure.caption.2}}
+\newlabel{fig:conga}{{1}{5}{The graphical model for the conditional Gaussian\relax }{figure.caption.2}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Conditional If}{5}{subsubsection.4.1.2}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The graphical model for condition if\relax }}{5}{figure.caption.3}}
 \newlabel{fig:conif}{{2}{5}{The graphical model for condition if\relax }{figure.caption.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.3}Linear Regression}{5}{subsubsection.4.1.3}}
 \@LN@col{2}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.3}Linear Regression}{5}{subsubsection.4.1.3}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The graphical model for Linear regression\relax }}{5}{figure.caption.4}}
 \newlabel{fig:lrgraph}{{3}{5}{The graphical model for Linear regression\relax }{figure.caption.4}{}}
 \citation{nishimura2017discontinuous}
-\newlabel{fig:plotconj1}{{4a}{6}{\relax }{figure.caption.5}{}}
-\newlabel{sub@fig:plotconj1}{{a}{6}{\relax }{figure.caption.5}{}}
-\newlabel{fig:plotconj3}{{4c}{6}{\relax }{figure.caption.5}{}}
-\newlabel{sub@fig:plotconj3}{{c}{6}{\relax }{figure.caption.5}{}}
-\newlabel{fig:plotif1}{{4d}{6}{\relax }{figure.caption.5}{}}
-\newlabel{sub@fig:plotif1}{{d}{6}{\relax }{figure.caption.5}{}}
-\newlabel{fig:plotif3}{{4f}{6}{\relax }{figure.caption.5}{}}
-\newlabel{sub@fig:plotif3}{{f}{6}{\relax }{figure.caption.5}{}}
-\newlabel{fig:plotlr1}{{4g}{6}{\relax }{figure.caption.5}{}}
-\newlabel{sub@fig:plotlr1}{{g}{6}{\relax }{figure.caption.5}{}}
-\newlabel{fig:plotlr3}{{4i}{6}{Left: bias . Right: slope.\relax }{figure.caption.5}{}}
-\newlabel{sub@fig:plotlr3}{{i}{6}{Left: bias . Right: slope.\relax }{figure.caption.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. \textit  {Top row} represents the conjugate Gaussian model,\textit  {Middle row} represents the conditional if model. \textit  {Bottom row} represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, represents the slope of the line. \relax }}{6}{figure.caption.5}}
-\newlabel{fig:allplots}{{4}{6}{Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. \textit {Top row} represents the conjugate Gaussian model,\textit {Middle row} represents the conditional if model. \textit {Bottom row} represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, represents the slope of the line. \relax }{figure.caption.5}{}}
 \@LN@col{1}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Experimental Results}{6}{subsection.4.2}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{6}{section.5}}
-\@LN@col{2}
+\newlabel{sec:conc}{{5}{6}{Discussion}{section.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Supplementary Material}{6}{section.6}}
 \newlabel{sec:supmat}{{6}{6}{Supplementary Material}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Compiler Output}{6}{subsection.6.1}}
+\@LN@col{2}
+\newlabel{fig:plotconj1}{{4a}{7}{\relax }{figure.caption.5}{}}
+\newlabel{sub@fig:plotconj1}{{a}{7}{\relax }{figure.caption.5}{}}
+\newlabel{fig:plotconj3}{{4c}{7}{\relax }{figure.caption.5}{}}
+\newlabel{sub@fig:plotconj3}{{c}{7}{\relax }{figure.caption.5}{}}
+\newlabel{fig:plotif1}{{4d}{7}{\relax }{figure.caption.5}{}}
+\newlabel{sub@fig:plotif1}{{d}{7}{\relax }{figure.caption.5}{}}
+\newlabel{fig:plotif3}{{4f}{7}{\relax }{figure.caption.5}{}}
+\newlabel{sub@fig:plotif3}{{f}{7}{\relax }{figure.caption.5}{}}
+\newlabel{fig:plotlr1}{{4g}{7}{\relax }{figure.caption.5}{}}
+\newlabel{sub@fig:plotlr1}{{g}{7}{\relax }{figure.caption.5}{}}
+\newlabel{fig:plotlr3}{{4i}{7}{Left: bias . Right: slope.\relax }{figure.caption.5}{}}
+\newlabel{sub@fig:plotlr3}{{i}{7}{Left: bias . Right: slope.\relax }{figure.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. \textit  {Top row} represents the conjugate Gaussian model. \textit  {Middle row} represents the conditional if model. \textit  {Bottom row} represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, representing the slope of the line. \relax }}{7}{figure.caption.5}}
+\newlabel{fig:allplots}{{4}{7}{Each row corresponds to the inference output of each model and provides a histogram of the samples, the trace of the samples for each parameter of interest in the model and the autocorrelation between the samples for a lag $l = 50$. \textit {Top row} represents the conjugate Gaussian model. \textit {Middle row} represents the conditional if model. \textit {Bottom row} represents the linear regression model with parameter 0, in blue, representing the bias and parameter 1, in orange, representing the slope of the line. \relax }{figure.caption.5}{}}
 \@LN@col{1}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Compiler Output}{7}{subsection.6.1}}
 \@LN@col{2}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.2}HMC Implementation}{7}{subsection.6.2}}
 \bibstyle{apalike}
@@ -115,15 +119,20 @@
 \gdef\minted@oldcachelist{,
   default-pyg-prefix.pygstyle,
   default.pygstyle,
+  4A69013BE9F08507FACCBECFD71A06E9B8B78FA93E1B2E2264640DEC647A233E.pygtex,
+  2995A8229C5FA85DE5F322131F847F1472727C7201BBAAF487438A8F7218BB2F.pygtex,
   F78FFCB5C1E00AC6DC34B14F9971BF1B72727C7201BBAAF487438A8F7218BB2F.pygtex,
   7F826331BC40A4DFD045B07A8183B32A72727C7201BBAAF487438A8F7218BB2F.pygtex,
   521CD7B832CF88BC7BF0F85F4AFF993B72727C7201BBAAF487438A8F7218BB2F.pygtex,
-  5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F7218BB2F.pygtex,
-  2E5C086506DF03F8144F42E8AFA8351A72727C7201BBAAF487438A8F7218BB2F.pygtex,
+  A5A93EABEDE51BD7F46DA90BB471A2F972727C7201BBAAF487438A8F7218BB2F.pygtex,
   A97A42FA406CDE2679F56067681E7CDB72727C7201BBAAF487438A8F7218BB2F.pygtex,
-  5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F7218BB2F.pygtex,
-  521CD7B832CF88BC7BF0F85F4AFF993B72727C7201BBAAF487438A8F7218BB2F.pygtex,
   17C537FBC72988FFFEBA154EFA43223A72727C7201BBAAF487438A8F7218BB2F.pygtex,
+  614DD0E977BECB4C6F7FA99E64549B1272727C7201BBAAF487438A8F7218BB2F.pygtex,
+  7FF321FFB95FEEFBEAF642C9DE9C392A72727C7201BBAAF487438A8F7218BB2F.pygtex,
+  17C537FBC72988FFFEBA154EFA43223A72727C7201BBAAF487438A8F7218BB2F.pygtex,
+  A97A42FA406CDE2679F56067681E7CDB72727C7201BBAAF487438A8F7218BB2F.pygtex,
+  521CD7B832CF88BC7BF0F85F4AFF993B72727C7201BBAAF487438A8F7218BB2F.pygtex,
+  5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F7218BB2F.pygtex,
   4A69013BE9F08507FACCBECFD71A06E9B8B78FA93E1B2E2264640DEC647A233E.pygtex,
   69875498B20943BAD5DF767C519D41DDB8B78FA93E1B2E2264640DEC647A233E.pygtex,
   1E2D79D0BA9D82EC98F2C478CDFEE9CDB8B78FA93E1B2E2264640DEC647A233E.pygtex,
@@ -144,6 +153,8 @@
   FAC8C5BF9256DBE310053F525BA68D81AE57070365791F059845F4892B950592.pygtex,
   AFF5DDB78C36AA2E648329800913A78772B6B6C141C549D87D203AB2025A790F.pygtex,
   5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F7218BB2F.pygtex,
+  5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F7218BB2F.pygtex,
+  521CD7B832CF88BC7BF0F85F4AFF993B72727C7201BBAAF487438A8F7218BB2F.pygtex,
   AF7F229C267238F86D7B63A3B3C613C0EF3AAEBFFAC59A3C1D54278C13D039E9.pygtex,
   8A5DF4847E09A99E579F6CB376DEF3F9DD5FA18C19FEF2EE049C084D6AD88DC2.pygtex,
   3462E86D6A2EA7F5DEE41E73A4A09A92B8B78FA93E1B2E2264640DEC647A233E.pygtex,
@@ -151,6 +162,6 @@
   3462E86D6A2EA7F5DEE41E73A4A09A92B8B78FA93E1B2E2264640DEC647A233E.pygtex,
   01DEE0E8FA11A1FDDDDB09654559A714B8B78FA93E1B2E2264640DEC647A233E.pygtex,
   B3ADACA0CFF64A5E606EE538334C4B6DB8B78FA93E1B2E2264640DEC647A233E.pygtex,
-  25AFA5D05FC04B74ED54EF62F1D21DEEFFD0E27758DDABE43ECA8E8A64CFA641.pygtex}
+  4312FC575D41DE9B1FFC7BD811980626FFD0E27758DDABE43ECA8E8A64CFA641.pygtex}
 \@LN@col{1}
 \@LN@col{2}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.1)  14 SEP 2017 22:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.9.1)  15 SEP 2017 11:13
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1046,7 +1046,12 @@ Overfull \hbox (5.1225pt too wide) in paragraph at lines 83--83
  [] 
  []
 
+\openout5 = `hmcFOPPL.pyg'.
 
+(./_minted-hmcFOPPL/default-pyg-prefix.pygstyle)
+(./_minted-hmcFOPPL/default.pygstyle)
+(./_minted-hmcFOPPL/4A69013BE9F08507FACCBECFD71A06E9B8B78FA93E1B2E2264640DEC647
+A233E.pygtex)
 Underfull \hbox (badness 1019) in paragraph at lines 84--84
 \OT1/cmr/m/n/10 (MCMC) in-fer-ence al-go-rithm, that be-ing
  []
@@ -1056,10 +1061,43 @@ Underfull \hbox (badness 1584) in paragraph at lines 84--84
 \OT1/cmr/m/n/10 Hamil-to-nian Monte Carlo (HMC), for a
  []
 
+
+Underfull \hbox (badness 1533) in paragraph at lines 88--91
+\OT1/cmr/m/n/10 ([]Wood et al.[], []2014[]) and oth-ers, where we rely
+ []
+
+
+Underfull \hbox (badness 1147) in paragraph at lines 88--91
+\OT1/cmr/m/n/10 upon ac-cu-rate in-fer-ence and sam-pling pro-ce-dures
+ []
+
+
+Underfull \hbox (badness 4492) in paragraph at lines 88--91
+\OT1/cmr/m/n/10 and in-fi-nite con-tin-u-ous pa-ram-e-ter spaces (non-
+ []
+
+
+Underfull \hbox (badness 1603) in paragraph at lines 88--91
+\OT1/cmr/m/n/10 higher or-der prob-a-bilis-tic pro-gram-ming lan-guages
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 88--91
+
+ []
+
 \openout5 = `hmcFOPPL.pyg'.
 
-(./_minted-hmcFOPPL/default-pyg-prefix.pygstyle)
-(./_minted-hmcFOPPL/default.pygstyle)
+
+(./_minted-hmcFOPPL/2995A8229C5FA85DE5F322131F847F1472727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+
+Package natbib Warning: Citation `Hickey2008' on page 1 undefined on input line
+ 96.
+
+\openout5 = `hmcFOPPL.pyg'.
+
+
 (./_minted-hmcFOPPL/F78FFCB5C1E00AC6DC34B14F9971BF1B72727C7201BBAAF487438A8F721
 8BB2F.pygtex)
 \openout5 = `hmcFOPPL.pyg'.
@@ -1075,12 +1113,7 @@ Underfull \hbox (badness 1584) in paragraph at lines 84--84
 \openout5 = `hmcFOPPL.pyg'.
 
 
-(./_minted-hmcFOPPL/5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F721
-8BB2F.pygtex)
-\openout5 = `hmcFOPPL.pyg'.
-
-
-(./_minted-hmcFOPPL/2E5C086506DF03F8144F42E8AFA8351A72727C7201BBAAF487438A8F721
+(./_minted-hmcFOPPL/A5A93EABEDE51BD7F46DA90BB471A2F972727C7201BBAAF487438A8F721
 8BB2F.pygtex)
 \openout5 = `hmcFOPPL.pyg'.
 
@@ -1090,7 +1123,27 @@ Underfull \hbox (badness 1584) in paragraph at lines 84--84
 \openout5 = `hmcFOPPL.pyg'.
 
 
-(./_minted-hmcFOPPL/5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F721
+(./_minted-hmcFOPPL/17C537FBC72988FFFEBA154EFA43223A72727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+\openout5 = `hmcFOPPL.pyg'.
+
+
+(./_minted-hmcFOPPL/614DD0E977BECB4C6F7FA99E64549B1272727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+\openout5 = `hmcFOPPL.pyg'.
+
+
+(./_minted-hmcFOPPL/7FF321FFB95FEEFBEAF642C9DE9C392A72727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+\openout5 = `hmcFOPPL.pyg'.
+
+
+(./_minted-hmcFOPPL/17C537FBC72988FFFEBA154EFA43223A72727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+\openout5 = `hmcFOPPL.pyg'.
+
+
+(./_minted-hmcFOPPL/A97A42FA406CDE2679F56067681E7CDB72727C7201BBAAF487438A8F721
 8BB2F.pygtex)
 \openout5 = `hmcFOPPL.pyg'.
 
@@ -1100,7 +1153,7 @@ Underfull \hbox (badness 1584) in paragraph at lines 84--84
 \openout5 = `hmcFOPPL.pyg'.
 
 
-(./_minted-hmcFOPPL/17C537FBC72988FFFEBA154EFA43223A72727C7201BBAAF487438A8F721
+(./_minted-hmcFOPPL/5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F721
 8BB2F.pygtex)
 \openout5 = `hmcFOPPL.pyg'.
 
@@ -1157,38 +1210,58 @@ A233E.pygtex)
 
 (./_minted-hmcFOPPL/8A826D32D164855AB4D71C069DDE936CB8B78FA93E1B2E2264640DEC647
 A233E.pygtex)
-Underfull \hbox (badness 1057) in paragraph at lines 103--104
-\OT1/cmr/m/n/10 wide rang-ing util-ity of prob-a-bilis-tic pro-gram-ming
+Underfull \hbox (badness 1675) in paragraph at lines 96--99
+\OT1/cmr/m/n/10 as con-di-tional state-ments, like [] and prim-i-tive
  []
 
 
-Underfull \hbox (badness 1406) in paragraph at lines 103--104
+Underfull \hbox (badness 1163) in paragraph at lines 96--99
+\OT1/cmr/m/n/10 of prob-a-bilis-tic pro-gram-ming lan-guages and it is
+ []
+
+
+Underfull \hbox (badness 2073) in paragraph at lines 96--99
+\OT1/cmr/m/n/10 in-tro-duce a unique nam-ing pro-ce-dure to en-sure
+ []
+
+
+Underfull \hbox (badness 1629) in paragraph at lines 96--99
+\OT1/cmr/m/n/10 that our graph-i-cal model struc-ture is pre-served.
+ []
+
+
+Underfull \hbox (badness 7613) in paragraph at lines 96--99
+[] \OT1/cmr/m/n/10 and for each la-tent
+ []
+
+
+Underfull \hbox (badness 2057) in paragraph at lines 96--99
+\OT1/cmr/m/n/10 pa-ram-e-ter in which some prim-i-tive op-er-a-tion is
+ []
+
+
+Underfull \hbox (badness 1406) in paragraph at lines 96--99
 \OT1/cmr/m/n/10 All pri-ors, like-li-hoods and pos-te-rior dis-tri-bu-tions
  []
 
 
-Underfull \hbox (badness 6741) in paragraph at lines 103--104
-\OT1/cmr/m/n/10 are given the la-bel [],
+Underfull \hbox (badness 4217) in paragraph at lines 96--99
+\OT1/cmr/m/n/10 are given the la-bels [],
  []
 
 
-Underfull \hbox (badness 1629) in paragraph at lines 103--104
+Underfull \hbox (badness 1629) in paragraph at lines 96--99
 \OT1/cmr/m/n/10 all con-stants and ob-served val-ues are given the
  []
 
 
-Underfull \hbox (badness 1953) in paragraph at lines 103--104
+Underfull \hbox (badness 1953) in paragraph at lines 96--99
 \OT1/cmr/m/n/10 la-bel [] and if the con-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--104
+Underfull \hbox (badness 10000) in paragraph at lines 96--99
 []\OT1/cmr/m/n/10 .
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 103--104
-
  []
 
 [1{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
@@ -1196,15 +1269,19 @@ Underfull \hbox (badness 10000) in paragraph at lines 103--104
 
 
 ]
-LaTeX Font Info:    Try loading font information for U+dsrom on input line 124.
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+LaTeX Font Info:    Try loading font information for U+dsrom on input line 118.
 
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/doublestroke/Udsrom.fd
 File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
 ) [2]
-[3]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 162.
+put line 156.
 \openout5 = `hmcFOPPL.pyg'.
 
 
@@ -1229,18 +1306,8 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 )
-Underfull \hbox (badness 3780) in paragraph at lines 208--209
-[]\OT1/cmr/m/n/10 This model has the fol-low-ing joint $\OML/cmm/m/it/10 p\OT1/
-cmr/m/n/10 (\OML/cmm/m/it/10 x; y\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 /
- []
-
-
-Underfull \hbox (badness 1824) in paragraph at lines 208--209
-\OML/cmm/m/it/10 p\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x\OMS/cmsy/m/n/10 j\OML/cmm
-/m/it/10 y\OT1/cmr/m/n/10 ) = \OML/cmm/m/it/10 p\OT1/cmr/m/n/10 (\OML/cmm/m/it/
-10 x\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 p\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 y\OMS/
-cmsy/m/n/10 j\OML/cmm/m/it/10 x\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 N\OT1/cmr/m
-/n/10 ([]\OML/cmm/m/it/10 ; []\OT1/cmr/m/n/10 )$, where $[] =
+Underfull \hbox (badness 1077) in paragraph at lines 202--203
+[]\OT1/cmr/m/n/10 In cal-cu-lat-ing the joint of the model, we ar-rive
  []
 
 [4] (./conif.tex
@@ -1326,14 +1393,34 @@ A790F.pygtex)
 
 (./_minted-hmcFOPPL/5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F721
 8BB2F.pygtex)
-Underfull \hbox (badness 1577) in paragraph at lines 228--229
-\OT1/cmr/m/n/10 from $\OMS/cmsy/m/n/10 N\OT1/cmr/m/n/10 (0\OML/cmm/m/it/10 ; \O
-T1/cmr/m/n/10 10\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 0)$ and we state that like-li
--hood of
+\openout5 = `hmcFOPPL.pyg'.
+
+
+(./_minted-hmcFOPPL/5177A58DC65C8A14DC90C69DB3BF3DD272727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+\openout5 = `hmcFOPPL.pyg'.
+
+
+(./_minted-hmcFOPPL/521CD7B832CF88BC7BF0F85F4AFF993B72727C7201BBAAF487438A8F721
+8BB2F.pygtex)
+Underfull \hbox (badness 1430) in paragraph at lines 222--223
+[]\OT1/cmr/m/n/10 In this model for both the slope and bias, we
  []
 
 
-Underfull \hbox (badness 1430) in paragraph at lines 228--229
+Underfull \hbox (badness 1924) in paragraph at lines 222--223
+\OT1/cmr/m/n/10 Gaus-sian $\OMS/cmsy/m/n/10 N\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 
+y[]\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 z[]; \OT1/cmr/m/n/10 1\OML/cmm/m/it/10 :\
+OT1/cmr/m/n/10 0)$ with a mean con-di-tioned
+ []
+
+
+Underfull \hbox (badness 3029) in paragraph at lines 222--223
+\OT1/cmr/m/n/10 There-fore, we can con-struct the joint for this
+ []
+
+
+Underfull \hbox (badness 1430) in paragraph at lines 222--223
 \OT1/cmr/m/n/10 model as $\OML/cmm/m/it/10 p\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 x
 []; s; b; z[]; y[]\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 / \OML/cmm/m/it/10 p\OT1/c
 mr/m/n/10 (\OML/cmm/m/it/10 s; b; z[]\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 x[]; y[
@@ -1341,98 +1428,88 @@ mr/m/n/10 (\OML/cmm/m/it/10 s; b; z[]\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 x[]; y[
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 228--229
+Underfull \hbox (badness 10000) in paragraph at lines 222--223
 
  []
 
-<conjgauss/figures/histogram.pdf, id=210, 289.08pt x 289.08pt>
+[5] <conjgauss/figures/histogram.pdf, id=223, 289.08pt x 289.08pt>
 File: conjgauss/figures/histogram.pdf Graphic file (type pdf)
 
 <use conjgauss/figures/histogram.pdf>
-Package pdftex.def Info: conjgauss/figures/histogram.pdf used on input line 233
+Package pdftex.def Info: conjgauss/figures/histogram.pdf used on input line 227
 .
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conjgauss/figures/trace.pdf, id=211, 289.08pt x 289.08pt>
+<conjgauss/figures/trace.pdf, id=224, 289.08pt x 289.08pt>
 File: conjgauss/figures/trace.pdf Graphic file (type pdf)
 
 <use conjgauss/figures/trace.pdf>
-Package pdftex.def Info: conjgauss/figures/trace.pdf used on input line 235.
+Package pdftex.def Info: conjgauss/figures/trace.pdf used on input line 229.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conjgauss/figures/Autocorrelationplot.pdf, id=212, 289.08pt x 289.08pt>
+<conjgauss/figures/Autocorrelationplot.pdf, id=225, 289.08pt x 289.08pt>
 File: conjgauss/figures/Autocorrelationplot.pdf Graphic file (type pdf)
 
 <use conjgauss/figures/Autocorrelationplot.pdf>
 Package pdftex.def Info: conjgauss/figures/Autocorrelationplot.pdf used on inpu
-t line 237.
+t line 231.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conditionalif/figures/histogram_with_density.pdf, id=213, 289.08pt x 289.08pt>
+<conditionalif/figures/histogram_with_density.pdf, id=226, 289.08pt x 289.08pt>
 File: conditionalif/figures/histogram_with_density.pdf Graphic file (type pdf)
 <use conditionalif/figures/histogram_with_density.pdf>
 Package pdftex.def Info: conditionalif/figures/histogram_with_density.pdf used 
-on input line 241.
+on input line 235.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conditionalif/figures/trace.pdf, id=214, 289.08pt x 289.08pt>
+<conditionalif/figures/trace.pdf, id=227, 289.08pt x 289.08pt>
 File: conditionalif/figures/trace.pdf Graphic file (type pdf)
 
 <use conditionalif/figures/trace.pdf>
-Package pdftex.def Info: conditionalif/figures/trace.pdf used on input line 243
+Package pdftex.def Info: conditionalif/figures/trace.pdf used on input line 237
 .
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<conditionalif/figures/Autocorrelationplot.pdf, id=215, 289.08pt x 289.08pt>
+<conditionalif/figures/Autocorrelationplot.pdf, id=228, 289.08pt x 289.08pt>
 File: conditionalif/figures/Autocorrelationplot.pdf Graphic file (type pdf)
 
 <use conditionalif/figures/Autocorrelationplot.pdf>
 Package pdftex.def Info: conditionalif/figures/Autocorrelationplot.pdf used on 
-input line 245.
+input line 239.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<linearreg/figures/histogram.pdf, id=216, 289.08pt x 289.08pt>
+<linearreg/figures/histogram.pdf, id=229, 289.08pt x 289.08pt>
 File: linearreg/figures/histogram.pdf Graphic file (type pdf)
 
 <use linearreg/figures/histogram.pdf>
-Package pdftex.def Info: linearreg/figures/histogram.pdf used on input line 249
+Package pdftex.def Info: linearreg/figures/histogram.pdf used on input line 243
 .
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<linearreg/figures/trace.pdf, id=217, 289.08pt x 289.08pt>
+<linearreg/figures/trace.pdf, id=230, 289.08pt x 289.08pt>
 File: linearreg/figures/trace.pdf Graphic file (type pdf)
 
 <use linearreg/figures/trace.pdf>
-Package pdftex.def Info: linearreg/figures/trace.pdf used on input line 251.
+Package pdftex.def Info: linearreg/figures/trace.pdf used on input line 245.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-<linearreg/figures/Autocorrelationplot.pdf, id=218, 289.08pt x 289.08pt>
+<linearreg/figures/Autocorrelationplot.pdf, id=231, 289.08pt x 289.08pt>
 File: linearreg/figures/Autocorrelationplot.pdf Graphic file (type pdf)
 
 <use linearreg/figures/Autocorrelationplot.pdf>
 Package pdftex.def Info: linearreg/figures/Autocorrelationplot.pdf used on inpu
-t line 253.
+t line 247.
 (pdftex.def)             Requested size: 97.563pt x 97.56248pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [5]
-Underfull \hbox (badness 10000) in paragraph at lines 335--336
+Underfull \hbox (badness 10000) in paragraph at lines 330--331
 
  []
 
 
 (./_minted-hmcFOPPL/AF7F229C267238F86D7B63A3B3C613C0EF3AAEBFFAC59A3C1D54278C13D
-039E9.pygtex
-Underfull \vbox (badness 3364) has occurred while \output is active []
-
- [6 <./conjgauss/figures/histogram.pdf> <./conjgauss/figures/trace.pdf> <./conj
-gauss/figures/Autocorrelationplot.pdf> <./conditionalif/figures/histogram_with_
-density.pdf> <./conditionalif/figures/trace.pdf> <./conditionalif/figures/Autoc
-orrelationplot.pdf> <./linearreg/figures/histogram.pdf> <./linearreg/figures/tr
-ace.pdf> <./linearreg/figures/Autocorrelationplot.pdf>])
+039E9.pygtex)
 (./_minted-hmcFOPPL/8A5DF4847E09A99E579F6CB376DEF3F9DD5FA18C19FEF2EE049C084D6AD
-88DC2.pygtex)
+88DC2.pygtex [6])
 \openout5 = `hmcFOPPL.pyg'.
 
 
@@ -1458,26 +1535,45 @@ A233E.pygtex)
 
 (./_minted-hmcFOPPL/B3ADACA0CFF64A5E606EE538334C4B6DB8B78FA93E1B2E2264640DEC647
 A233E.pygtex)
-(./_minted-hmcFOPPL/25AFA5D05FC04B74ED54EF62F1D21DEEFFD0E27758DDABE43ECA8E8A64C
-FA641.pygtex [7]) (./hmcFOPPL.bbl) [8]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 415.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 415.
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [7 <./conjgauss/figures/histogram.pdf> <./conjgauss/figures/trace.pdf> <./conj
+gauss/figures/Autocorrelationplot.pdf> <./conditionalif/figures/histogram_with_
+density.pdf> <./conditionalif/figures/trace.pdf> <./conditionalif/figures/Autoc
+orrelationplot.pdf> <./linearreg/figures/histogram.pdf> <./linearreg/figures/tr
+ace.pdf> <./linearreg/figures/Autocorrelationplot.pdf>]
+(./_minted-hmcFOPPL/4312FC575D41DE9B1FFC7BD811980626FFD0E27758DDABE43ECA8E8A64C
+FA641.pygtex)
+Underfull \vbox (badness 2689) has occurred while \output is active []
+
+
+(./hmcFOPPL.bbl)
+
+Package natbib Warning: There were undefined citations.
+
+[8]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 410.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 410.
  (./hmcFOPPL.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 415.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 415.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 410.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 410.
 Package rerunfilecheck Info: File `hmcFOPPL.out' has not changed.
 (rerunfilecheck)             Checksum: 4A5D37E6D56C69B1A959ADF7427B4A4D;928.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 runsystem(rm hmcFOPPL.pyg)...executed.
 
  ) 
 Here is how much of TeX's memory you used:
- 25355 strings out of 492995
- 502949 string characters out of 6132705
- 642366 words of memory out of 5000000
- 28258 multiletter control sequences out of 15000+600000
+ 25377 strings out of 492995
+ 504664 string characters out of 6132705
+ 639880 words of memory out of 5000000
+ 28263 multiletter control sequences out of 15000+600000
  13173 words of font info for 54 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 48i,12n,78p,3585b,817s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 48i,12n,78p,1743b,817s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx6.pfb></
@@ -1512,10 +1608,10 @@ pe1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2017/texmf-dist/font
 s/type1/public/amsfonts/symbols/msbm7.pfb></usr/local/texlive/2017/texmf-dist/f
 onts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2017/texmf-dist/fon
 ts/type1/public/cm-super/sfrm1000.pfb>
-Output written on hmcFOPPL.pdf (8 pages, 565365 bytes).
+Output written on hmcFOPPL.pdf (8 pages, 566033 bytes).
 PDF statistics:
- 497 PDF objects out of 1000 (max. 8388607)
- 439 compressed objects within 5 object streams
+ 502 PDF objects out of 1000 (max. 8388607)
+ 444 compressed objects within 5 object streams
  58 named destinations out of 1000 (max. 500000)
  178 words of extra memory for PDF output out of 10000 (max. 10000000)
 
