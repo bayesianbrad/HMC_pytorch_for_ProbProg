@@ -19,10 +19,7 @@ import torch
 import numpy as np
 import time
 import math
-import importlib
 from torch.autograd import Variable
-from Utils.core import VariableCast
-from Utils.kinetic import Kinetic
 from Utils.integrator import Integrator
 from Utils.metropolis_step import Metropolis
 # np.random.seed(12345)
@@ -43,14 +40,11 @@ class HMCsampler():
     ----------
 
     '''
-    def __init__(self, burn_in= 100, n_samples= 1000, model = 'conjgauss', M= None,  min_step= None, max_step= None,\
+    def __init__(self, program, burn_in= 100, n_samples= 1000, M= None,  min_step= None, max_step= None,\
                  min_traj= None, max_traj= None):
         self.burn_in    = burn_in
         self.n_samples  = n_samples
         self.M          = M
-        self.model      = model
-        # External dependencies
-        program         = getattr(importlib.import_module('Utils.program'), model) # import Utils.program.model #getattr(importlib.import_module("module.submodule"), "MyClass")
         self.potential  = program()
         self.integrator = Integrator(self.potential, min_step, max_step, \
                                      min_traj, max_traj)
