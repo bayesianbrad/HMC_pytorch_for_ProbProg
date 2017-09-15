@@ -33,6 +33,11 @@ Hastings, W.~K. (1970).
   applications.
 \newblock {\em Biometrika}.
 
+\bibitem[Hickey, 2008]{Hickey2008}
+Hickey, R. (2008).
+\newblock The clojure programming language.
+\newblock {\em Proceedings of the 2008 Symposium on Dynamic Languages}.
+
 \bibitem[Neal et~al., 2011]{neal2011mcmc}
 Neal, R.~M. et~al. (2011).
 \newblock Mcmc using hamiltonian dynamics.
