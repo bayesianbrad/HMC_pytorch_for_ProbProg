@@ -101,4 +101,4 @@ class HMCsampler():
         print('empirical mean : ', mean)
         print('Average acceptance rate is: ', target_acceptance)
 
-        return samples_reduced, samples, mean
+        return samples,samples_reduced, mean
