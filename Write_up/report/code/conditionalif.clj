@@ -1,5 +1,5 @@
 ;;; conditional if
-(def if-src
+(def condif
   (foppl-query
     (let [x (sample (normal 0.0 1.0))]
       (if (> x 0)

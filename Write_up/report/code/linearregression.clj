@@ -1,5 +1,5 @@
 ;;; linear regression
-(def lr-src
+(def linreg
   (foppl-query
     (defn observe-data [_ data slope bias]
       (let [xn (first data)
