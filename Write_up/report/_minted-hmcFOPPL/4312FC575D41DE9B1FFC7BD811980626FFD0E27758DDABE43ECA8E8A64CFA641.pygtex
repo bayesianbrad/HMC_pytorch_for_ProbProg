@@ -1,30 +1,23 @@
 \begin{Verbatim}[commandchars=\\\{\}]
 \PYG{k+kn}{import} \PYG{n+nn}{torch}
 \PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
-\PYG{k+kn}{import} \PYG{n+nn}{importlib}
-\PYG{k+kn}{from} \PYG{n+nn}{torch.autograd} \PYG{k+kn}{import} \PYG{n}{Variable}
 \PYG{k+kn}{from} \PYG{n+nn}{Utils.kinetic} \PYG{k+kn}{import} \PYG{n}{Kinetic}
 \PYG{k+kn}{from} \PYG{n+nn}{Utils.integrator} \PYG{k+kn}{import} \PYG{n}{Integrator}
 \PYG{k+kn}{from} \PYG{n+nn}{Utils.metropolis\PYGZus{}step} \PYG{k+kn}{import} \PYG{n}{Metropolis}
 
 \PYG{k}{class} \PYG{n+nc}{HMCsampler}\PYG{p}{():}
 
-  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{burn\PYGZus{}in}\PYG{o}{=} \PYG{l+m+mi}{100}\PYG{p}{,} \PYGZbs{}
-	\PYG{n}{n\PYGZus{}samples}\PYG{o}{=} \PYG{l+m+mi}{1000}\PYG{p}{,} \PYG{n}{model} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}conjgauss\PYGZsq{}}\PYG{p}{,}\PYGZbs{}
-	\PYG{n}{M}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,}  \PYG{n}{min\PYGZus{}step}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,}\PYGZbs{} 
-	\PYG{n}{max\PYGZus{}step}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{min\PYGZus{}traj}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,}\PYGZbs{} 
-	\PYG{n}{max\PYGZus{}traj}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{):}
+  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{program}\PYG{p}{,} \PYG{n}{burn\PYGZus{}in}\PYG{o}{=} \PYG{l+m+mi}{100}\PYG{p}{,} \PYGZbs{}
+	  \PYG{n}{n\PYGZus{}samples}\PYG{o}{=} \PYG{l+m+mi}{1000}\PYG{p}{,} \PYG{n}{M}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,}\PYGZbs{}
+    \PYG{n}{min\PYGZus{}step}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{max\PYGZus{}step}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,}\PYGZbs{}
+    \PYG{n}{min\PYGZus{}traj}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{max\PYGZus{}traj}\PYG{o}{=} \PYG{n+nb+bp}{None}\PYG{p}{):}
     \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{burn\PYGZus{}in}    \PYG{o}{=} \PYG{n}{burn\PYGZus{}in}
     \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{n\PYGZus{}samples}  \PYG{o}{=} \PYG{n}{n\PYGZus{}samples}
     \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{M}          \PYG{o}{=} \PYG{n}{M}
-    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{model}      \PYG{o}{=} \PYG{n}{model}
     \PYG{c+c1}{\PYGZsh{} External dependencies}
-    \PYG{n}{program}         \PYG{o}{=} \PYGZbs{}
-    \PYG{n+nb}{getattr}\PYG{p}{(}\PYG{n}{importlib}\PYG{o}{.}\PYGZbs{}
-     \PYG{n}{import\PYGZus{}module}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Utils.program\PYGZsq{}}\PYG{p}{),} \PYG{n}{model}\PYG{p}{)}
     \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{potential}  \PYG{o}{=} \PYG{n}{program}\PYG{p}{()}
     \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{integrator}\PYG{o}{=} \PYG{n}{Integrator}\PYG{p}{(}\PYGZbs{}
-    	\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{potential}\PYG{p}{,}\PYG{n}{min\PYGZus{}step}\PYG{p}{,}\PYGZbs{}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{potential}\PYG{p}{,}\PYG{n}{min\PYGZus{}step}\PYG{p}{,}\PYGZbs{}
     	 \PYG{n}{max\PYGZus{}step}\PYG{p}{,} \PYG{n}{min\PYGZus{}traj}\PYG{p}{,} \PYG{n}{max\PYGZus{}traj}\PYG{p}{)}
 
 
@@ -55,5 +48,5 @@
     \PYG{n}{mean} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{samples\PYGZus{}reduced}\PYG{p}{,}\PYG{n}{dim}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{,}\PYGZbs{}
      \PYG{n}{keepdim}\PYG{o}{=} \PYG{n+nb+bp}{True}\PYG{p}{)}
 
-    \PYG{k}{return} \PYG{n}{samples\PYGZus{}reduced}\PYG{p}{,} \PYG{n}{samples}\PYG{p}{,} \PYG{n}{mean}
+    \PYG{k}{return} \PYG{n}{samples}\PYG{p}{,} \PYG{n}{samples\PYGZus{}reduced}\PYG{p}{,}  \PYG{n}{mean}
 \end{Verbatim}

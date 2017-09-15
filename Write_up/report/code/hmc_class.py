@@ -6,17 +6,17 @@ from Utils.metropolis_step import Metropolis
 
 class HMCsampler():
 
-  def __init__(self, program(), burn_in= 100, \
-	n_samples= 1000, M= None,\
-  min_step= None, max_step= None,\
-   min_traj= None, max_traj= None):
+  def __init__(self, program, burn_in= 100, \
+	  n_samples= 1000, M= None,\
+    min_step= None, max_step= None,\
+    min_traj= None, max_traj= None):
     self.burn_in    = burn_in
     self.n_samples  = n_samples
     self.M          = M
     # External dependencies
     self.potential  = program()
     self.integrator= Integrator(\
-    	self.potential,min_step,\
+    self.potential,min_step,\
     	 max_step, min_traj, max_traj)
 
 
@@ -47,4 +47,4 @@ class HMCsampler():
     mean = torch.mean(samples_reduced,dim=0,\
      keepdim= True)
 
-    return samples_reduced, samples, mean
+    return samples, samples_reduced,  mean

@@ -49,6 +49,8 @@ py2 =py2.pdf(y)
 mean = np.mean(data)
 print(mean)
 posterior  =  px*py1**(x>0)*py2**(x<0)
+mean_post = np.mean(posterior)
+print(mean_post)
 fig,ax = plt.subplots(1,1)
 ax.plot(x, posterior, 'r.', label='Unnormalized density')
 

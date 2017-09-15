@@ -1,0 +1,53 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} FOPPL compiler output}
+\PYG{n}{c23582}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{0.0}\PYG{p}{])}
+\PYG{n}{c23583}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{10.0}\PYG{p}{])}
+\PYG{n}{d23584} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{c23582}\PYG{p}{,} \PYG{n}{c23583}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}sample}
+\PYG{n}{x23474} \PYG{o}{=}  \PYG{n}{d23584}\PYG{o}{.}\PYG{n}{sample}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{}prior  }
+\PYG{n}{p23585} \PYG{o}{=} \PYG{n}{d23584}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{x23474}\PYG{p}{)} 
+\PYG{n}{c23586}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{0.0}\PYG{p}{])}
+\PYG{n}{c23587}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{10.0}\PYG{p}{])}
+\PYG{n}{d23588} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{c23586}\PYG{p}{,} \PYG{n}{c23587}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}sample}
+\PYG{n}{x23471} \PYG{o}{=} \PYG{n}{d23588}\PYG{o}{.}\PYG{n}{sample}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{}prior  }
+\PYG{n}{p23589} \PYG{o}{=} \PYG{n}{d23588}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{x23471}\PYG{p}{)}
+\PYG{n}{c23590}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{1.0}\PYG{p}{])}
+\PYG{n}{x23591} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{mul}\PYG{p}{(}\PYG{n}{x23471}\PYG{o}{.}\PYG{n}{data}\PYG{p}{,} \PYG{n}{c23590}\PYG{p}{)} 
+\PYG{n}{x23592} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{add}\PYG{p}{(}\PYG{n}{x23591}\PYG{p}{,}\PYG{n}{x23474}\PYG{o}{.}\PYG{n}{data}\PYG{p}{)}
+\PYG{n}{c23593}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{1.0}\PYG{p}{])}
+\PYG{n}{d23594} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{x23592}\PYG{p}{,}  \PYG{n}{c23593}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}obs, log likelihood}
+\PYG{n}{c23595}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{2.1}\PYG{p}{])}
+\PYG{n}{y23481} \PYG{o}{=} \PYG{n}{c23595}
+\PYG{n}{p23596} \PYG{o}{=} \PYG{n}{d23594}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{y23481}\PYG{p}{)}
+
+\PYG{n}{c23597}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{2.0}\PYG{p}{])}
+\PYG{n}{x23598} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{mul}\PYG{p}{(}\PYG{n}{x23471}\PYG{p}{,} \PYG{n}{c23597}\PYG{p}{)}
+\PYG{n}{x23599} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{add}\PYG{p}{(}\PYG{n}{x23598}\PYG{p}{,}\PYG{n}{x23474}\PYG{p}{)}
+\PYG{n}{c23600}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{1.0}\PYG{p}{])}
+\PYG{n}{d23601} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{x23599}\PYG{p}{,}  \PYG{n}{c23600}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}obs, log likelihood}
+\PYG{n}{c23602}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{3.9}\PYG{p}{])}
+\PYG{n}{y23502} \PYG{o}{=} \PYG{n}{c23602}
+\PYG{n}{p23603} \PYG{o}{=} \PYG{n}{d23601}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{y23502}\PYG{p}{)}
+
+\PYG{n}{c23604}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{3.0}\PYG{p}{])}
+\PYG{n}{x23605} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{mul}\PYG{p}{(}\PYG{n}{x23471}\PYG{p}{,} \PYG{n}{c23604}\PYG{p}{)}
+\PYG{n}{x23606} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{add}\PYG{p}{(}\PYG{n}{x23605}\PYG{p}{,}\PYG{n}{x23474}\PYG{p}{)}
+\PYG{n}{c23607}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{1.0}\PYG{p}{])}
+\PYG{n}{d23608} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{x23606}\PYG{p}{,}  \PYG{n}{c23607}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}obs, log likelihood}
+\PYG{n}{c23609}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{5.3}\PYG{p}{])}
+\PYG{n}{y23527} \PYG{o}{=} \PYG{n}{c23609}
+\PYG{n}{p23610} \PYG{o}{=} \PYG{n}{d23608}\PYG{o}{.}\PYG{n}{log\PYGZus{}pdf}\PYG{p}{(} \PYG{n}{y23527}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} log joint }
+\PYG{n}{p23611} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{add}\PYG{p}{([}\PYG{n}{p23585}\PYG{p}{,}\PYG{n}{p23589}\PYG{p}{,}\PYG{o}{/}
+		\PYG{n}{p23596}\PYG{p}{,}\PYG{n}{p23603}\PYG{p}{,}\PYG{n}{p23610}\PYG{p}{])}
+\PYG{c+c1}{\PYGZsh{} return E from the model}
+\PYG{n}{x23612} \PYG{o}{=} \PYG{p}{[}\PYG{n}{x23471}\PYG{p}{,}\PYG{n}{x23474}\PYG{p}{]}
+
+\PYG{k}{return} \PYG{n}{p23611}\PYG{p}{,} \PYG{n}{x23612}
+\end{Verbatim}

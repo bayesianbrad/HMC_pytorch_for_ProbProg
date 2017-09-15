@@ -1,0 +1,3 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{l+s+s1}{\PYGZsq{}d\PYGZsq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{o}{\PYGZlt{}}\PYG{n}{unique\PYGZus{}key}\PYG{o}{\PYGZgt{}}\PYG{p}{)}
+\end{Verbatim}
