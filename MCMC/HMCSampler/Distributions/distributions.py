@@ -76,75 +76,110 @@ class Normal(ContinuousRandomVariable):
         # pdf: 1 / torch.sqrt(2 * var * np.pi) * torch.exp(-0.5 * torch.pow(value - mean, 2) / var)
         return (-0.5 *  torch.pow(value - self.mean, 2) / self.std**2) -  torch.log(self.std)
 
-
 class MultivariateNormal(ContinuousRandomVariable):
-    """MultivariateIndependentNormal simple class
-    Returns  a normal distribution object class with mean - mean
-    and standard deviation - std.
+   """Normal random variable"""
+   def __init__(self, mean, cov):
+       """Initialize this distribution with mean, cov.
 
-    Methods
-    --------
-    sample   - Returns a sample X ~ N(mean,std) as a Variable. Takes an additional
-               argument grad. If we need the differential of X ~ N(mu, var)
-    pdf
-    logpdf   -
+       input:
+           mean: n by 1
+           cov: covariance matrix, n by n
+       """
+       self.mean = VariableCast(mean)
+       self.cov = VariableCast(cov)
+       assert self.mean.data.size()[0] == self.cov.data.size()[0] #, "ERROR! mean and cov have different size!")
+       self.dim = self.mean.data.size()[0]
+       self.chol_std = VariableCast(torch.potrf(self.cov.data).t())  # lower triangle
+       self.chol_std_inv = torch.inverse(self.chol_std)
 
-    Attributes
-    ----------
-    mean        -  Type: torch.Tensor, Variable, ndarray
-                   Size: [ 1, ...., N]
-    covariance  -  Type: torch.Tensor, Variable, ndarray
-                    Size: \mathbb{R}^{N \times N}
-    """
+   def sample(self, num_samples=1):
+       zs = torch.randn(self.dim, 1)
+       # print("zs", zs)
+       # samples = Variable( self.mean.data + torch.matmul(self.chol_std.data, zs), requires_grad = True)
+       return self.mean.data + torch.matmul(self.chol_std.data, zs)
 
-    def __init__(self, mean, covariance):
-        """Initialize this distribution with given mean and covariance.
-        """
-        assert (mean.size()[0] == covariance.size()[0])
-        assert (mean.size()[0] == covariance.size()[1])
-        self.mean      = VariableCast(mean)
-        self.covariance = VariableCast(covariance)
-        # cholesky decomposition returns upper triangular matrix. Will not accept Variables
-        self.L = VariableCast(torch.potrf(self.covariance.data))
+   def logpdf(self, value):
+       """
+       value : obs value, should be n by 1
+       :return: scalar, log pdf value
+       """
+       value = VariableCast(value)
+       cov_det = self.chol_std.diag().prod() ** 2
+       log_norm_constant = 0.5 * self.dim * torch.log(torch.Tensor([2 * np.pi])) \
+                           + 0.5*torch.log(cov_det.data)
+       right = torch.matmul( self.chol_std_inv, value - self.mean)
+       # print(value, self.mean, value - self.mean)
+       log_p = - Variable(log_norm_constant) - 0.5 * torch.matmul(torch.t(right), right)
+       return log_p
 
-    def sample(self):
-        # Returns a sample of a multivariate normal X ~ N(mean, cov)
-        # A column vecotor of X ~ N(0,I)  - IS THIS ACTUALLY TRUE ?? NOT SURE, ALL POINTS HAVE
-        # THE RIGHT MEAN AND VARIANCE N(0,1)
-        self.uniformNorm  = torch.Tensor(self.mean.size()).normal_()
-        samples           = self.mean.data  + Variable(self.L.t().data.mm(self.uniformNorm))
-        return samples
-
-    # def sample_grad(self):
-    #     x          = Variable(self.uniformNorm.data, requires_grad = True)
-    #     logSample  = self.uniformNorm * (self.L)
-    #     sampleGrad = torch.autograd.grad([logSample],[x], grad_outputs= torch.ones(x.size()))[0]
-    #     return sampleGrad
-    # def pdf(self, value):
-    #     assert (value.size() == self._mean.size())
-    #     # CAUTION: If the covariance is 'Unknown' then we will
-    #     # not be returned the correct derivatives.
-    #     print('****** Warning ******')
-    #     print(' IF COVARIANCE IS UNKNOWN AND THE DERIVATIVES ARE NEEDED W.R.T IT, THIS RETURNED FUNCTION \n \
-    #     WILL NOT RECORD THE GRAPH STRUCTURE OF THE FULL PASS, ONLY THE CALCUALTION OF THE PDF')
-    #     value = VariableCast(value)
-    #     # the sqrt root of a det(cov) : sqrt(det(cov)) == det(L.t()) = \Pi_{i=0}^{N} L_{ii}
-    #     self._constant = torch.pow(2 * np.pi, value.size()[1]) * self._L.t().diag().prod()
-    #     return self._constant * torch.exp(
-    #         -0.5 * (value - self._mean).mm(self._L.inverse().mm(self._L.inverse().t())).mm(
-    #             (value - self._mean).t()))
-
-    def logpdf(self, value):
-        print('****** Warning ******')
-        print(' IF COVARIANCE IS UNKNOWN AND THE DERIVATIVES ARE NEEDED W.R.T IT, THIS RETURNED FUNCTION \n \
-        WILL NOT RECORD THE GRAPH STRUCTURE OF THE FULL PASS, ONLY THE CALCUALTION OF THE LOGPDF')
-        assert (value.size() == self.mean.size())
-        value = VariableCast(value)
-        self._constant = ((2 * np.pi) ** value.size()[1]) * self.L.t().diag().prod()
-        return torch.log(-0.5 * (value - self.mean).t().mm(self.L.inverse().mm(self.L.inverse().t())).mm(
-            (value - self.mean))) \
-               + self._constant
-
+# class MultivariateNormal(ContinuousRandomVariable):
+#     """MultivariateIndependentNormal simple class
+#     Returns  a normal distribution object class with mean - mean
+#     and standard deviation - std.
+#
+#     Methods
+#     --------
+#     sample   - Returns a sample X ~ N(mean,std) as a Variable. Takes an additional
+#                argument grad. If we need the differential of X ~ N(mu, var)
+#     pdf
+#     logpdf   -
+#
+#     Attributes
+#     ----------
+#     mean        -  Type: torch.Tensor, Variable, ndarray
+#                    Size: [ 1, ...., N]
+#     covariance  -  Type: torch.Tensor, Variable, ndarray
+#                     Size: \mathbb{R}^{N \times N}
+#     """
+#
+#     def __init__(self, mean, covariance):
+#         """Initialize this distribution with given mean and covariance.
+#         """
+#         assert (mean.size()[0] == covariance.size()[0])
+#         assert (mean.size()[0] == covariance.size()[1])
+#         self.mean      = VariableCast(mean)
+#         self.covariance = VariableCast(covariance)
+#         # cholesky decomposition returns upper triangular matrix. Will not accept Variables
+#         self.L = VariableCast(torch.potrf(self.covariance.data))
+#
+#     def sample(self):
+#         # Returns a sample of a multivariate normal X ~ N(mean, cov)
+#         # A column vecotor of X ~ N(0,I)  - IS THIS ACTUALLY TRUE ?? NOT SURE, ALL POINTS HAVE
+#         # THE RIGHT MEAN AND VARIANCE N(0,1)
+#         self.uniformNorm  = torch.Tensor(self.mean.size()).normal_()
+#         samples           = self.mean.data  + Variable(self.L.t().data.mm(self.uniformNorm))
+#         return samples
+#
+#     # def sample_grad(self):
+#     #     x          = Variable(self.uniformNorm.data, requires_grad = True)
+#     #     logSample  = self.uniformNorm * (self.L)
+#     #     sampleGrad = torch.autograd.grad([logSample],[x], grad_outputs= torch.ones(x.size()))[0]
+#     #     return sampleGrad
+#     # def pdf(self, value):
+#     #     assert (value.size() == self._mean.size())
+#     #     # CAUTION: If the covariance is 'Unknown' then we will
+#     #     # not be returned the correct derivatives.
+#     #     print('****** Warning ******')
+#     #     print(' IF COVARIANCE IS UNKNOWN AND THE DERIVATIVES ARE NEEDED W.R.T IT, THIS RETURNED FUNCTION \n \
+#     #     WILL NOT RECORD THE GRAPH STRUCTURE OF THE FULL PASS, ONLY THE CALCUALTION OF THE PDF')
+#     #     value = VariableCast(value)
+#     #     # the sqrt root of a det(cov) : sqrt(det(cov)) == det(L.t()) = \Pi_{i=0}^{N} L_{ii}
+#     #     self._constant = torch.pow(2 * np.pi, value.size()[1]) * self._L.t().diag().prod()
+#     #     return self._constant * torch.exp(
+#     #         -0.5 * (value - self._mean).mm(self._L.inverse().mm(self._L.inverse().t())).mm(
+#     #             (value - self._mean).t()))
+#
+#     def logpdf(self, value):
+#         print('****** Warning ******')
+#         print(' IF COVARIANCE IS UNKNOWN AND THE DERIVATIVES ARE NEEDED W.R.T IT, THIS RETURNED FUNCTION \n \
+#         WILL NOT RECORD THE GRAPH STRUCTURE OF THE FULL PASS, ONLY THE CALCUALTION OF THE LOGPDF')
+#         assert (value.size() == self.mean.size())
+#         value = VariableCast(value)
+#         self._constant = ((2 * np.pi) ** value.size()[1]) * self.L.t().diag().prod()
+#         return torch.log(-0.5 * (value - self.mean).t().mm(self.L.inverse().mm(self.L.inverse().t())).mm(
+#             (value - self.mean))) \
+#                + self._constant
+#
 
 # ---------------------------------------------------------------------
 # DISCRETE DISTRIBUTIONS
