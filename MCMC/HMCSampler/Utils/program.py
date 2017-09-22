@@ -12,7 +12,7 @@ import numpy as np
 import Distributions.distributions as dis
 from torch.autograd import Variable
 from core import VariableCast
-class program():
+class BaseProgram():
     '''
     Base class for all programs. Values comes in as  tensor and outputs as list
     Unpacking of that list to a tensor is done in the integrator module.
@@ -30,7 +30,7 @@ class program():
         # For some reason all the gradients are d times bigger than they should be, where d is the dimension
 
         return grad
-class conjgauss(program):
+class conjgauss(BaseProgram):
     def __init__(self):
         super().__init__()
 
@@ -105,7 +105,7 @@ class conjgauss(program):
             return logjoint, gradients
         else:
             return logjoint, values
-class linearreg(program):
+class linearreg(BaseProgram):
     def __init__(self):
         super().__init__()
 
@@ -260,7 +260,7 @@ class linearreg(program):
         else:
             return p23611, values
 
-class conditionalif(program):
+class conditionalif(BaseProgram):
     def __init__(self):
         '''Generating code, returns  a map of variable names / symbols '''
         self.params = {'x': None}
@@ -323,7 +323,7 @@ class conditionalif(program):
         else:
             return logjoint, values
 
-class hierarchial(program):
+class hierarchial(BaseProgram):
     '''
     1: double x;
     2: int i = 0;
@@ -393,7 +393,7 @@ class hierarchial(program):
         else:
             return logjoint, values
 
-class mixture(program):
+class mixture(BaseProgram):
     ''': double x;
         2: x ~ Gaussian(0, 1);
         3: if (x > 0.5) then
