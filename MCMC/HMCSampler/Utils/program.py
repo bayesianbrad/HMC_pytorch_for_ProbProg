@@ -489,3 +489,64 @@ class mixture(BaseProgram):
             return logjoint, gradients
         else:
             return logjoint, values
+
+class condif2(BaseProgram):
+    def __init__(self):
+        '''Generating code, returns  a map of variable names / symbols '''
+        self.params = {'x': None}
+
+    def generate(self):
+        dim = 1
+        params = Variable(torch.FloatTensor(1, dim).zero_())
+        a = VariableCast(0)
+        b = VariableCast(2)
+        normal_obj1 = dis.Normal(a, b)
+        x = Variable(normal_obj1.sample().data, requires_grad=True)
+        params = x
+        logp_x = normal_obj1.logpdf(x)
+
+        if torch.gt(x.data, torch.zeros(x.size()))[0][0]:
+            y = VariableCast(5)
+            normal_obj2 = dis.Normal(x+b, b)
+            logp_y_x = normal_obj2.logpdf(y)
+        else:
+            y = VariableCast(-5)
+            normal_obj3 = dis.Normal(x-b, b)
+            logp_y_x = normal_obj3.logpdf(y)
+
+        logp_x_y = logp_x + logp_y_x
+
+        return logp_x_y, params, self.calc_grad(logp_x_y, params), dim
+
+    def eval(self, values, grad=False, grad_loop=False):
+        ''' Takes a map of variable names, to variable values '''
+        assert (isinstance(values, Variable))
+        ################## Start FOPPL input ##########
+        values = Variable(values.data, requires_grad=True)
+        a = VariableCast(0.0)
+        b = VariableCast(2)
+        normal_obj1 = dis.Normal(a, b)
+        # log of prior p(x)
+        logp_x = normal_obj1.logpdf(values)
+        # else:
+        #     x = normal_object.sample()
+        #     x = Variable(x.data, requires_grad = True)
+        if torch.gt(values.data, torch.zeros(values.size()))[0][0]:
+            y = VariableCast(5)
+            normal_obj2 = dis.Normal(values + b, b)
+            logp_y_x = normal_obj2.logpdf(y)
+        else:
+            y = VariableCast(-5)
+            normal_obj3 = dis.Normal(values-b, b)
+            logp_y_x = normal_obj3.logpdf(y)
+
+        logjoint = Variable.add(logp_x, logp_y_x)
+        if grad:
+            gradients = self.calc_grad(logjoint, values)
+            return gradients
+        elif grad_loop:
+            gradients = self.calc_grad(logjoint, values)
+            return logjoint, gradients
+        else:
+            return logjoint, values
+
