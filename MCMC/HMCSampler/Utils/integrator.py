@@ -83,3 +83,12 @@ class Integrator():
 
         # return new proposal state
         return values, p
+
+    # # def discIntegrator(self, values, p_init, ):
+    # # def coord_wise(self,values, p_init, i):
+    #     '''
+    #     Discountinous HMC Nishimura et al. Algorithm 1.
+    #     The p here has to have been sampled from a Laplace distribution
+    #
+    #      '''
+

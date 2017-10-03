@@ -83,6 +83,7 @@ def testing_laplace(mean, std):
 
 # Testing categorical
 def testing_categorical():
+
     return 0
 
 def testing_bernoulli():

@@ -1,0 +1,48 @@
+\documentclass[]{scrartcl}
+
+%opening
+\usepackage[round]{natbib}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{color}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{dsfont}
+\usepackage{pgf}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{dsfont}
+\usetikzlibrary{bayesnet}
+\newcommand{\iden}{\ensuremath{\mathbb{I}}}  %identity func
+\newcommand{\real}{\ensuremath{\mathbb{R}}} %real numbers
+\newcommand{\nat}{\ensuremath{\mathbb{N}}}  %natural numbers
+\newcommand{\ints}{\ensuremath{\mathbb{Z}}}
+\newcommand{\expt}{\ensuremath{\mathbb{E}}}
+\newcommand{\X}{\ensuremath{\mathbb{X}}}
+\newcommand{\Z}{\ensuremath{\mathfrak{Z}}}
+\newcommand{\y}{\textbf{y}} 
+\newcommand{\x}{\textbf{x}} 
+\newcommand{\asto}{\overset{a.s.}{\to}}
+\newtheorem{thm}{Theorem}
+\newtheorem{defn}{Definition}
+\DeclareMathOperator*{\argmax}{arg\,\!max}
+
+\title{Notes on MCMC convergence of HMC and General HMC ideas} 
+\author{Bradley Gram-Hansen}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+\input{prelim/mcmctheory}
+\input{prelim/gumbel}
+%\input{measurenotes/measure}
+
+\end{document}

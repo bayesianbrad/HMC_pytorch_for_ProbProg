@@ -1,0 +1,67 @@
+% !TEX root = ../main.tex\section{Basic MCMC theory}
+\section{Reprameterization Trick}
+\begin{defn} Law of the Unconscious Statistician (LOTUS), states that one can compute the expectation of a measurable function $g$ of a random variable $r$, by integrating $g(r)$ w.r.t the distribution of $r$:\begin{equation*}
+	\mathbb{E}[g(r)] = \int g(r)dF_{r}
+	\end{equation*}
+\end{defn}
+
+This means that to compute the expectation of $z = g(r)$ we only need to know $g$ and the distribution of $r$. We do not need to know explicitly the distribution of $z$. \begin{equation*}
+\mathbb{E}_{r\sim p(r)}[g(r)] = \mathbb{E}_{z \sim p(z)}[z]
+\end{equation*}
+
+\textbf{add more stuff here}
+
+\subsection{The Gumbel Distribution Trick}
+\begin{defn} The random variable $G$ is said to have a standard Gumbel distribution  if:
+	\begin{equation*}
+		G = \log (-\log(U))
+	\end{equation*}
+where $U \sim Unif[0,1]$.
+\end{defn}
+Using the Gumbel distribution, we can parameterize any discrete distribution in terms of Gumbel random variables by using the follow fact:
+\begin{defn}
+	Let $X$ be a discrete random variable with $P(X = k) \propto \alpha_{k}$ random variable and let $\{G_{k}\}_{k \leq K}$ be an i.i.d sequence of standard Gumbel random variables. Then:\begin{equation*}
+		X = \arg \underset{k}{\max} (\log \alpha_{k} + G_{k})
+	\end{equation*} 
+\end{defn}
+
+In a high level view this means that the recipe for sampling from a categorical distribution is: \begin{itemize}
+	\item \textit{Draw Gumbel noise by just transforming uniform samples}
+	\item \textit{Add it to $\log \alpha_{k}$ which only has to be known up to a normalising constant.}
+	\item \textit{Take the value $k$ that produces the maximum.}
+\end{itemize}
+
+\subsubsection{Relaxing the Discreteness}
+
+However, $\arg \max$ that tries to embed our discrete parameter is not continuous. To circumvent this, we can relax the discrete set by considering random variables taking the values in a larger, unconstrained set. To construct this relaxation we recongnise that:
+\begin{itemize}
+	\item Any discrete random variable can be expressed as  a one-hot vector.
+	\item The convex hull of the set of one-hot vector is the probability simplex
+\end{itemize}
+
+\begin{equation*}
+\Delta^{K-1} = \left\{x \in \mathbb{R}^{K}_{+}, \sum_{k=1}^{K}x_{k} = 1 \right\}
+\end{equation*}
+
+Therefore, a natural way to extend a discrete random variable is by allowing it to take values in the probability simplex. This we can do via the partition function, indexed by a temperature parameter as follows:\begin{equation}
+	f_{\tau}(x)_{k} = \frac{\exp(x_{k} \backslash \tau) }{\sum_{k=1}^{K}\exp(x_{k} \backslash \tau )}
+\end{equation}
+this enables us to define the sequence of simplex-valued random variables:
+\begin{equation*}
+	X^{\tau} = (X^{\tau}_{k})_{k} = f_{\tau}(\log \alpha + G) = \left(\frac{\exp(\log\alpha_{k} + G_{k})\backslash \tau}{\sum_{k=1}^{K}\exp((\log\alpha_{k}+G_{k}) \backslash \tau)}\right)
+\end{equation*}
+where $X^{\tau}$ is the ''concrete"`` distribution, that is a mixture of \textbf{con}tinuous and dis\textbf{crete}, denoted $x^{\tau} \sim Concrete(\alpha, \tau)$
+
+\begin{defn}Let $X \sim Concrete(\alpha, \lambda)$ with location parameters $\alpha \in (0, \inf)^{n} $ and temperature $\lambda \in (0, \inf)$
+
+\begin{itemize}
+	\item (\textit{Reparameterization}) If $G_{k} \sim  Gumbel$ i.i.d, then $X_{k} = (X^{\tau}_{k})_{k} = f_{\tau}(\log \alpha + G) = \left(\frac{\exp(\log\alpha_{k} + G_{k})\backslash \tau}{\sum_{k=1}^{K}\exp((\log\alpha_{k}+G_{k}) \backslash \tau)}\right)$
+	\item (\textit{Rounding}) $\mathcal{P}(X_{k} > X_{i} for i \neq k) = \frac{\alpha_{k}}{(\sum_{i=1}^{n}\alpha_{i})}4$
+	\item (\textit{Zero temperature}) $\mathcal{P}(lim_{\lambda \rightarrow 0} X_{k} = 1) = \alpha_{k} \backslash (\sum_{i=1}^{n}\alpha_{i})$
+\end{itemize}
+
+\end{defn}
+
+The pdf of the concrete distribution is given by:\begin{equation}
+p_{\alpha, \tau}(x) = (n-1)!\tau^{n-1}\Pi^{K}_{k=1}\left(\frac{\sum^{K}_{k=1}\alpha_{i}x_{i}^{-\tau}\right), x\in \Delta^{K-1}
+\end{equation}

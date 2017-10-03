@@ -550,3 +550,69 @@ class condif2(BaseProgram):
         else:
             return logjoint, values
 
+class gmm(BaseProgram):
+
+    def __init__(self):
+        super(gmm, self).__init__()
+
+    def generate(self):
+        dim   = 1
+        logp   = []
+        params  = []
+        values  = Variable(torch.FloatTensor(1,dim).zero_())
+        x32131 = [0.5, 0.5]
+        x32132 = Categorical(p=x32131)
+        x31950 = x32132.sample()  # sample
+        p32133 = x32132.log_pdf(x31950)  # from prior
+        x32134 = [0.5, 0.5]
+        x32135 = Categorical(p=x32134)
+        x31918 = x32135.sample()  # sample
+        p32136 = x32135.log_pdf(x31918)  # from prior
+        x32137 = [0.5, 0.5]
+        x32138 = Categorical(p=x32137)
+        x31930 = x32138.sample()  # sample
+        p32139 = x32138.log_pdf(x31930)  # from prior
+        x32140 = [0.5, 0.5]
+        x32141 = Categorical(p=x32140)
+        x31990 = x32141.sample()  # sample
+        p32142 = x32141.log_pdf(x31990)  # from prior
+        x32143 = [0.5, 0.5]
+        x32144 = Categorical(p=x32143)
+        x31970 = x32144.sample()  # sample
+        p32145 = x32144.log_pdf(x31970)  # from prior
+
+        x32146 = Normal(mean=0, std=2)
+        x31911 = Variable(x32146.sample().data, requires_grad = True)  # sample
+        p32147 = x32146.log_pdf(x31911)  # from prior
+        x32148 = Normal(mean=0, std=2)
+        x31908 = x32148.sample()  # sample
+        p32149 = x32148.log_pdf(x31908)  # from prior
+        x32150 = [x31908, x31911]
+        x32151 = x32150[int(x31930)]
+        x32152 = Normal(mean=x32151, std=2)
+        y31939 = -2.5
+        p32153 = x32152.log_pdf(y31939)  # from observe
+        x32154 = [x31908, x31911]
+        x32155 = x32154[int(x31990)]
+        x32156 = Normal(mean=x32155, std=2)
+        y31999 = -2.2
+        p32157 = x32156.log_pdf(y31999)  # from observe
+        x32158 = [x31908, x31911]
+        x32159 = x32158[int(x31918)]
+        x32160 = Normal(mean=x32159, std=2)
+        y31923 = -2.0
+        p32161 = x32160.log_pdf(y31923)  # from observe
+        x32162 = [x31908, x31911]
+        x32163 = x32162[int(x31970)]
+        x32164 = Normal(mean=x32163, std=2)
+        y31979 = -1.9
+        p32165 = x32164.log_pdf(y31979)  # from observe
+        x32166 = [x31908, x31911]
+        x32167 = x32166[int(x31950)]
+        x32168 = Normal(mean=x32167, std=2)
+        y31959 = VariableCast(-1.7)
+        p32169 = x32168.log_pdf(y31959)  # from observe
+        p32170 = p32169 + p32149 + p32147 + p32153 + p32145 + p32157 + p32142 + p32139 + p32136 + p32161 + p32165 + p32133  # total log joint
+        # printing original E in foppl:
+        x32171 = [x31908, x31911]
+        print(x32171)

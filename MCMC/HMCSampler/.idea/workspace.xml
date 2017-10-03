@@ -2,24 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dfbaea3c-1afc-455b-875d-f19821dfa748" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/bounceback.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/progressEdits.pdf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/progressdocs.aux" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/progressdocs.log" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/progressdocs.out" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/progressdocs.pdf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/progressdocs.synctex.gz" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/progressdocs.tex" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/pythonhighlight.sty" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../../Write_up/report/conditionalif/figures/histogram_with_density.pdf" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/code/example2.pdf" afterPath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/code/example2.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/main.pdf" afterPath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/main.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/main.synctex.gz" afterPath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/main.synctex.gz" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../aesmc" afterPath="$PROJECT_DIR$/../aesmc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.pdf" afterPath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.pdf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.synctex.gz" afterPath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.synctex.gz" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../HMC/Tests/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../HMC/Tests/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/code/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/code/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/code/mixofgauss.ipynb" afterPath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/code/mixofgauss.ipynb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/main.log" afterPath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/main.log" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/mognotes/mixofgauss.tex" afterPath="$PROJECT_DIR$/../../Learning/Mixture of Gaussians/mognotes/mixofgauss.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../HMC/discontinuousHMC/DHMC/DHMC_nishimura/demo/pac_bayes_script.py" afterPath="$PROJECT_DIR$/../HMC/discontinuousHMC/DHMC/DHMC_nishimura/demo/pac_bayes_script.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/HMC/main.py" afterPath="$PROJECT_DIR$/HMC/main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.aux" afterPath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.aux" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.log" afterPath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.log" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.tex" afterPath="$PROJECT_DIR$/../../Write_up/report/hmcFOPPL.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Distributions/distributions.py" afterPath="$PROJECT_DIR$/Distributions/distributions.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unit test/Testing.ipynb" afterPath="$PROJECT_DIR$/Unit test/Testing.ipynb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unit test/distribution_test.py" afterPath="$PROJECT_DIR$/Unit test/distribution_test.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Utils/integrator.py" afterPath="$PROJECT_DIR$/Utils/integrator.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Utils/program.py" afterPath="$PROJECT_DIR$/Utils/program.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../stan_models/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../stan_models/.idea/workspace.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -34,121 +33,145 @@
     <SUITE FILE_PATH="coverage/HMCSampler$dev_program.coverage" NAME="dev_program Coverage Results" MODIFIED="1504895143099" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Utils" />
     <SUITE FILE_PATH="coverage/HMCSampler$kinetic.coverage" NAME="kinetic Coverage Results" MODIFIED="1504716368044" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Utils" />
     <SUITE FILE_PATH="coverage/HMCSampler$hmc_class_development.coverage" NAME="hmc_class_development Coverage Results" MODIFIED="1504876922031" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/HMC" />
-    <SUITE FILE_PATH="coverage/HMCSampler$main.coverage" NAME="main Coverage Results" MODIFIED="1505229955405" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/HMC" />
+    <SUITE FILE_PATH="coverage/HMCSampler$main.coverage" NAME="main Coverage Results" MODIFIED="1506442691014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/HMC" />
     <SUITE FILE_PATH="coverage/HMCSampler$hmc_gauss_ndim.coverage" NAME="hmc_gauss_ndim Coverage Results" MODIFIED="1504609622515" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../HMC/Tests/HMC tests" />
     <SUITE FILE_PATH="coverage/HMCSampler$src0.coverage" NAME="src0 Coverage Results" MODIFIED="1504254540602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../HMC/Tests" />
     <SUITE FILE_PATH="coverage/HMCSampler$distribution_test.coverage" NAME="distribution_test Coverage Results" MODIFIED="1504876712269" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Distributions" />
+    <SUITE FILE_PATH="coverage/HMCSampler$HMCSampler.coverage" NAME="HMCSampler Coverage Results" MODIFIED="1507017630873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/HMCSampler$test_program.coverage" NAME="test_program Coverage Results" MODIFIED="1504484014387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Utils" />
     <SUITE FILE_PATH="coverage/HMCSampler$test_ag.coverage" NAME="test_ag Coverage Results" MODIFIED="1504890941050" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../Pytorch/Pytorch_learning" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/HMC/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="19" column="47" lean-forward="false" selection-start-line="19" selection-start-column="47" selection-end-line="19" selection-end-column="47" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_program.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Unit test/test_program.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="22" lean-forward="false" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="plotting_and_saving.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Utils/plotting_and_saving.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="56" column="103" lean-forward="false" selection-start-line="56" selection-start-column="103" selection-end-line="56" selection-end-column="103" />
-              <folding>
-                <marker date="1505207049000" expanded="true" signature="3807:4119" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="hmc_class.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/HMC/hmc_class.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="2" selection-end-line="28" selection-end-column="26" />
-              <folding>
-                <marker date="1505151386000" expanded="true" signature="520:568" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="metropolis_step.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Utils/metropolis_step.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="22" lean-forward="false" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="program.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Utils/program.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="12" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
-              <folding>
-                <element signature="e#1101#4037#0" expanded="false" />
-                <element signature="e#13085#15302#0" expanded="false" />
-                <element signature="e#13085#13336#1" expanded="false" />
-                <marker date="1505134030000" expanded="true" signature="3781:3858" ph="..." />
-                <marker date="1505134030000" expanded="true" signature="3891:3978" ph="..." />
-                <marker date="1505134030000" expanded="true" signature="11043:11796" ph="..." />
-                <marker date="1505134030000" expanded="true" signature="15160:15184" ph="..." />
-                <marker date="1505134030000" expanded="true" signature="15213:15247" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="distribution_test.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Unit test/distribution_test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="30" column="42" lean-forward="false" selection-start-line="30" selection-start-column="42" selection-end-line="30" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="integrator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Utils/integrator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1035">
-              <caret line="75" column="0" lean-forward="false" selection-start-line="75" selection-start-column="0" selection-end-line="75" selection-end-column="0" />
-              <folding>
-                <element signature="e#47#143#1" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="kinetic.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Utils/kinetic.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.5">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/HMC/main.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="29" column="24" lean-forward="false" selection-start-line="29" selection-start-column="24" selection-end-line="29" selection-end-column="24" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="plotting_and_saving.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Utils/plotting_and_saving.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="840">
+                  <caret line="56" column="110" lean-forward="false" selection-start-line="56" selection-start-column="110" selection-end-line="56" selection-end-column="110" />
+                  <folding>
+                    <marker date="1505466240000" expanded="true" signature="3807:4119" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="hmc_class.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/HMC/hmc_class.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="300">
+                  <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="11" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="metropolis_step.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Utils/metropolis_step.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="1" column="23" lean-forward="false" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
+                  <folding>
+                    <element signature="n#!!doc" expanded="false" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Testing.ipynb" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/Unit test/Testing.ipynb">
+              <provider selected="true" editor-type-id="ipnb-editor">
+                <state>
+                  <selected id="1" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="distribution_test.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Unit test/distribution_test.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="330">
+                  <caret line="22" column="46" lean-forward="false" selection-start-line="22" selection-start-column="46" selection-end-line="22" selection-end-column="46" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="integrator.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Utils/integrator.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1200">
+                  <caret line="86" column="1" lean-forward="false" selection-start-line="86" selection-start-column="1" selection-end-line="93" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#47#143#1" expanded="false" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="distribution_test.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Unit test/distribution_test.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="75">
+                  <caret line="22" column="46" lean-forward="false" selection-start-line="22" selection-start-column="46" selection-end-line="22" selection-end-column="46" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="program.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/Utils/program.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1076">
+                  <caret line="584" column="69" lean-forward="false" selection-start-line="584" selection-start-column="69" selection-end-line="584" selection-end-column="69" />
+                  <folding>
+                    <element signature="e#309#1074#0" expanded="false" />
+                    <element signature="e#1109#4045#0" expanded="false" />
+                    <element signature="e#7849#10866#0" expanded="false" />
+                    <element signature="e#10906#13067#0" expanded="false" />
+                    <element signature="e#13105#15322#0" expanded="false" />
+                    <element signature="e#13105#13356#1" expanded="false" />
+                    <element signature="e#15356#18699#0" expanded="false" />
+                    <element signature="e#18733#20843#0" expanded="false" />
+                    <element signature="e#18761#18861#0" expanded="false" />
+                    <marker date="1506938400000" expanded="true" signature="3789:3866" ph="..." />
+                    <marker date="1506938400000" expanded="true" signature="3899:3986" ph="..." />
+                    <marker date="1506938400000" expanded="true" signature="11059:11812" ph="..." />
+                    <marker date="1506938400000" expanded="true" signature="15180:15204" ph="..." />
+                    <marker date="1506938400000" expanded="true" signature="15233:15267" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="distributions.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Distributions/distributions.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1376">
+                  <caret line="216" column="0" lean-forward="true" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -192,23 +215,26 @@
         <option value="$PROJECT_DIR$/Utils/pytorchoutput.py" />
         <option value="$PROJECT_DIR$/HMC/py3mchmc.py" />
         <option value="$PROJECT_DIR$/Utils/Plotting_and_saving.py" />
-        <option value="$PROJECT_DIR$/Distributions/distributions.py" />
         <option value="$PROJECT_DIR$/../HMC/Tests/HMC tests/hmc_gauss_ndim.py" />
         <option value="$PROJECT_DIR$/HMC/hmc_class_general.py" />
         <option value="$PROJECT_DIR$/Utils/kinetic.py" />
         <option value="$PROJECT_DIR$/HMC/integrator.py" />
         <option value="$PROJECT_DIR$/Distributions/distribution_test.py" />
         <option value="$PROJECT_DIR$/../../Pytorch/Pytorch_learning/test_ag.py" />
-        <option value="$PROJECT_DIR$/Utils/integrator.py" />
         <option value="$PROJECT_DIR$/Utils/metropolis_step.py" />
         <option value="$PROJECT_DIR$/Utils/core.py" />
         <option value="$PROJECT_DIR$/Utils/dev_program.py" />
         <option value="$PROJECT_DIR$/HMC/hmc_class_development.py" />
         <option value="$PROJECT_DIR$/Utils/temp" />
-        <option value="$PROJECT_DIR$/Utils/program.py" />
-        <option value="$PROJECT_DIR$/HMC/hmc_class.py" />
+        <option value="$PROJECT_DIR$/HMC/hmc_class_dev.py" />
         <option value="$PROJECT_DIR$/Utils/plotting_and_saving.py" />
+        <option value="$PROJECT_DIR$/HMC/hmc_class.py" />
+        <option value="$PROJECT_DIR$/Utils/integrator.py" />
         <option value="$PROJECT_DIR$/HMC/main.py" />
+        <option value="$PROJECT_DIR$/Utils/program.py" />
+        <option value="$PROJECT_DIR$/Unit test/distribution_test.py" />
+        <option value="$PROJECT_DIR$/Distributions/distributions.py" />
+        <option value="$PROJECT_DIR$/Unit test/Testing.ipynb" />
       </list>
     </option>
   </component>
@@ -219,10 +245,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="x" value="-469" />
-    <option name="y" value="-1080" />
+    <option name="x" value="-622" />
+    <option name="y" value="-1440" />
     <option name="width" value="2560" />
-    <option name="height" value="1080" />
+    <option name="height" value="1440" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -260,6 +286,7 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -296,7 +323,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -338,7 +364,24 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Jupyter Notebook.HMCSampler">
+    <configuration name="HMCSampler" type="Python.Ipnb" factoryName="Jupyter Notebook">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="HMCSampler" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="additionalOptions" value="" />
+      <option name="ipnbHost" value="127.0.0.1" />
+      <option name="ipnbPort" value="8888" />
+    </configuration>
     <configuration name="dev_program" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -429,12 +472,13 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.main" />
-      <item index="1" class="java.lang.String" itemvalue="Python.hmc_class_development" />
-      <item index="2" class="java.lang.String" itemvalue="Python.test_ag" />
-      <item index="3" class="java.lang.String" itemvalue="Python.dev_program" />
-      <item index="4" class="java.lang.String" itemvalue="Python.plotting_and_saving" />
+    <list size="6">
+      <item index="0" class="java.lang.String" itemvalue="Jupyter Notebook.HMCSampler" />
+      <item index="1" class="java.lang.String" itemvalue="Python.main" />
+      <item index="2" class="java.lang.String" itemvalue="Python.hmc_class_development" />
+      <item index="3" class="java.lang.String" itemvalue="Python.test_ag" />
+      <item index="4" class="java.lang.String" itemvalue="Python.dev_program" />
+      <item index="5" class="java.lang.String" itemvalue="Python.plotting_and_saving" />
     </list>
     <recent_temporary>
       <list size="5">
@@ -480,20 +524,20 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-469" y="-1080" width="2560" height="1080" extended-state="0" />
+    <frame x="-622" y="-1440" width="2560" height="1440" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14694202" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.10365369" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287483" sideWeight="0.49434572" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31636864" sideWeight="0.5371567" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15654719" sideWeight="0.4628433" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19165839" sideWeight="0.49841145" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2264151" sideWeight="0.4725973" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4617676" sideWeight="0.4628433" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329188" sideWeight="0.4725973" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2494043" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286991" sideWeight="0.4952343" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32845646" sideWeight="0.4952343" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.23733863" sideWeight="0.49205717" order="10" side_tool="false" content_ui="tabs" x="100" y="-797" width="1123" height="752" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -556,69 +600,9 @@
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/HMC/hmc_class.py</url>
-          <line>83</line>
-          <option name="timeStamp" value="83" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Utils/program.py</url>
           <line>389</line>
           <option name="timeStamp" value="139" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/program.py</url>
-          <line>440</line>
-          <option name="timeStamp" value="142" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/HMC/hmc_class.py</url>
-          <line>82</line>
-          <option name="timeStamp" value="143" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/HMC/hmc_class.py</url>
-          <line>89</line>
-          <option name="timeStamp" value="144" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/HMC/hmc_class.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="145" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/HMC/hmc_class.py</url>
-          <line>88</line>
-          <option name="timeStamp" value="146" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/program.py</url>
-          <line>449</line>
-          <option name="timeStamp" value="147" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/metropolis_step.py</url>
-          <line>63</line>
-          <option name="timeStamp" value="148" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/metropolis_step.py</url>
-          <line>66</line>
-          <option name="timeStamp" value="150" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/integrator.py</url>
-          <line>68</line>
-          <option name="timeStamp" value="151" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/integrator.py</url>
-          <line>70</line>
-          <option name="timeStamp" value="152" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/integrator.py</url>
-          <line>67</line>
-          <option name="timeStamp" value="153" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Utils/integrator.py</url>
@@ -632,38 +616,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Utils/integrator.py</url>
-          <line>71</line>
-          <option name="timeStamp" value="156" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/integrator.py</url>
           <line>77</line>
           <option name="timeStamp" value="157" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Utils/program.py</url>
-          <line>474</line>
-          <option name="timeStamp" value="158" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/program.py</url>
-          <line>476</line>
-          <option name="timeStamp" value="159" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/program.py</url>
-          <line>479</line>
-          <option name="timeStamp" value="160" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/program.py</url>
           <line>481</line>
           <option name="timeStamp" value="161" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Utils/program.py</url>
-          <line>480</line>
-          <option name="timeStamp" value="162" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -673,7 +632,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="163" />
+      <option name="time" value="167" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -685,20 +644,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Utils/core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
-          <caret line="46" column="39" lean-forward="false" selection-start-line="46" selection-start-column="39" selection-end-line="46" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Unit test/test_program.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1020">
-          <caret line="68" column="27" lean-forward="true" selection-start-line="68" selection-start-column="27" selection-end-line="68" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda/lib/python3.5/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4620">
@@ -912,13 +857,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Distributions/distributions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="71" column="0" lean-forward="false" selection-start-line="71" selection-start-column="0" selection-end-line="71" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../Pytorch/Pytorch_learning/test_ag.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="398">
@@ -965,42 +903,50 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="720">
           <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Utils/temp" />
+    <entry file="file://$PROJECT_DIR$/HMC/hmc_class_dev.py" />
+    <entry file="file://$PROJECT_DIR$/Unit test/test_program.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="22" lean-forward="false" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Utils/integrator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1035">
-          <caret line="75" column="0" lean-forward="false" selection-start-line="75" selection-start-column="0" selection-end-line="75" selection-end-column="0" />
+        <state relative-caret-position="1200">
+          <caret line="86" column="1" lean-forward="false" selection-start-line="86" selection-start-column="1" selection-end-line="93" selection-end-column="0" />
           <folding>
             <element signature="e#47#143#1" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Utils/program.py">
+    <entry file="file://$PROJECT_DIR$/Utils/plotting_and_saving.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="12" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
+        <state relative-caret-position="840">
+          <caret line="56" column="110" lean-forward="false" selection-start-line="56" selection-start-column="110" selection-end-line="56" selection-end-column="110" />
           <folding>
-            <element signature="e#1101#4037#0" expanded="false" />
-            <element signature="e#13085#15302#0" expanded="false" />
-            <element signature="e#13085#13336#1" expanded="false" />
-            <marker date="1505134030000" expanded="true" signature="3781:3858" ph="..." />
-            <marker date="1505134030000" expanded="true" signature="3891:3978" ph="..." />
-            <marker date="1505134030000" expanded="true" signature="11043:11796" ph="..." />
-            <marker date="1505134030000" expanded="true" signature="15160:15184" ph="..." />
-            <marker date="1505134030000" expanded="true" signature="15213:15247" ph="..." />
+            <marker date="1505466240000" expanded="true" signature="3807:4119" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Utils/temp" />
-    <entry file="file://$PROJECT_DIR$/Unit test/distribution_test.py">
+    <entry file="file://$PROJECT_DIR$/HMC/hmc_class.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" column="42" lean-forward="false" selection-start-line="30" selection-start-column="42" selection-end-line="30" selection-end-column="42" />
+        <state relative-caret-position="300">
+          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HMC/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="29" column="24" lean-forward="false" selection-start-line="29" selection-start-column="24" selection-end-line="29" selection-end-column="24" />
           <folding />
         </state>
       </provider>
@@ -1008,44 +954,56 @@
     <entry file="file://$PROJECT_DIR$/Utils/metropolis_step.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="22" lean-forward="false" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HMC/hmc_class.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="2" selection-end-line="28" selection-end-column="26" />
+          <caret line="1" column="23" lean-forward="false" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
           <folding>
-            <marker date="1505151386000" expanded="true" signature="520:568" ph="..." />
+            <element signature="n#!!doc" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Utils/plotting_and_saving.py">
+    <entry file="file://$PROJECT_DIR$/Unit test/distribution_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="56" column="103" lean-forward="false" selection-start-line="56" selection-start-column="103" selection-end-line="56" selection-end-column="103" />
+        <state relative-caret-position="330">
+          <caret line="22" column="46" lean-forward="false" selection-start-line="22" selection-start-column="46" selection-end-line="22" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Distributions/distributions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1376">
+          <caret line="216" column="0" lean-forward="true" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Utils/program.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1076">
+          <caret line="584" column="69" lean-forward="false" selection-start-line="584" selection-start-column="69" selection-end-line="584" selection-end-column="69" />
           <folding>
-            <marker date="1505207049000" expanded="true" signature="3807:4119" ph="..." />
+            <element signature="e#309#1074#0" expanded="false" />
+            <element signature="e#1109#4045#0" expanded="false" />
+            <element signature="e#7849#10866#0" expanded="false" />
+            <element signature="e#10906#13067#0" expanded="false" />
+            <element signature="e#13105#15322#0" expanded="false" />
+            <element signature="e#13105#13356#1" expanded="false" />
+            <element signature="e#15356#18699#0" expanded="false" />
+            <element signature="e#18733#20843#0" expanded="false" />
+            <element signature="e#18761#18861#0" expanded="false" />
+            <marker date="1506938400000" expanded="true" signature="3789:3866" ph="..." />
+            <marker date="1506938400000" expanded="true" signature="3899:3986" ph="..." />
+            <marker date="1506938400000" expanded="true" signature="11059:11812" ph="..." />
+            <marker date="1506938400000" expanded="true" signature="15180:15204" ph="..." />
+            <marker date="1506938400000" expanded="true" signature="15233:15267" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Unit test/test_program.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="22" lean-forward="false" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HMC/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="47" lean-forward="false" selection-start-line="19" selection-start-column="47" selection-end-line="19" selection-end-column="47" />
-          <folding />
+    <entry file="file://$PROJECT_DIR$/Unit test/Testing.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
         </state>
       </provider>
     </entry>

@@ -188,14 +188,23 @@ class Categorical(DiscreteRandomVariable):
     """
     Categorical over 0,...,N-1 with arbitrary probabilities, 1-dimensional rv, long type.
     """
-    def __init__(self, p, p_min=1E-6):
-        p =     VariableCast(p)
-        self._p = torch.clamp(p, p_min)
+    def __init__(self, p=None, p_min=1E-6):
+        super(Categorical, self).__init__()
+        # assert torch.min(p.data) >= 0, str(torch.min(p.data))
+        # assert torch.max(torch.abs(torch.sum(p.data) - 1)) <= 1E-5
+        self._p = p
+
+    def size(self):
+        return self._p.size()[0], 1  # Type is Long.
+
+    def logpmf(self, x):
+        return torch.log(self._p.gather(1, x)).squeeze()
+
     def sample(self):
         return self._p.multinomial(1, True)
 
-    def logpmf(self, value):
-        return torch.log(self._p.gather(1, value)).squeeze()
+    def entropy(self):
+        return - torch.sum(self._p * torch.log(self._p), 1).squeeze()
 
 class Bernoulli(DiscreteRandomVariable):
     """bernoulli random variable

@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{;;; linear regression}
+\PYG{p}{(}\PYG{k}{def }\PYG{n+nv}{linreg}
+  \PYG{p}{(}\PYG{n+nf}{foppl\PYGZhy{}query}
+    \PYG{p}{(}\PYG{k+kd}{defn }\PYG{n+nv}{observe\PYGZhy{}data} \PYG{p}{[}\PYG{n+nv}{\PYGZus{}} \PYG{n+nv}{data} \PYG{n+nv}{slope} \PYG{n+nv}{bias}\PYG{p}{]}
+      \PYG{p}{(}\PYG{k}{let }\PYG{p}{[}\PYG{n+nv}{xn} \PYG{p}{(}\PYG{n+nb}{first }\PYG{n+nv}{data}\PYG{p}{)}
+            \PYG{n+nv}{yn} \PYG{p}{(}\PYG{n+nb}{second }\PYG{n+nv}{data}\PYG{p}{)}
+            \PYG{n+nv}{zn} \PYG{p}{(}\PYG{n+nb}{+ }\PYG{p}{(}\PYG{n+nb}{* }\PYG{n+nv}{slope} \PYG{n+nv}{xn}\PYG{p}{)} \PYG{n+nv}{bias}\PYG{p}{)]}
+        \PYG{p}{(}\PYG{n+nf}{observe} \PYG{p}{(}\PYG{n+nf}{normal} \PYG{n+nv}{zn} \PYG{l+m+mf}{1.0}\PYG{p}{)} \PYG{n+nv}{yn}\PYG{p}{)}
+        \PYG{p}{(}\PYG{n+nb}{rest }\PYG{p}{(}\PYG{n+nb}{rest }\PYG{n+nv}{data}\PYG{p}{))))}
+
+    \PYG{p}{(}\PYG{k}{let }\PYG{p}{[}\PYG{n+nv}{slope} \PYG{p}{(}\PYG{n+nf}{sample} \PYG{p}{(}\PYG{n+nf}{normal} \PYG{l+m+mf}{0.0} \PYG{l+m+mf}{10.0}\PYG{p}{))}
+          \PYG{n+nv}{bias}  \PYG{p}{(}\PYG{n+nf}{sample} \PYG{p}{(}\PYG{n+nf}{normal} \PYG{l+m+mf}{0.0} \PYG{l+m+mf}{10.0}\PYG{p}{))}
+          \PYG{n+nv}{data} \PYG{p}{(}\PYG{n+nf}{vector}
+                 \PYG{l+m+mf}{1.0} \PYG{l+m+mf}{2.1} \PYG{l+m+mf}{2.0} \PYG{l+m+mf}{3.9} \PYG{l+m+mf}{3.0} \PYG{l+m+mf}{5.3}\PYG{p}{)]}
+      \PYG{p}{(}\PYG{k}{loop }\PYG{l+m+mi}{3} \PYG{n+nv}{data} \PYG{n+nv}{observe\PYGZhy{}data} \PYG{n+nv}{slope} \PYG{n+nv}{bias}\PYG{p}{)}
+       \PYG{p}{(}\PYG{n+nb}{vector }\PYG{n+nv}{slope} \PYG{n+nv}{bias}\PYG{p}{))))}
+\end{Verbatim}

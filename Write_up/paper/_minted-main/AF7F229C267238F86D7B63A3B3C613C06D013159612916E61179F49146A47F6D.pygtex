@@ -1,0 +1,23 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{c24039}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{1.0}\PYG{p}{])}
+\PYG{n}{c24040}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{2.0}\PYG{p}{])}
+\PYG{c+c1}{\PYGZsh{} prior}
+\PYG{n}{d24041} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{c24039}\PYG{p}{,} \PYG{n}{c24040}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} sample}
+\PYG{n}{x22542} \PYG{o}{=} \PYG{n}{Variable}\PYG{p}{(}\PYG{n}{d24041}\PYG{o}{.}\PYG{n}{sample}\PYG{p}{()}\PYG{o}{.}\PYG{n}{data}\PYG{p}{,}\PYGZbs{}
+  \PYG{n}{requires\PYGZus{}grad} \PYG{o}{=} \PYG{n+nb+bp}{True}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} log prior}
+\PYG{n}{p24042} \PYG{o}{=} \PYG{n}{x24041}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{x22542}\PYG{p}{)}
+\PYG{n}{c24043}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{3.0}\PYG{p}{])}
+\PYG{c+c1}{\PYGZsh{} likelihood}
+\PYG{n}{d24044} \PYG{o}{=} \PYG{n}{Normal}\PYG{p}{(}\PYG{n}{x22542}\PYG{p}{,} \PYG{n}{c24043}\PYG{p}{)}
+\PYG{n}{c24045}\PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{Tensor}\PYG{p}{([}\PYG{l+m+mf}{7.0}\PYG{p}{])}
+\PYG{c+c1}{\PYGZsh{} obs}
+\PYG{n}{y22543} \PYG{o}{=} \PYG{n}{c24045}
+\PYG{c+c1}{\PYGZsh{} log likelihood}
+\PYG{n}{p24046} \PYG{o}{=} \PYG{n}{d24044}\PYG{o}{.}\PYG{n}{logpdf}\PYG{p}{(} \PYG{n}{y22543}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} log joint}
+\PYG{n}{p24047} \PYG{o}{=} \PYG{n}{Variable}\PYG{o}{.}\PYG{n}{add}\PYG{p}{(}\PYG{n}{p24042}\PYG{p}{,}\PYG{n}{p24046}\PYG{p}{)}
+
+\PYG{k}{return} \PYG{n}{p24047}\PYG{p}{,} \PYG{n}{x22542}
+\end{Verbatim}

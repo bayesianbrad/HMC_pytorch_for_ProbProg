@@ -1,0 +1,36 @@
+% !TEX root = ../main.tex
+\section{Basic MCMC theory}
+\label{sec:mcmctheory}
+The preliminary basics for defining MCMC convergence. Consider a probability space $(Q, \mathcal{B}(Q), \pi)$ with an $n$-dimensional sample space $Q$, the Borel $\sigma$-algebra over $Q$, $\mathcal{B}(Q)$ and a distinguished probability measure $\pi$. Where, in a Bayesian setting, the distinguished probability measure $\pi$ represents the posterior distribution. 
+
+\begin{defn}A Markov kernel $\tau$ is a map from an element of the sample space and the $\sigma$-algebra to a probability.
+\begin{equation*}
+\tau : Q x \mathcal{B}(Q) \rightarrow [0,1]
+\end{equation*}
+such that the kernel is a measurable function in the first argument:
+\begin{equation*}
+\tau(\cdot,A) : Q \rightarrow [0,1] \textbf{ $\forall A \in \mathcal{B}(Q)$}
+\end{equation*}
+and a probability measure in the second argument:
+\begin{equation*}
+\tau(q,\cdot) : \mathcal{B}(Q) \rightarrow [0,1] \textbf{$\forall q \in Q$}
+\end{equation*}
+\end{defn}
+and so by construction the Markov kernel defines a map:
+\begin{equation*}
+\tau : Q \rightarrow \mathcal{P}(Q)
+\end{equation*}
+where $\mathcal{P}(Q)$ represents the space of probability measures over $Q$. Essentially, at each point on the sample space, the kernel defines a probability measure describing how to sample a new point. 
+By averaging the Markov kernel over all initial points in the state space, we can construct a \textit{Markov transition} from a probability measures, to probability measures:
+\begin{equation*}
+\mathcal{T} : \mathcal{P}(Q) \rightarrow \mathcal{P}(Q)
+\end{equation*}
+by:
+\begin{equation*}
+\pi'(A) = \pi \mathcal{T}(A) = \int\tau(q,A)\pi(dq) \textbf{$\forall q \in Q, A \in \mathcal{B}(Q)$}
+\end{equation*}
+when the transition has an eigenvalue equation of the form:
+\begin{equation*}
+\pi\mathcal{T} = \pi
+\end{equation*}
+then the transition is aperiodic, irreducible, Harris recurrent, and preserves the target measure. The repeated application of a transition of this form constructs a Markov chain, that will eventually explore the entirety of $\pi$. 

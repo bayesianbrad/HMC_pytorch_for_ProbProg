@@ -1,0 +1,74 @@
+% !TEX root = ../main.tex
+\section{Supplementary Material}
+\label{sec:supmat}
+
+In the supplementary material we show some examples of the compiler output for the conjugate Gaussian and linear regression models. We also briefly discuss the implementation of the HMC algorithm in Python.  All code used to generate results can be found on github\footnote{\url{https://github.com/Bjgh/Project_notes}}\\
+
+\subsection{Compiler Output}
+Here we present some examples of the FOPPL compiler output for Python. 
+The following output is for the conjugate Gaussian model:  
+\inputminted{python}{code/cjgauss.py}
+This is the output for the linear regression model:
+\inputminted{python}{code/lr_out.py}
+
+\subsection{HMC Implementation}
+
+Below we present a top level view of the HMC sampler, without going into explicit details. Although as stated previously, all code can be found on our github page. The HMC can take a variety of inputs, depending on the users specification. The most important input is the \mintinline{python}{program()} object, which is a class of the compiled output. The \mintinline{python}{program()} itself inherits directly from a base class which performs the differentiation of the log joint distribution, with respect to the parameters of interest. Within the \mintinline{python}{program()} class we have a method \mintinline{python}{program.generate()} which simulates the chosen model once and intialises the latent variables within the model. This returns all initial values such as the log joint, the initial state, the gradient of the log joint and the number of parameters of interest. It then calls another method within class \mintinline{python}{program.eval()}, which no longer performs the sampling steps and instead evaluates the model at various values generated via the Leapfrog function. The rest of the program follows from algorithm \ref{alg:simpHMC}.
+ 
+\inputminted{python}{code/hmc_class.py}
+%\section{INSTRUCTIONS FOR CAMERA-READY PAPERS}
+
+%For the camera-ready paper, if you are using \LaTeX, please make sure
+%that you follow these instructions.  (If you are not using \LaTeX,
+%please make sure to achieve the same effect using your chosen
+%typesetting package.) Blah blah
+
+%\begin{enumerate}
+%    \item Download \texttt{fancyhdr.sty} -- the
+%    \texttt{aistats2017.sty} file will make use of it.
+%    \item Begin your document with
+%    \begin{flushleft}
+%    \texttt{\textbackslash documentclass[twoside]\{article\}}\\
+%    \texttt{\textbackslash usepackage[accepted]\{aistats2017\}}
+%    \end{flushleft}
+%    The \texttt{twoside} option for the class article allows the
+%    package \texttt{fancyhdr.sty} to include headings for even and odd
+%    numbered pages. The option \texttt{accepted} for the package
+%    \texttt{aistats2017.sty} will write a copyright notice at the end of
+%    the first column of the first page. This option will also print
+%    headings for the paper.  For the \emph{even} pages, the title of
+%    the paper will be used as heading and for \emph{odd} pages the
+%    author names will be used as heading.  If the title of the paper
+%    is too long or the number of authors is too large, the style will
+%    print a warning message as heading. If this happens additional
+%    commands can be used to place as headings shorter versions of the
+%    title and the author names. This is explained in the next point.
+%    \item  If you get warning messages as described above, then
+%    immediately after $\texttt{\textbackslash
+%    begin\{document\}}$, write
+%    \begin{flushleft}
+%    \texttt{\textbackslash runningtitle\{Provide here an alternative shorter version of the title of your
+%    paper\}}\\
+%    \texttt{\textbackslash runningauthor\{Provide here the surnames of the authors of your paper, all separated by
+%    commas\}}
+%    \end{flushleft}
+%    Note that the text that appears as argument in \texttt{\textbackslash
+%      runningtitle} will be printed as a heading in the \emph{even}
+%    pages. The text that appears as argument in \texttt{\textbackslash
+%      runningauthor} will be printed as a heading in the \emph{odd}
+%    pages.  If even the author surnames do not fit, it is acceptable
+%    to give a subset of author names followed by ``et al.''
+%
+%    \item Use the file sample\_paper.tex as an example.
+%
+%    \item The camera-ready versions of the accepted papers are 8
+%      pages, plus any additional pages needed for references.
+%
+%    \item If you need to include additional appendices,
+%      you can include them in the supplementary
+%      material file.
+%
+%    \item Please, don't change the layout given by the above
+%      instructions and by the style file.
+%
+%\end{enumerate}
